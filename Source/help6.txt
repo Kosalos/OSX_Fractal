@@ -1,0 +1,14 @@
+Color Window
+
+Alternate way to control widgets.
+Four independent panel are provided.
+
+Click the 'X' and 'Y' buttons to assign a widget to the respective axis.
+
+Click/Drag to set widget values.
+
+Arrow keys with <shift> and/or <option> speed modifiers are also active.
+
+Press <tab> to cycle active panel
+
+Press <L> to cycle keyboard focus between the windows.

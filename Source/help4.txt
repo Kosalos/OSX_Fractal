@@ -1,0 +1,27 @@
+Lights Window
+
+Three light sources are provided.
+
+Set <Bright> to zero (full left on widget) to skip a light source.
+
+<Spread> controls the "spot light" vs. "diffuse" characteristic.
+
+OrbitTrapping
+All of these algorithms are 'escape-time Fractals',
+and by tracking certain variables as the escape is determined
+we learn information that can be used to enhance the fractal coloring.
+
+Cycles:     how many times the trap controls are repeated
+Strength:   relative brightness of trap coloring, from 0% to 100%
+x Color:    assign Color to channel 'x' (252 colors)
+x Weight:   specify how much channel 'x' adds to color, from -3 to +3
+
+... the same 2 widgets for channels 'y' - 'r'
+
+Fixed Trap has three values:
+0: Orbit Trap calculated from ray point position
+1: Orbit Trap calculated using distance of point from fixed point
+2: fixed point is a relative distance from first ray point position
+
+Press <L> to cycle keyboard focus between the windows.
+
