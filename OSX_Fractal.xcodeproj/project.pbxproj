@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		1D09268C223C1248005BC5FC /* EquationPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D09268B223C1248005BC5FC /* EquationPickerViewController.swift */; };
-		1D0DDCD9222F14E000D916F6 /* View3D.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D0DDCD8222F14E000D916F6 /* View3D.swift */; };
-		1D0DDCDD222F173600D916F6 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D0DDCDC222F173600D916F6 /* Renderer.swift */; };
 		1D0DDCDF222F181C00D916F6 /* ArcBall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D0DDCDE222F181B00D916F6 /* ArcBall.swift */; };
 		1D3FB471225519240027DFDF /* VideoRecorderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3FB46F225519240027DFDF /* VideoRecorderViewController.swift */; };
 		1D3FB4742256C78A0027DFDF /* help3.txt in Resources */ = {isa = PBXBuildFile; fileRef = 1D3FB4732256C7890027DFDF /* help3.txt */; };
@@ -38,8 +36,6 @@
 
 /* Begin PBXFileReference section */
 		1D09268B223C1248005BC5FC /* EquationPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EquationPickerViewController.swift; sourceTree = "<group>"; };
-		1D0DDCD8222F14E000D916F6 /* View3D.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = View3D.swift; sourceTree = "<group>"; };
-		1D0DDCDC222F173600D916F6 /* Renderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
 		1D0DDCDE222F181B00D916F6 /* ArcBall.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArcBall.swift; sourceTree = "<group>"; };
 		1D3FB46F225519240027DFDF /* VideoRecorderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoRecorderViewController.swift; sourceTree = "<group>"; };
 		1D3FB4732256C7890027DFDF /* help3.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = help3.txt; sourceTree = "<group>"; };
@@ -112,8 +108,6 @@
 				1D95FCFB2308613F00C99D8D /* InstructionsG.swift */,
 				1DAF37B921EAD662000DC9E5 /* Shader.h */,
 				1DFFB87D23E39A380093C78C /* Shader.m */,
-				1D0DDCDC222F173600D916F6 /* Renderer.swift */,
-				1D0DDCD8222F14E000D916F6 /* View3D.swift */,
 				CFD49CC52115B92300B4C5EB /* MetalView.swift */,
 				1D465007221E88DA00D14A94 /* SaveLoadViewController.swift */,
 				1D4650092221B0BB00D14A94 /* HelpViewController.swift */,
@@ -218,7 +212,6 @@
 				1D4A5BB9257D8C8C00B63E39 /* ControlViewController.swift in Sources */,
 				1D3FB471225519240027DFDF /* VideoRecorderViewController.swift in Sources */,
 				1DA43D4B259ED227004954F9 /* WinColorViewController.swift in Sources */,
-				1D0DDCD9222F14E000D916F6 /* View3D.swift in Sources */,
 				1D46500A2221B0BB00D14A94 /* HelpViewController.swift in Sources */,
 				CFD49CCA2115C6DC00B4C5EB /* Shaders.metal in Sources */,
 				CFD49CC62115B92300B4C5EB /* MetalView.swift in Sources */,
@@ -228,7 +221,6 @@
 				1DFFB87C23E2A3910093C78C /* WinLightViewController.swift in Sources */,
 				1DFFB87E23E39A380093C78C /* Shader.m in Sources */,
 				CFEA3DEB211463D800C7DBD3 /* AppDelegate.swift in Sources */,
-				1D0DDCDD222F173600D916F6 /* Renderer.swift in Sources */,
 				1D465008221E88DA00D14A94 /* SaveLoadViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

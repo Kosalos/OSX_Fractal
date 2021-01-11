@@ -783,7 +783,6 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         renderEncoder.setTexture(drawable.texture, index: 0)
         renderEncoder.setTexture(coloringTexture,  index: 1)
         renderEncoder.setBuffer(controlBuffer, offset: 0, index: 0)
-        renderEncoder.setBuffer(vBuffer,       offset: 0, index: 1)
         renderEncoder.dispatchThreads(threadsPerGrid[PIPELINE_FRACTAL], threadsPerThreadgroup:threadsPerGroup[PIPELINE_FRACTAL])
         renderEncoder.endEncoding()
         commandBuffer?.present(drawable)

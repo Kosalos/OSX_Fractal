@@ -1726,7 +1726,6 @@ kernel void rayMarchShader
  texture2d<float, access::write> outTexture     [[texture(0)]],
  texture2d<float, access::read> coloringTexture [[texture(1)]],
  device Control &ccc    [[ buffer(0) ]],
- device TVertex* vData  [[ buffer(1) ]],
  uint2 p [[thread_position_in_grid]]
  )
 {
