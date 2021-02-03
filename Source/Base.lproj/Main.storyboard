@@ -150,13 +150,13 @@
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </textFieldCell>
                             </textField>
-                            <scrollView wantsLayer="YES" autohidesScrollers="YES" horizontalLineScroll="35" horizontalPageScroll="10" verticalLineScroll="35" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8wg-Zk-k8i">
+                            <scrollView wantsLayer="YES" autohidesScrollers="YES" horizontalLineScroll="30" horizontalPageScroll="10" verticalLineScroll="30" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8wg-Zk-k8i">
                                 <rect key="frame" x="20" y="20" width="418" height="405"/>
                                 <clipView key="contentView" wantsLayer="YES" drawsBackground="NO" copiesOnScroll="NO" id="kT9-vk-v50">
                                     <rect key="frame" x="1" y="1" width="416" height="403"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <tableView wantsLayer="YES" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="35" rowSizeStyle="automatic" viewBased="YES" id="ePT-tS-NiO">
+                                        <tableView wantsLayer="YES" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="30" rowSizeStyle="automatic" viewBased="YES" id="ePT-tS-NiO">
                                             <rect key="frame" x="0.0" y="0.0" width="416" height="403"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -176,11 +176,11 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView identifier="SLCell" wantsLayer="YES" id="xEJ-TS-j0i" userLabel="SLCell" customClass="SaveLoadCell" customModule="OSX_Fractal" customModuleProvider="target">
-                                                            <rect key="frame" x="0.0" y="0.0" width="416" height="35"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="416" height="30"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <button verticalHuggingPriority="750" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="o7u-4s-0qZ">
-                                                                    <rect key="frame" x="335" y="0.0" width="70" height="32"/>
+                                                                    <rect key="frame" x="335" y="-2" width="70" height="32"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" constant="58" id="bQs-5k-ZVI"/>
                                                                     </constraints>
@@ -193,9 +193,9 @@
                                                                     </connections>
                                                                 </button>
                                                                 <textField autoresizesSubviews="NO" horizontalHuggingPriority="251" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Evv-ZC-PSF">
-                                                                    <rect key="frame" x="14" y="9" width="321" height="20"/>
+                                                                    <rect key="frame" x="14" y="4" width="321" height="19"/>
                                                                     <textFieldCell key="cell" lineBreakMode="clipping" allowsUndo="NO" id="vL5-90-Jeu">
-                                                                        <font key="font" metaFont="system" size="17"/>
+                                                                        <font key="font" metaFont="system" size="15"/>
                                                                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                     </textFieldCell>
@@ -203,10 +203,10 @@
                                                             </subviews>
                                                             <constraints>
                                                                 <constraint firstAttribute="trailing" secondItem="o7u-4s-0qZ" secondAttribute="trailing" constant="17" id="JFa-Ix-utg"/>
-                                                                <constraint firstItem="o7u-4s-0qZ" firstAttribute="top" secondItem="xEJ-TS-j0i" secondAttribute="top" constant="7" id="MIv-vO-wcU"/>
+                                                                <constraint firstItem="o7u-4s-0qZ" firstAttribute="top" secondItem="xEJ-TS-j0i" secondAttribute="top" constant="4" id="MIv-vO-wcU"/>
                                                                 <constraint firstItem="o7u-4s-0qZ" firstAttribute="leading" secondItem="Evv-ZC-PSF" secondAttribute="trailing" constant="8" symbolic="YES" id="Vmf-Ec-l6B"/>
                                                                 <constraint firstItem="Evv-ZC-PSF" firstAttribute="leading" secondItem="xEJ-TS-j0i" secondAttribute="leading" constant="16" id="Zrj-sP-Jm2"/>
-                                                                <constraint firstItem="Evv-ZC-PSF" firstAttribute="baseline" secondItem="o7u-4s-0qZ" secondAttribute="baseline" id="n6X-6H-X06"/>
+                                                                <constraint firstItem="Evv-ZC-PSF" firstAttribute="baseline" secondItem="o7u-4s-0qZ" secondAttribute="baseline" constant="3" id="n6X-6H-X06"/>
                                                             </constraints>
                                                             <connections>
                                                                 <outlet property="legend" destination="Evv-ZC-PSF" id="dIP-ed-JmM"/>
@@ -670,7 +670,7 @@
         <scene sceneID="Jit-r6-ZPI">
             <objects>
                 <windowController storyboardIdentifier="Lights" id="vso-m8-sBu" userLabel="Light Window" sceneMemberID="viewController">
-                    <window key="window" title="Lights" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="qLb-ST-m8P">
+                    <window key="window" title="3  Lights" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="qLb-ST-m8P">
                         <windowStyleMask key="styleMask" titled="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="425" y="461" width="200" height="68"/>
@@ -757,7 +757,7 @@
         <scene sceneID="9zG-zK-brE">
             <objects>
                 <windowController storyboardIdentifier="Color" id="Bgv-Ik-EeE" userLabel="Color Window" sceneMemberID="viewController">
-                    <window key="window" title="Color" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="9HQ-A9-aGJ">
+                    <window key="window" title="2  Color" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="9HQ-A9-aGJ">
                         <windowStyleMask key="styleMask" titled="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="425" y="461" width="200" height="68"/>
@@ -779,11 +779,11 @@
             <objects>
                 <viewController title="Color ViewController" id="kX8-Wy-vIm" customClass="WinColorViewController" customModule="OSX_Fractal" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="Lfe-t3-Nrb" customClass="BaseNSView4" customModule="OSX_Fractal" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="201" height="520"/>
+                        <rect key="frame" x="0.0" y="0.0" width="201" height="785"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView autoresizesSubviews="NO" wantsLayer="YES" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yfS-Ik-Gqv" customClass="InstructionsG" customModule="OSX_Fractal" customModuleProvider="target">
-                                <rect key="frame" x="13" y="367" width="46" height="139"/>
+                                <rect key="frame" x="13" y="632" width="46" height="139"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </customView>
                             <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QG2-uV-bIS">
@@ -797,7 +797,7 @@
                                 </connections>
                             </button>
                             <textField autoresizesSubviews="NO" wantsLayer="YES" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xaH-zN-Vxr">
-                                <rect key="frame" x="11" y="264" width="121" height="88"/>
+                                <rect key="frame" x="11" y="529" width="121" height="88"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <shadow key="shadow" blurRadius="2">
                                     <size key="offset" width="1" height="-2"/>
@@ -834,13 +834,13 @@
                 </viewController>
                 <customObject id="KiU-Wl-8HF" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2630.5" y="139"/>
+            <point key="canvasLocation" x="-2630.5" y="271.5"/>
         </scene>
         <!--Control Window-->
         <scene sceneID="XRf-ca-244">
             <objects>
                 <windowController storyboardIdentifier="Control" id="dcM-WL-aPd" userLabel="Control Window" sceneMemberID="viewController">
-                    <window key="window" title="Control" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="cwq-RG-SIg">
+                    <window key="window" title="4  Control" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="cwq-RG-SIg">
                         <windowStyleMask key="styleMask" titled="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="425" y="461" width="186" height="71"/>

@@ -20,14 +20,16 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     var isFullScreen:Bool = false
     var lightAngle:Float = 0
     var palletteIndex:Int = 0
-    
+    var texture:MTLTexture! = nil
+
     @IBOutlet var instructions: NSTextField!
     @IBOutlet var instructionsG: InstructionsG!
     @IBOutlet var metalView: MetalView!
     
     let PIPELINE_FRACTAL = 0
     let PIPELINE_NORMAL  = 1
-    let shaderNames = [ "rayMarchShader","normalShader" ]
+    let PIPELINE_EFFECTS = 2
+    let shaderNames = [ "rayMarchShader","normalShader","effectsShader" ]
     
     //MARK:
     
@@ -73,7 +75,6 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         control.skip = 1            // "fast render" defaults to 'not active'
         control.isStereo = false
         control.parallax = 0.003
-        control.colorParam = 1
         
         reset()
         ensureWindowSizeIsNotTooSmall()
@@ -179,7 +180,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
           "Monster","Kali Tower","Gold","Spider","Knighty's Kleinian",
           "Half Tetrahedron","Knighty Polychora","3Dickulus Quaternion Julia","Spudsville","Flower Hive",
           "Pupukuusikkos Spiralbox", "SurfBox","TwistBox","Vertebrae", "DarkBeam Surfbox",
-          "Klienian Sponge","Donuts" ]
+          "Klienian Sponge","Donuts","PDOF" ]
     
     func updateWindowTitle() {
         let index = Int(control.equation)
@@ -193,18 +194,18 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         updateWindowTitle()
 
         vcControl.refreshControlPanels()
+        vcColor.defineWidgets()
         winHandler.refreshWidgetsAndImage()
     }
     
     /// load initial parameter values and view vectors for the current fractal (control.equation holds index)
     func reset() {
         updateShaderDirectionVector(simd_float3(0,0.1,1))
-        control.bright = 5
+        control.bright = 1.1
         control.contrast = 0.5
         control.specular = 0
         control.angle1 = 0.1
         control.angle2 = 0.1
-        control.colorParam = 25000
         control.radialAngle = 0
         control.InvCx = 0.1
         control.InvCy = 0.1
@@ -219,6 +220,10 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         control.LVIenable = false
         control.LVIiter = 5
         control.isteps = 5
+        
+        control.blurStrength = 0    // no blurring
+        control.coloring1 = 0.9
+        control.coloring2 = 0.9
 
         switch Int(control.equation) {
         case EQU_01_MANDELBULB :
@@ -684,10 +689,30 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
                 control.InvRadius =  7.589995
                 control.InvAngle =  -2.7999995
             }
+        case EQU_23_PDOF :
+            control.camera = simd_float3(-0.1589123, -0.17758754, -2.984771)
+            updateShaderDirectionVector(simd_float3(0.0, 0.09950372, 0.9950372))
+            control.isteps = 15
+            control.cx = 0.94000006
+            control.cy = 0.42999986
+            control.cz = -0.42000043
+            control.cw = 0.0010999999
+            control.juliaboxMode = true
+            control.juliaX =  0.109999985
+            control.juliaY =  0.11999998
+            control.juliaZ =  -0.55999994
+            
+            if control.bcy {
+                control.camera = simd_float3( -0.1589123 , -0.4561975 , -1.5499284 )
+                updateShaderDirectionVector(simd_float3( 0.0 , 0.09950371 , 0.99503714 ))
+                control.InvCx =  0.07000005
+                control.InvCy =  0.1
+                control.InvCz =  0.1
+                control.InvRadius =  0.3
+                control.InvAngle =  0.1
+            }
         default : break
         }
-        
-        control.coloring1 = 0.0001
         
         defineWidgetsForCurrentEquation()
         if vcControl != nil { vcControl.checkAllWidgetIndices() }
@@ -777,17 +802,49 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         
         let start = NSDate()
         
-        let commandBuffer = commandQueue?.makeCommandBuffer()!
-        let renderEncoder = commandBuffer!.makeComputeCommandEncoder()!
-        renderEncoder.setComputePipelineState(pipeline[PIPELINE_FRACTAL])
-        renderEncoder.setTexture(drawable.texture, index: 0)
-        renderEncoder.setTexture(coloringTexture,  index: 1)
-        renderEncoder.setBuffer(controlBuffer, offset: 0, index: 0)
-        renderEncoder.dispatchThreads(threadsPerGrid[PIPELINE_FRACTAL], threadsPerThreadgroup:threadsPerGroup[PIPELINE_FRACTAL])
-        renderEncoder.endEncoding()
-        commandBuffer?.present(drawable)
-        commandBuffer?.commit()
-        commandBuffer?.waitUntilCompleted()
+        if c.blurStrength == 0 {    // NO blurring
+            if true {
+                let commandBuffer = commandQueue?.makeCommandBuffer()!
+                let renderEncoder = commandBuffer!.makeComputeCommandEncoder()!
+                renderEncoder.setComputePipelineState(pipeline[PIPELINE_FRACTAL])
+                renderEncoder.setTexture(drawable.texture, index: 0)
+                renderEncoder.setTexture(coloringTexture,  index: 1)
+                renderEncoder.setBuffer(controlBuffer, offset: 0, index: 0)
+                renderEncoder.dispatchThreads(threadsPerGrid[PIPELINE_FRACTAL], threadsPerThreadgroup:threadsPerGroup[PIPELINE_FRACTAL])
+                renderEncoder.endEncoding()
+                commandBuffer?.present(drawable)
+                commandBuffer?.commit()
+                commandBuffer?.waitUntilCompleted()
+            }
+        }
+        else {  // blurring
+            if true {
+                let commandBuffer = commandQueue?.makeCommandBuffer()!
+                let renderEncoder = commandBuffer!.makeComputeCommandEncoder()!
+                renderEncoder.setComputePipelineState(pipeline[PIPELINE_FRACTAL])
+                renderEncoder.setTexture(texture, index: 0)
+                renderEncoder.setTexture(coloringTexture,  index: 1)
+                renderEncoder.setBuffer(controlBuffer, offset: 0, index: 0)
+                renderEncoder.dispatchThreads(threadsPerGrid[PIPELINE_FRACTAL], threadsPerThreadgroup:threadsPerGroup[PIPELINE_FRACTAL])
+                renderEncoder.endEncoding()
+                commandBuffer?.commit()
+                commandBuffer?.waitUntilCompleted()
+            }
+            if true {
+                let commandBuffer = commandQueue?.makeCommandBuffer()!
+                let renderEncoder = commandBuffer!.makeComputeCommandEncoder()!
+                renderEncoder.setComputePipelineState(pipeline[PIPELINE_EFFECTS])
+                renderEncoder.setTexture(texture, index: 0)
+                renderEncoder.setTexture(drawable.texture,  index: 1)
+                renderEncoder.setBuffer(controlBuffer, offset: 0, index: 0)
+                renderEncoder.dispatchThreads(threadsPerGrid[PIPELINE_FRACTAL], threadsPerThreadgroup:threadsPerGroup[PIPELINE_FRACTAL])
+                renderEncoder.endEncoding()
+                
+                commandBuffer?.present(drawable)
+                commandBuffer?.commit()
+                commandBuffer?.waitUntilCompleted()
+            }
+        }
         
         if control.skip > 1 {   // 'fast' renders will have ~50% utilization
             timeInterval = NSDate().timeIntervalSince(start as Date)
@@ -859,22 +916,19 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     }
     
     var ctrlKeyDown:Bool = false
-    
+    var optionKeyDown:Bool = false
+    var cmdKeyDown:Bool = false
+
     func updateModifierKeyFlags(_ ev:NSEvent) {
         let rv = ev.modifierFlags.intersection(.deviceIndependentFlagsMask).rawValue
-        ctrlKeyDown   = rv & (1 << 18) != 0
+        ctrlKeyDown     = rv & (1 << 18) != 0
+        optionKeyDown   = rv & (1 << 19) != 0
+        cmdKeyDown      = rv & (1 << 20) != 0
     }
     
     override func keyDown(with event: NSEvent) {
         func toggle2() {
             defineWidgetsForCurrentEquation()
-            
-//            switch Int(control.equation) {
-//            case EQU_02_APOLLONIAN, EQU_02_APOLLONIAN2 :
-//                reset()
-//            default : break
-//            }
-            
             flagViewToRecalcFractal()
         }
         
@@ -902,6 +956,17 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             controlJustLoaded()
             return
         default : break
+        }
+        
+        if cmdKeyDown {
+        switch event.charactersIgnoringModifiers!.uppercased() {
+        case "1" : winHandler.setWindowFocus(0)
+        case "2" : winHandler.setWindowFocus(1)
+        case "3" : winHandler.setWindowFocus(2)
+        case "4" : winHandler.setWindowFocus(3)
+        default : break
+            }
+            return
         }
         
         switch event.charactersIgnoringModifiers!.uppercased() {
@@ -981,8 +1046,9 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             toggle2()
         case "G" :
             control.colorScheme += 1
-            if control.colorScheme > 7 { control.colorScheme = 0 }
+            if control.colorScheme > 6 { control.colorScheme = 0 }
             defineWidgetsForCurrentEquation()
+            vcColor.defineWidgets()
             flagViewToRecalcFractal()
         case "L" :
             winHandler.cycleWindowFocus()
@@ -1094,7 +1160,6 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         print("control.bright =",control.bright)
         print("control.contrast =",control.contrast)
         print("control.specular =",control.specular)
-        print("control.colorParam =",control.colorParam)
         
         print("updateShaderDirectionVector(",control.viewVector.debugDescription,")")
 
@@ -1196,19 +1261,12 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         widget.reset()
         
         if control.isStereo { widget.addFloat("Parallax",&control.parallax,0.001,1,0.01) }
-        widget.addFloat("Bright",&control.bright,0.01,10,0.02)
-        
-        if control.colorScheme == 6 || control.colorScheme == 7 {
-            widget.addFloat("Color Boost",&control.colorParam,1,1200000,200)
-        }
-
-        widget.addFloat("Enhance",&control.enhance,0,30,0.03)
-        widget.addFloat("Contrast",&control.contrast,0.1,0.7,0.02)
-        widget.addFloat("Specular",&control.specular,0,2,0.1)
-        widget.addFloat("Light Position",&lightAngle,-3,3,0.3)
-        
-        widget.addFloat("Second Surface",&control.secondSurface,0,12,0.02)
-        widget.addFloat("Radial Symmetry",&control.radialAngle,0,Float.pi,0.03)
+//        widget.addFloat("Bright",&control.bright,0.01,10,0.02)
+//        
+//        widget.addFloat("Enhance",&control.enhance,0,30,0.03)
+//        widget.addFloat("Contrast",&control.contrast,0.1,0.7,0.02)
+//        widget.addFloat("Specular",&control.specular,0,2,0.1)
+//        widget.addFloat("Light Position",&lightAngle,-3,3,0.3)
         
         switch Int(control.equation) {
         case EQU_01_MANDELBULB :
@@ -1383,6 +1441,13 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addFloat("Z",&control.cz, 0.01,20,0.05)
             widget.addFloat("Spread",&control.dx, 0.01,2,0.01)
             widget.addFloat("Mult",&control.dy, 0.01,2,0.01)
+        case EQU_23_PDOF :
+            widget.addInt32("Iterations",&control.isteps,1,25,1)
+            widget.addFloat("box Size",&control.cx,0,2,0.01)
+            widget.addFloat("size",&control.cy,0,2,0.01)
+            widget.addFloat("Offset",&control.cz,-1,1,0.02)
+            widget.addFloat("DE Offset",&control.cw,0,0.01,0.0001)
+            juliaGroup(10,0.01)
         default : break
         }
 
@@ -1523,6 +1588,19 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             metalView.frame = CGRect(x:1, y:1, width:r.size.width-2, height:r.size.height-2)
         }
         
+        //-------------------------------
+        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(
+            pixelFormat: .rgba8Unorm,
+            width: Int(r.size.width * 2),
+            height: Int(r.size.height * 2),
+            mipmapped: false)
+        
+        textureDescriptor.usage = [.shaderRead, .shaderWrite]
+
+        texture = nil
+        texture = device.makeTexture(descriptor: textureDescriptor)!
+        //-------------------------------
+
         let widgetPanelHeight:Int = 1200
         instructionsG.frame = CGRect(x:5, y:5, width:75, height:widgetPanelHeight)
         instructionsG.bringToFront()

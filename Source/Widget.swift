@@ -16,6 +16,7 @@ struct WidgetData {
     var delta:Float = 0
     var range = simd_float2()
     var showValue:Bool = false
+    var wrap:Bool = false
     var callbackIndex:Int = 0
     
     func alterValue(_ direction:Int) -> Bool {
@@ -46,9 +47,15 @@ struct WidgetData {
             
             var amt:Int32 = Int32(Float(delta) * alterationSpeed)
             if amt == 0 { amt = delta < 0 ? -1 : 1 }
-            
             value += direction > 0 ? amt : -amt
-            value = max( min(value, Int32(range.y)), Int32(range.x))
+
+            if wrap {
+                if value < 0 { value = Int32(range.y) }
+                if value > Int32(range.y) { value = 0 }
+            }
+            else {
+                value = max( min(value, Int32(range.y)), Int32(range.x))
+            }
             
             if value != oldValue {
                 valuePtr.storeBytes(of:value, as:Int32.self)
@@ -131,6 +138,7 @@ class Widget {
     var focus:Int = 0
     var previousFocus:Int = 0
     
+    
     var shiftKeyDown = Bool()
     var optionKeyDown = Bool()
     
@@ -139,9 +147,9 @@ class Widget {
         reset()
     }
     
-    func reset() {
+    func reset(_ rememberFocusIndex:Bool = false) {
         data.removeAll()
-        focus = 0
+        if !rememberFocusIndex { focus = 0 }
         previousFocus = focus
     }
     
@@ -159,24 +167,26 @@ class Widget {
     func addFloat(_ nLegend:String,
                   _ nValuePtr:UnsafeMutableRawPointer,
                   _ minValue:Float, _ maxValue:Float, _ nDelta:Float,
-                  _ nKind:WidgetKind = .float,
-                  _ nShowValue:Bool = false) {
+                  _ nShowValue:Bool = false,
+                  _ callbackIndex:Int = 1) {
         var w = WidgetData()
         w.legend = nLegend
         w.valuePtr = nValuePtr
         w.range.x = minValue
         w.range.y = maxValue
         w.delta = nDelta
-        w.kind = nKind
+        w.kind = .float
         w.showValue = nShowValue
         w.ensureValueIsInRange()
+        w.callbackIndex = callbackIndex
         data.append(w)
     }
     
     func addInt32(_ legend:String,
                   _ nValuePtr:UnsafeMutableRawPointer,
                   _ minValue:Int, _ maxValue:Int, _ nDelta:Int,
-                  _ callbackIndex:Int = 0) {
+                  _ wrap:Bool = false,
+                  _ callbackIndex:Int = -1) {
         var w = WidgetData()
         w.legend = legend
         w.valuePtr = nValuePtr
@@ -185,6 +195,7 @@ class Widget {
         w.range.y = Float(maxValue)
         w.delta = Float(nDelta)
         w.showValue = true
+        w.wrap = wrap
         w.callbackIndex = callbackIndex
         data.append(w)
     }
@@ -196,7 +207,9 @@ class Widget {
         data.append(w)
     }
     
-    func addBoolean(_ legend:String, _ nValuePtr:UnsafeMutableRawPointer, _ callbackIndex:Int = 0) {
+    func addBoolean(_ legend:String,
+                    _ nValuePtr:UnsafeMutableRawPointer,
+                    _ callbackIndex:Int = -1) {
         var w = WidgetData()
         w.legend = legend
         w.valuePtr = nValuePtr
@@ -254,7 +267,7 @@ class Widget {
             if data[focus].alterValue(-1) {
                 vc.flagViewToRecalcFractal()
                 if data[focus].showValue { delegate?.displayWidgets() }
-                if data[focus].kind == .boolean { delegate?.widgetCallback(data[focus].callbackIndex) }
+                if data[focus].callbackIndex >= 0 { delegate?.widgetCallback(data[focus].callbackIndex) }
                 return true
             }
         case RIGHT_ARROW :
@@ -262,7 +275,7 @@ class Widget {
             if data[focus].alterValue(+1) {
                 vc.flagViewToRecalcFractal()
                 if data[focus].showValue { delegate?.displayWidgets() }
-                if data[focus].kind == .boolean { delegate?.widgetCallback(data[focus].callbackIndex) }
+                if data[focus].callbackIndex >= 0 { delegate?.widgetCallback(data[focus].callbackIndex) }
                 return true
             }
         case DOWN_ARROW :

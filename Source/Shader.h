@@ -14,7 +14,7 @@ enum {
     EQU_06_MONSTER, EQU_07_KALI_TOWER, EQU_08_GOLD, EQU_09_SPIDER, EQU_10_KLEINIAN2,
     EQU_11_HALF_TETRA, EQU_12_POLYCHORA, EQU_13_QUATJULIA2, EQU_14_SPUDS, EQU_15_FLOWER,
     EQU_16_SPIRALBOX, EQU_17_SURFBOX, EQU_18_TWISTBOX, EQU_19_VERTEBRAE, EQU_20_DARKSURF,
-    EQU_21_SPONGE, EQU_22_DONUTS, EQU_MAX };
+    EQU_21_SPONGE, EQU_22_DONUTS, EQU_23_PDOF, EQU_MAX };
 
 #define NUM_LIGHT   3
 
@@ -84,7 +84,7 @@ typedef struct {
     matrix_float4x4 mm;
     
     int colorScheme;
-    float colorParam;
+
     float radialAngle;
     float enhance;
     float secondSurface;
@@ -94,9 +94,9 @@ typedef struct {
     // orbit Trap -----------
     float Cycles;
     float OrbitStrength;
-    vector_float4 X,Y,Z,R;  // color RGB from lookup table
-    float xIndex,yIndex,zIndex,rIndex; // color palette index
-    float xWeight,yWeight,zWeight,rWeight; // color weight
+    vector_float4 X,Y,Z,R;                  // color RGB from lookup table
+    float xIndex,yIndex,zIndex,rIndex;      // color palette index
+    float xWeight,yWeight,zWeight,rWeight;  // color weight
     int orbitStyle;
     float otFixedX,otFixedY,otFixedZ;
     vector_float3 otFixed;
@@ -108,20 +108,18 @@ typedef struct {
     // control panel -------
     int panel00,panel01,panel10,panel11,panel20,panel21,panel30,panel31;
 
-    float reflect1,reflect2,reflect3;
-    float coloring1,coloring2,coloring3;
-    float coloring4,coloring5;
-    float coloring6,coloring7;
-    float coloring8,coloring9;
-    float coloringa,coloringb;
-    float coloringc,coloringd;
-    float coloringe,coloringf;
-    float coloringg;
+    float refractAmount;
+    float transparentAmount;
+    float normalOffset;
+    float coloring1,coloring2,coloring3,coloring4,coloring5;
+    float coloring6,coloring7,coloring8,coloring9,coloringa;
     
     vector_float3 LVIlow,LVIhigh;
     float fLVIiter,LVIr,LVIg,LVIb;
     int LVIiter;
     bool LVIenable;
+    
+    float blurFocalDistance,blurStrength;
 
 } Control;
 

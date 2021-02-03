@@ -59,7 +59,7 @@ class WinLightViewController: NSViewController, NSWindowDelegate, WidgetDelegate
         let i:Int32 = lightIndex - 1  // base 0
         
         widget.reset()
-        widget.addInt32("Light#",&lightIndex,1,3,1)
+        widget.addInt32("Light#",&lightIndex,1,3,1,false,2)
         widget.addLegend(" ")
         widget.addFloat("Bright",lightBright(i),0,10,0.2)
         widget.addFloat("Spread",lightPower(i),0.001,100,0.1)
@@ -108,7 +108,10 @@ class WinLightViewController: NSViewController, NSWindowDelegate, WidgetDelegate
         instructionsG.refresh()
     }
     
-    func widgetCallback(_ index:Int) { }
+    func widgetCallback(_ index:Int) {
+        if index == 1 { vc.flagViewToRecalcFractal() } // floats
+        if index == 2 { defineWidgets() } // light index
+    }
 
     //MARK: -
     

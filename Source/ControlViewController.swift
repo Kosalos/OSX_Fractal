@@ -161,30 +161,47 @@ class ControlPanelView: NSView {
         setNeedsDisplay(self.bounds)
     }
     
+    var isMouseDown:Bool = false
+    
     override func mouseDown(with event: NSEvent) {
         let pt:NSPoint = event.locationInWindow
         
-        for i in 0 ..< NUMPANELS {
-            let p = panelRect[i]
-            if  pt.x >= p.minX && pt.x < p.minX + CGFloat(PanelSize) &&
-                pt.y <= p.minY && pt.y > p.minY - CGFloat(PanelSize) {
-                panelIndex = i
-                
-                decodeSelectionIndex(getPanelWidgetIndex(panelIndex,0))
-                winHandler.widgetPointer(selectedWindow).data[selectedRow].setRatio(Float((pt.x - p.minX) / CGFloat(PanelSize)))
-                
-                decodeSelectionIndex(getPanelWidgetIndex(panelIndex,1))
-                winHandler.widgetPointer(selectedWindow).data[selectedRow].setRatio(Float((p.minY - pt.y) / CGFloat(PanelSize)))
-                
-                winHandler.refreshWidgetsAndImage()
-                refresh()
-                return
+        if !isMouseDown {
+            for i in 0 ..< NUMPANELS {
+                let p = panelRect[i]
+                if  pt.x >= p.minX && pt.x < p.minX + CGFloat(PanelSize) &&
+                    pt.y <= p.minY && pt.y > p.minY - CGFloat(PanelSize) {
+                    panelIndex = i
+                    isMouseDown = true
+                }
             }
+        }
+            
+        if isMouseDown {
+            let pSize = Float(PanelSize)
+            let p = panelRect[panelIndex]
+            
+            decodeSelectionIndex(getPanelWidgetIndex(panelIndex,0))
+            var x = Float(pt.x - p.minX)
+            if x < 0 { x = 0 } else if x > pSize { x = pSize }
+            winHandler.widgetPointer(selectedWindow).data[selectedRow].setRatio(x / pSize)
+            
+            decodeSelectionIndex(getPanelWidgetIndex(panelIndex,1))
+            var y = Float(p.minY - pt.y)
+            if y < 0 { y = 0 } else if y > pSize { y = pSize }
+            winHandler.widgetPointer(selectedWindow).data[selectedRow].setRatio(y / pSize)
+            
+            winHandler.refreshWidgetsAndImage()
+            refresh()
         }
     }
     
     override func mouseDragged(with event: NSEvent) { mouseDown(with:event) }
-    
+
+    override func mouseUp(with event: NSEvent) {
+        isMouseDown = false
+    }
+
     override func draw(_ rect: NSRect) {
         let cr = (panelID == panelIndex) ? CGFloat(0.3) : CGFloat(0.1)
         let c = CGFloat(0.1)

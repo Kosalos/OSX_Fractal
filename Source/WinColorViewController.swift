@@ -1,6 +1,8 @@
 import Cocoa
 import MetalKit
 
+var vcColor:WinColorViewController! = nil
+
 class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate {
     var widget:Widget! = nil
     var colorIndex:Int32 = 1
@@ -20,6 +22,7 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
  
     override func viewDidLoad() {
         super.viewDidLoad()
+        vcColor = self
         widget = Widget(self)
         instructionsG.initialize(widget)
     }
@@ -34,7 +37,7 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
     //MARK: -
     
     func updateLayoutOfChildViews() {
-        let widgetPanelHeight:Int = 400
+        let widgetPanelHeight:Int = 700
         instructionsG.frame = CGRect(x:5, y:5, width:75, height:widgetPanelHeight)
         instructionsG.bringToFront()
         instructionsG.refresh()
@@ -48,28 +51,63 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
     //MARK: -
     
     func defineWidgets() {
-        widget.reset()
-        widget.addInt32("Style#",&colorIndex,1,8,1)
+        widget.reset(true)
+        widget.addFloat("Bright",&vc.control.bright,0.01,10,0.02)
+        widget.addFloat("Enhance",&vc.control.enhance,0,30,0.03)
+        widget.addFloat("Contrast",&vc.control.contrast,0.1,0.7,0.02)
+        widget.addFloat("Specular",&vc.control.specular,0,2,0.1)
+        widget.addFloat("Light Position",&vc.lightAngle,-3,3,0.3)
+        
         widget.addLegend(" ")
-        widget.addFloat("Color 1",&vc.control.coloring1,0.0001,1,0.01)
-        widget.addFloat("Color 2",&vc.control.coloring2,-1,1,0.01)
-        widget.addFloat("Color 3",&vc.control.coloring3,-1,1,0.01)
-        widget.addFloat("Color 4",&vc.control.coloring4,-1,1,0.01)
-        widget.addFloat("Color 5",&vc.control.coloring5,-1,1,0.01)
-        widget.addFloat("Color 6",&vc.control.coloring6,-1,1,0.01)
-        widget.addFloat("Color 7",&vc.control.coloring7,-1,1,0.01)
-        widget.addFloat("Color 8",&vc.control.coloring8,-1,1,0.01)
-        widget.addFloat("Color 9",&vc.control.coloring9,-1,1,0.01)
-        widget.addFloat("Color a",&vc.control.coloringa,-1,1,0.01)
-        widget.addFloat("Color b",&vc.control.coloringb,-1,1,0.01)
-        widget.addFloat("Color c",&vc.control.coloringc,-1,1,0.01)
-        widget.addFloat("Color d",&vc.control.coloringd,-1,1,0.01)
-        widget.addFloat("Color e",&vc.control.coloringe,-1,1,0.01)
-        widget.addFloat("Color f",&vc.control.coloringf,-1,1,0.01)
-        widget.addFloat("Color g",&vc.control.coloringg,-1,1,0.01)
-        widget.addFloat("Reflect 1",&vc.control.reflect1, 0,0.25,0.01)
-        widget.addFloat("Reflect 2",&vc.control.reflect2, 0,3,0.01)
-        widget.addFloat("C Normal",&vc.control.reflect3, 0.0001,1,0.001)
+        widget.addInt32("Style#",&vc.control.colorScheme,0,6,1,true,1)
+        widget.addLegend(" ")
+        
+        switch vc.control.colorScheme {
+        case 0 :
+            widget.addFloat("Color 1",&vc.control.coloring1,0.0001,1,0.01)
+            widget.addFloat("Color 2",&vc.control.coloring2,-1,1,0.01)
+        case 1 :
+            widget.addFloat("Color 1",&vc.control.coloring1,0,1,0.01)
+            widget.addFloat("Color 2",&vc.control.coloring2,0,1,0.01)
+            widget.addFloat("Color 3",&vc.control.coloring3,0,1,0.01)
+        case 2 :
+            widget.addFloat("Color 1",&vc.control.coloring1,0,1,0.01)
+            widget.addFloat("Color 2",&vc.control.coloring2,0,1,0.01)
+            widget.addFloat("Color 3",&vc.control.coloring3,0,1,0.01)
+            widget.addFloat("Color 4",&vc.control.coloring4,0,1,0.01)
+            widget.addFloat("Color 5",&vc.control.coloring5,0,1,0.01)
+        case 3 :
+            widget.addFloat("Color 1",&vc.control.coloring1,0,1,0.01)
+            widget.addFloat("Color 2",&vc.control.coloring2,0,1,0.01)
+        case 6 :
+            widget.addFloat("Color 1",&vc.control.coloring1,0.0001,1,0.01)
+            widget.addFloat("Color 2",&vc.control.coloring2,-1,1,0.01)
+            widget.addFloat("Color 3",&vc.control.coloring3,-1,1,0.01)
+            widget.addFloat("Color 4",&vc.control.coloring4,-1,1,0.01)
+            widget.addFloat("Color 5",&vc.control.coloring5,-1,1,0.01)
+            widget.addFloat("Color 6",&vc.control.coloring6,-1,1,0.01)
+            widget.addFloat("Color 7",&vc.control.coloring7,-1,1,0.01)
+            widget.addFloat("Color 8",&vc.control.coloring8,-1,1,0.01)
+            widget.addFloat("Color 9",&vc.control.coloring9,-1,1,0.01)
+            widget.addFloat("Color a",&vc.control.coloringa,-1,1,0.01)
+        default : break
+        }
+        
+        widget.addLegend(" ")
+        widget.addFloat("Second Surface",&vc.control.secondSurface,0,12,0.02)
+        widget.addFloat("Reflect 1",&vc.control.refractAmount, 0,0.25,0.01)
+        widget.addFloat("Reflect 2",&vc.control.transparentAmount, 0,3,0.01)
+
+        widget.addLegend(" ")
+        widget.addFloat("C Normal",&vc.control.normalOffset, 0.0001,1,0.001)
+
+        widget.addLegend(" ")
+        widget.addLegend("Blur")
+        widget.addFloat("Strength (0 = Off)", &vc.control.blurStrength, 0,500,5)
+        widget.addFloat("Distance", &vc.control.blurFocalDistance, 0.001,4,0.01)
+        
+        widget.addLegend(" ")
+        widget.addFloat("Radial Symmetry",&vc.control.radialAngle,0,Float.pi,0.03)
 
         displayWidgets()
     }
@@ -81,8 +119,15 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
         instructionsG.refresh()
     }
     
-    func widgetCallback(_ index:Int) { }
-    
+    func widgetCallback(_ index:Int) {
+        switch(index) {
+        case 1 :
+            defineWidgets()
+            vc.flagViewToRecalcFractal()
+        default : break
+        }
+    }
+        
     //MARK: -
     
     func presentPopover(_ name:String) {

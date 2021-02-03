@@ -58,7 +58,7 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     var fileURL:URL! = nil
 
     func numberOfSections(in tableView: NSTableView) -> Int { return 1 }
-    func numberOfRows(in tableView: NSTableView) -> Int { return slEntry.count }
+    func numberOfRows(in tableView: NSTableView) -> Int { return slEntry.count+1 }
     
     func didTapButton(_ sender: NSButton) {
         let buttonPosition = sender.convert(CGPoint.zero, to:tv)
@@ -104,6 +104,8 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         let cell:SaveLoadCell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "SLCell"), owner: self) as! SaveLoadCell
 
+        if row >= slEntry.count { return cell }
+        
         if slEntry[row].dateString == noFileString {
             cell.legend.stringValue = noFileString
             cell.isUnused = true

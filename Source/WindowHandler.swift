@@ -3,8 +3,9 @@ import Cocoa
 var winHandler:WindowHandler! = nil
 
 // 0 = widgets on Main window
-// 1 = widgets on Lights window
-// 2 = widgets on Color window
+// 1 = widgets on Color window
+// 2 = widgets on Lights window
+// 3 = control window
 
 class WindowHandler {
     var windows:[NSWindow] = []
@@ -26,17 +27,17 @@ class WindowHandler {
         }
         
         windows.append(vc.view.window!) // main window
-        addWindowToList("Lights")
         addWindowToList("Color")
+        addWindowToList("Lights")
         
         // widget instances do not exist until their parent window is launched
         let w1 = windows[0].contentViewController as! ViewController
         widgets.append(w1.widget)
 
-        let w2 = windows[1].contentViewController as! WinLightViewController
+        let w2 = windows[1].contentViewController as! WinColorViewController
         widgets.append(w2.widget)
 
-        let w3 = windows[2].contentViewController as! WinColorViewController
+        let w3 = windows[2].contentViewController as! WinLightViewController
         widgets.append(w3.widget)
     }
 
@@ -48,10 +49,10 @@ class WindowHandler {
         let w1 = windows[0].contentViewController as! ViewController
         w1.flagViewToRecalcFractal()
 
-        let w2 = windows[1].contentViewController as! WinLightViewController
+        let w2 = windows[1].contentViewController as! WinColorViewController
         w2.displayWidgets()
 
-        let w3 = windows[2].contentViewController as! WinColorViewController
+        let w3 = windows[2].contentViewController as! WinLightViewController
         w3.displayWidgets()
     }
 
@@ -67,6 +68,11 @@ class WindowHandler {
         windows[focusIndex].makeKeyAndOrderFront(nil)
     }
 
+    func setWindowFocus(_ index:Int) {
+        focusIndex = index-1
+        cycleWindowFocus()
+    }
+        
     func closeAllWindows() {
         for i in 1 ..< windows.count {   // skip 0 (main window)
             windows[i].close()
