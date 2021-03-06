@@ -99,7 +99,7 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
         widget.addFloat("Reflect 2",&vc.control.transparentAmount, 0,3,0.01)
 
         widget.addLegend(" ")
-        widget.addFloat("C Normal",&vc.control.normalOffset, 0.0001,1,0.001)
+        widget.addFloat("C Normal",&vc.control.normalOffset, 0.00001,1,0.0001)
 
         widget.addLegend(" ")
         widget.addLegend("Blur")
@@ -137,14 +137,9 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
     }
     
     override func keyDown(with event: NSEvent) {
-        if widget.keyPress(event) {
+        if widget.keyPress(event,true) {
             displayWidgets()
             instructionsG.refresh()
-            
-            if widget.focus != 0 && event.keyCode != UP_ARROW && event.keyCode != DOWN_ARROW {
-                vc.setShaderToFastRender()
-                vc.flagViewToRecalcFractal()
-            }
         }
         else { // pass to main window?
             if !widget.lastKeypressWasArrowKey { vc.keyDown(with:event) }

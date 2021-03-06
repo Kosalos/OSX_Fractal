@@ -95,41 +95,179 @@ float DE_MANDELBULB(float3 pos,thread Control &control,thread float4 &orbitTrap)
 //MARK: - 2 Apollonian2
 // apollonian2: https://www.shadertoy.com/view/llKXzh
 
+//p.xz = mod(p.xz + 1.0, 2.0) - 1.0;
+//float4 q = float4(p, 1);
+//float3 offset1 = float3(control.cx, control.cy, control.cz);
+//float4 offset2 = float4(control.cw, control.dx, control.dy, control.dz);
+//
+//float3 ot,trap = control.otFixed;
+//if(control.orbitStyle == 2) trap -= p;
+//
+//control.LVIlow = p;
+//
+//for(int i = 0; i < control.isteps; ++i) {
+//    if(i < control.LVIiter) control.LVIlow = q.xyz;
+//
+//    q.xyz = abs(q.xyz) - offset1;
+//    q = 2.0*q/clamp(dot(q.xyz, q.xyz), 0.4, 1.0) - offset2;
+//
+//    if(i < control.LVIiter) control.LVIhigh = q.xyz;
+//
+//    ot = q.xyz;
+//    if(control.orbitStyle > 0) ot -= trap;
+//    orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
+//}
+//
+//return length(q.xyz)/q.w;
+
+
 float DE_APOLLONIAN2(float3 pos,thread Control &control,thread float4 &orbitTrap) {
 //    #ifdef SINGLE_EQUATION
 //        return 0;
 //    #else
     
-    control.LVIlow = pos;
-    
     float t = control.cz + 0.25 * cos(control.cw * PI * control.cx * (pos.z - pos.x));
-    float scale = 1;
-    
-    float3 ot,trap = control.otFixed;
-    if(control.orbitStyle == 2) trap -= pos;
-    
-    for(int i=0; i< control.isteps; ++i) {
-        if(i < control.LVIiter) control.LVIlow = pos;
-        
-        pos = -1.0 + 2.0 * fract(0.5 * pos + 0.5);
-        pos -= sign(pos) * control.cy / 20;
-        
-        float k = t / dot(pos,pos);
-        pos *= k;
-        scale *= k;
-        
-        if(i < control.LVIiter) control.LVIhigh = pos;
+    float hk,scale = 1;
+    bool part2 = false;
 
-        ot = pos;
-        if(control.orbitStyle > 0) ot -= trap;
-        orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
+//    float4 q = float4(pos, 1);
+//    float3 offset1 = float3(control.dx, control.dy, control.dz);
+//    float4 offset2 = float4(control.ex, control.ey, control.ez, control.ew);
+
+    for(int i=0; i< control.isteps; ++i) {
+        float3 old = pos;
+        if(!part2) {
+//            pos = -1.0 + 2.0 * fract(0.5 * pos + 0.5);
+            pos = -control.dz/2 + control.dz * fract(pos/control.dz + control.dz);
+            pos -= sign(pos) * control.cy / control.dy;
+            hk = dot(pos,pos);
+
+            if(hk < control.fx) {
+                hk *= control.dx;
+            }
+
+            float k = t / hk;
+            pos *= k;
+            scale *= k;
+       }
+       else {
+           pos = control.dz * clamp(pos, -control.dz, control.dz) - pos;
+            float k = max(control.cy/dot(pos,pos), 1.0);
+            pos *= k;
+            scale *= k;
+
+//            if(control.juliaboxMode)
+//                pos += control.julia;
+        }
+        
+        
+        if(length(old-pos) < control.fx) part2 = true;
     }
-    
-    float d1 = sqrt( min( min( dot(pos.xy,pos.xy), dot(pos.yz,pos.yz) ), dot(pos.zx,pos.zx) ) ) - 0.02;
-    float dmi = min(d1,abs(pos.y));
-    return 0.5 * dmi / scale;
-//    #endif
+
+ //   if(!part2) {
+        float d1 = sqrt( min( min( dot(pos.xy,pos.xy), dot(pos.yz,pos.yz) ), dot(pos.zx,pos.zx) ) ) - 0.02;
+        float dmi = min(d1,abs(pos.y));
+        return 0.5 * dmi / scale;
+  //  }
+
+   // return length(q.xyz)/q.w;
+
+//    #endifv
 }
+
+
+//    for(int i=0; i< control.isteps; ++i) {
+////        if(!part2) {
+////            pos = -1.0 + 2.0 * fract(0.5 * pos + 0.5);
+//            pos = -control.dz/2 + control.dz * fract(pos/control.dz + control.dz);
+//            pos -= sign(pos) * control.cy / control.dy;
+//            hk = dot(pos,pos);
+//
+//            if(hk < control.fx) {
+//                hk *= control.dx;
+//            }
+//
+//            float k = t / hk;
+//            pos *= k;
+//            scale *= k;
+////  /      }
+////        else {
+////            q.xyz = abs(q.xyz) - offset1;
+////            q = 2.0*q/clamp(dot(q.xyz, q.xyz), 0.4, 1.0) - offset2;
+////            pos = q.xyz;
+////        }
+//    }
+//
+// //   if(!part2) {
+//        float d1 = sqrt( min( min( dot(pos.xy,pos.xy), dot(pos.yz,pos.yz) ), dot(pos.zx,pos.zx) ) ) - 0.02;
+//        float dmi = min(d1,abs(pos.y));
+//        return 0.5 * dmi / scale;
+//  //  }
+//
+//   // return length(q.xyz)/q.w;
+//
+////    #endifv
+//}
+
+
+//float DEfactor = 1;
+//float3 ap;
+//
+//for(int i=0; i < control.isteps; ++i) {
+//    ap = pos;
+//    pos = control.dx * clamp(pos, -control.cx, control.cx) - pos;
+//
+//    float r2=dot(pos,pos);
+//    orbitTrap = min(orbitTrap, abs(float4(pos,r2)));
+//
+//    float k = max(control.cy/r2, 1.0);
+//    pos *= k;
+//    DEfactor *= k;
+//
+//    if(control.juliaboxMode)
+//        pos += control.julia;
+//
+//    orbitTrap = min(orbitTrap, abs(float4(pos,dot(pos,pos))));
+//}
+//
+//return abs(0.5 * abs(pos.z - control.cz)/DEfactor - control.cw);
+
+
+//float DE_APOLLONIAN2(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+////    #ifdef SINGLE_EQUATION
+////        return 0;
+////    #else
+//
+//    control.LVIlow = pos;
+//
+//    float t = control.cz + 0.25 * cos(control.cw * PI * control.cx * (pos.z - pos.x));
+//    float scale = 1;
+//
+//    float3 ot,trap = control.otFixed;
+//    if(control.orbitStyle == 2) trap -= pos;
+//
+//    for(int i=0; i< control.isteps; ++i) {
+//        if(i < control.LVIiter) control.LVIlow = pos;
+//
+//        pos = -1.0 + 2.0 * fract(0.5 * pos + 0.5);
+//        pos -= sign(pos) * control.cy / 20;
+//
+//        float k = t / dot(pos,pos);
+//        pos *= k;
+//        scale *= k;
+//
+//        if(i < control.LVIiter) control.LVIhigh = pos;
+//
+//        ot = pos;
+//        if(control.orbitStyle > 0) ot -= trap;
+//        orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
+//    }
+//
+//    float d1 = sqrt( min( min( dot(pos.xy,pos.xy), dot(pos.yz,pos.yz) ), dot(pos.zx,pos.zx) ) ) - 0.02;
+//    float dmi = min(d1,abs(pos.y));
+//    return 0.5 * dmi / scale;
+////    #endif
+//}
 
 //MARK: - 3 JosKleinian
 
@@ -1305,7 +1443,7 @@ float DE_PDOF(float3 pos,thread Control &control,thread float4 &orbitTrap) {
     
     for(int i=0; i < control.isteps; ++i) {
         ap = pos;
-        pos = 2 * clamp(pos, -control.cx, control.cx) - pos;
+        pos = control.dx * clamp(pos, -control.cx, control.cx) - pos;
         
         float r2=dot(pos,pos);
         orbitTrap = min(orbitTrap, abs(float4(pos,r2)));
@@ -1314,13 +1452,164 @@ float DE_PDOF(float3 pos,thread Control &control,thread float4 &orbitTrap) {
         pos *= k;
         DEfactor *= k;
         
-        pos += control.julia;
+        if(control.juliaboxMode)
+            pos += control.julia;
+        
         orbitTrap = min(orbitTrap, abs(float4(pos,dot(pos,pos))));
     }
     
     return abs(0.5 * abs(pos.z - control.cz)/DEfactor - control.cw);
 #endif
 }
+
+//MARK: - 25 MagnetoBulb
+// PDOF : https://fractalforums.org/code-snippets-fragments/74/magnetobulb/3824
+
+float3 triPow(float power, float3 a) {
+    // Power function for s = x + iy + jz expressed in spherical coordinates
+    float r = sqrt( a.x*a.x + a.y*a.y + a.z*a.z )+1e-10;
+    float phi = atan2(a.y,a.x);  // azimuth
+    float theta = 0.0;
+
+    theta = asin(a.z/r);
+
+    r = pow(r,power);
+    phi = power*phi;
+    theta = power*theta;
+
+    return float3(r*cos(theta)*cos(phi),
+                r*cos(theta)*sin(phi),
+                r*sin(theta));
+}
+
+// non-trig version
+
+float3 triMul(float3 lc, float3 z1)
+{
+float r1 = sqrt(z1.x * z1.x + z1.y * z1.y);
+float r2 = sqrt(lc.x * lc.x + lc.y * lc.y);
+float temp = z1.x;
+float a = 1.0 - z1.z * lc.z / (r1 * r2);
+z1.x = a * (z1.x * lc.x - z1.y * lc.y);
+z1.y = a * (lc.x * z1.y + temp * lc.y);
+z1.z = r2 * z1.z + r1 * lc.z;
+
+return z1;
+}
+
+float3 triDiv(float3 a, float3 b) {
+    return triMul(a, triPow(-1.0, b) );
+}
+
+float3 Magnetobulb1(float3 z, float3 c,thread Control &control)
+{
+    float3 a = triMul(z,z) + c - control.v3a;
+    float3 b = triMul(float3(2.,0.,0.), z) + c - control.v3b;
+    z = triMul( a, b );
+    z = triPow(control.cx,z);
+
+    return z;
+}
+
+float3 Magnetobulb2(float3 z, float3 c,thread Control &control)
+{
+    z = triPow(    control.cx,(
+                        triMul(
+                            triPow(3.,z) + triMul(triMul(float3(3.,0.,0.),(c-control.v3a)),z) + triMul((c-control.v3a),(c-control.v3b)) ,
+                                triPow(2.,triMul(float3(3.,0.,0.),z)) + triMul(triMul(float3(3.,0.,0.),(c-control.v3b)),z) + triMul((c-control.v3a),(c-control.v3b)) + float3(1.,0.,0.)
+            )
+        )
+    );
+
+    return z;
+}
+
+//inline float CalcDistance(float3 pos, int iter)
+//{
+//    float clock = sin(_Time.w * 0.01);
+//    float p0 = clock * 0.2 + 0.4;
+//    float4 z = float4(modc(pos, 2.0), 0.5);
+//    for (int n = 0; n < iter; n++) {
+//        z.xyz = clamp(z.xyz, -p0, p0) * 2.0 - z.xyz;
+//        z *= 3 / max(dot(z.xyz, z.xyz), 0.0);
+//    }
+//    return (length(max(abs(z.xyz) - float3(0.0, 20.0, 0.0), 0.0))) / z.w;
+
+
+//float3 modc(float3 num, float den) {
+//    if(den == 0) return 0;
+//
+//    float3 ans = num;
+//    float t = num.x /den;
+//    int ti = int(t + 0.5);
+//    ans.x = num.x - float(ti) * den;
+//
+//    t = num.y /den;
+//    ti = int(t + 0.5);
+//    ans.y = num.y - float(ti) * den;
+//
+//    t = num.z /den;
+//    ti = int(t + 0.5);
+//    ans.z = num.z - float(ti) * den;
+//    return ans;
+//}
+    
+
+float DE_MAGNETO(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+#ifdef SINGLE_EQUATION_disabled
+    return 0;
+#else
+    float p0 = control.cx;
+    float4 z = float4(fmod(pos, control.cy),  control.dx);
+    for(int i=0; i < control.isteps; ++i) {
+        z.xyz = clamp(z.xyz, -p0, p0) * control.cw - z.xyz;
+        z *= control.cz / max(dot(z.xyz, z.xyz), 0.0);
+        
+        p0 *= control.dy;
+    }
+    
+    return (length(max(abs(z.xyz) - float3(0.0, 20.0, 0.0), 0.0))) / z.w;
+#endif
+}
+
+//float DE_MAGNETO(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+//#ifdef SINGLE_EQUATION_disabled
+//    return 0;
+//#else
+//    float3 z = control.juliaboxMode ? pos : float3(1e-14);
+//    float dr = 1.0;
+//    float r = dot(z,z);
+//
+//    for(int i=0; i < control.isteps; ++i) {
+//        if(r >= control.fy) break;
+//
+//        if(control.bdx) z.x = abs(z.x);
+//        if(control.bdy) z.y = abs(z.y);
+//        if(control.bdz) z.z = abs(z.z);
+//
+//        if(control.bdw) {
+//            z = Magnetobulb2(z, control.juliaboxMode ? control.julia : pos,control);
+//        } else {
+//            z = Magnetobulb1(z, control.juliaboxMode ? control.julia : pos,control);
+//        }
+//
+//        //z += (control.juliaboxMode ? control.julia : pos);
+//
+//        r = length(z);
+//
+////        // mermelada's tweak
+////        // http://www.fractalforums.com/new-theories-and-research/error-estimation-of-distance-estimators/msg102670/?topicseen#msg102670
+//        dr = max(dr * control.fx, pow( r, control.cx-1.0 ) * dr * control.cx + 1.0);
+////
+////        if (i<ColorIterations) orbitTrap = min(orbitTrap, abs(vec4(z.x,z.y,z.z,r*dr)));
+//
+//        z = rotatePosition(z,0,control.angle1);
+//        z = rotatePosition(z,1,control.angle2);
+//    }
+//
+//    return 0.5*log(r)*r/dr;
+//#endif
+//}
 
 //MARK: - distance estimate
 // ===========================================
@@ -1350,6 +1639,7 @@ float DE_Inner(float3 pos,thread Control &control,thread float4 &orbitTrap) {
         case EQU_21_SPONGE      : return DE_SPONGE(pos,control,orbitTrap);
         case EQU_22_DONUTS      : return DE_DONUTS(pos,control,orbitTrap);
         case EQU_23_PDOF        : return DE_PDOF(pos,control,orbitTrap);
+        case EQU_24_MAGNETO     : return DE_MAGNETO(pos,control,orbitTrap);
     }
     
     return 0;
@@ -1454,18 +1744,18 @@ float3 HSVtoRGB(float3 hsv) {
  
 
          // shade
-         vec3 col = vec3(0.0);
+         float3 col = float3(0.0);
          if( tmat.z>-0.5 )
          {
              // geometry
-             vec3 pos = ro + tmat.x*rd;
-             vec3 nor = calcNormal(pos, 0.005);
-             vec3 sor = calcNormal(pos, 0.010);
+             float3 pos = ro + tmat.x*rd;
+             float3 nor = calcNormal(pos, 0.005);
+             float3 sor = calcNormal(pos, 0.010);
 
              // material
-             vec3 mate = vec3(1.0);
-             mate = mix( vec3(0.5,0.5,0.2), vec3(0.5,0.3,0.0), 0.5 + 0.5*sin(4.0+8000.0*tmat.y)  );
-             mate = mix( vec3(1.0,0.9,0.8), mate, 0.5 + 0.5*sin(4.0+20.0*tmat.z) );
+             float3 mate = float3(1.0);
+             mate = mix( float3(0.5,0.5,0.2), float3(0.5,0.3,0.0), 0.5 + 0.5*sin(4.0+8000.0*tmat.y)  );
+             mate = mix( float3(1.0,0.9,0.8), mate, 0.5 + 0.5*sin(4.0+20.0*tmat.z) );
              mate.x *= 1.15;
 
              // lighting
@@ -1473,35 +1763,35 @@ float3 HSVtoRGB(float3 hsv) {
              occ *= 0.75 + 0.25*clamp(tmat.y*400.0,0.0,1.0);
 
              // diffuse
-             col = vec3(0.0);
+             col = float3(0.0);
              for( int i=0; i<32; i++ )
              {
-                 //vec3 rr = normalize(-1.0 + 2.0*texture( iChannel2, vec2((0.5+float(i)),0.5)/256.0,-100.0).xyz);
-                 vec3 rr = normalize(-1.0 + 2.0*hash3(float(i)*123.5463));
+                 //float3 rr = normalize(-1.0 + 2.0*texture( iChannel2, vec2((0.5+float(i)),0.5)/256.0,-100.0).xyz);
+                 float3 rr = normalize(-1.0 + 2.0*hash3(float(i)*123.5463));
                  rr = normalize( nor + 7.0*rr );
                  rr = rr * sign(dot(nor,rr));
                  float ds = occ;//softshadow( pos, rr, 0.01, 32.0 );
-                 col += pow( texture( iChannel0, rr ).xyz, vec3(2.2) ) * dot(rr,nor) * ds;
+                 col += pow( texture( iChannel0, rr ).xyz, float3(2.2) ) * dot(rr,nor) * ds;
              }
              col /= 32.0;
 
              col *= 1.8;
 
              // subsurface
-             col *= 1.0 + 1.0*vec3(1.0,0.6,0.1)*pow(clamp(1.0+dot(rd,sor),0.0,1.0),2.0)*vec3(1.0);
+             col *= 1.0 + 1.0*float3(1.0,0.6,0.1)*pow(clamp(1.0+dot(rd,sor),0.0,1.0),2.0)*float3(1.0);
 
              // specular
              float fre = pow( clamp(1.0+dot(rd,nor),0.0,1.0), 5.0 );
-             vec3 ref = reflect( rd, nor );
+             float3 ref = reflect( rd, nor );
              float rs = softshadow( pos, ref, 0.01, 32.0 );
-             col += 1.8 * (0.04 + 12.0*fre) * occ * pow( texture( iChannel0, ref ).xyz, vec3(2.0) ) * rs;
+             col += 1.8 * (0.04 + 12.0*fre) * occ * pow( texture( iChannel0, ref ).xyz, float3(2.0) ) * rs;
 
              col *= mate;
          }
          else
          {
              // background
-             col = pow( texture( iChannel0, rd ).xyz, vec3(2.2) );
+             col = pow( texture( iChannel0, rd ).xyz, float3(2.2) );
          }
          tot += col;
  #if AA>1
@@ -1510,7 +1800,7 @@ float3 HSVtoRGB(float3 hsv) {
  #endif
      
      // gamma
-     tot = pow( clamp( tot*1.5, 0.0, 1.0 ), vec3(0.45) );
+     tot = pow( clamp( tot*1.5, 0.0, 1.0 ), float3(0.45) );
 
      // vigneting
      {
@@ -1529,7 +1819,7 @@ float3 HSVtoRGB(float3 hsv) {
  
  
  
-typedef float3 vec3;
+typedef float3 float3;
 
 float3 monsterColor(float3 pos, float3 distAns, float3 normal, thread Control &control) {
     float3 ans = float3();
@@ -1538,17 +1828,17 @@ float3 monsterColor(float3 pos, float3 distAns, float3 normal, thread Control &c
     return float3(1 - (normal / 10 + sqrt(iterationCount / 80)));
 
     // geometry
-    vec3 nor = calcNormal(pos, 0.005,control);
-    vec3 sor = calcNormal(pos, 0.010,control);
+    float3 nor = calcNormal(pos, 0.005,control);
+    float3 sor = calcNormal(pos, 0.010,control);
     
     // tmat.x = dist
     // y = min orbit
     // z =
     
     // material
-    vec3 mate = vec3(1.0);
-    mate = mix( vec3(0.5,0.5,0.2), vec3(0.5,0.3,0.0), 0.5 + 0.5*sin(4.0+8000.0*tmat.y)  );
-    mate = mix( vec3(1.0,0.9,0.8), mate, 0.5 + 0.5*sin(4.0+20.0*tmat.z) );
+    float3 mate = float3(1.0);
+    mate = mix( float3(0.5,0.5,0.2), float3(0.5,0.3,0.0), 0.5 + 0.5*sin(4.0+8000.0*tmat.y)  );
+    mate = mix( float3(1.0,0.9,0.8), mate, 0.5 + 0.5*sin(4.0+20.0*tmat.z) );
     mate.x *= 1.15;
 
     // lighting
@@ -1556,28 +1846,28 @@ float3 monsterColor(float3 pos, float3 distAns, float3 normal, thread Control &c
     occ *= 0.75 + 0.25*clamp(tmat.y*400.0,0.0,1.0);
 
     // diffuse
-    col = vec3(0.0);
+    col = float3(0.0);
     for( int i=0; i<32; i++ )
     {
-        //vec3 rr = normalize(-1.0 + 2.0*texture( iChannel2, vec2((0.5+float(i)),0.5)/256.0,-100.0).xyz);
-        vec3 rr = normalize(-1.0 + 2.0*hash3(float(i)*123.5463));
+        //float3 rr = normalize(-1.0 + 2.0*texture( iChannel2, vec2((0.5+float(i)),0.5)/256.0,-100.0).xyz);
+        float3 rr = normalize(-1.0 + 2.0*hash3(float(i)*123.5463));
         rr = normalize( nor + 7.0*rr );
         rr = rr * sign(dot(nor,rr));
         float ds = occ;//softshadow( pos, rr, 0.01, 32.0 );
-        col += pow( texture( iChannel0, rr ).xyz, vec3(2.2) ) * dot(rr,nor) * ds;
+        col += pow( texture( iChannel0, rr ).xyz, float3(2.2) ) * dot(rr,nor) * ds;
     }
     col /= 32.0;
 
     col *= 1.8;
 
     // subsurface
-    col *= 1.0 + 1.0*vec3(1.0,0.6,0.1)*pow(clamp(1.0+dot(rd,sor),0.0,1.0),2.0)*vec3(1.0);
+    col *= 1.0 + 1.0*float3(1.0,0.6,0.1)*pow(clamp(1.0+dot(rd,sor),0.0,1.0),2.0)*float3(1.0);
 
     // specular
     float fre = pow( clamp(1.0+dot(rd,nor),0.0,1.0), 5.0 );
-    vec3 ref = reflect( rd, nor );
+    float3 ref = reflect( rd, nor );
     float rs = softshadow( pos, ref, 0.01, 32.0 );
-    col += 1.8 * (0.04 + 12.0*fre) * occ * pow( texture( iChannel0, ref ).xyz, vec3(2.0) ) * rs;
+    col += 1.8 * (0.04 + 12.0*fre) * occ * pow( texture( iChannel0, ref ).xyz, float3(2.0) ) * rs;
 
     col *= mate;
 

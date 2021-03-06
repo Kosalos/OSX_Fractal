@@ -136,13 +136,13 @@
             <objects>
                 <viewController storyboardIdentifier="SaveLoadVC" id="5u1-Pe-ug6" userLabel="SaveLoadVC" customClass="SaveLoadViewController" customModule="OSX_Fractal" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" autoresizesSubviews="NO" wantsLayer="YES" id="IGx-dD-k4I" userLabel="View" customClass="BaseNSView3" customModule="OSX_Fractal" customModuleProvider="target" colorLabel="IBBuiltInLabel-Orange">
-                        <rect key="frame" x="0.0" y="0.0" width="458" height="470"/>
+                        <rect key="frame" x="0.0" y="0.0" width="458" height="567"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xOV-DN-5Jd" userLabel="Legend">
-                                <rect key="frame" x="18" y="433" width="422" height="26"/>
+                                <rect key="frame" x="18" y="530" width="422" height="26"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="26" id="HCL-Gq-sLn"/>
+                                    <constraint firstAttribute="height" constant="26" id="BYt-C2-609"/>
                                 </constraints>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Save/Load Settings" id="IFb-oF-vJ5">
                                     <font key="font" metaFont="system" size="17"/>
@@ -150,14 +150,40 @@
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </textFieldCell>
                             </textField>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1t3-P3-0i7">
+                                <rect key="frame" x="55" y="9" width="78" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="66" id="O79-PH-FTs"/>
+                                </constraints>
+                                <buttonCell key="cell" type="push" title="Date" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="8FP-CA-pqV">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="radioPressed:" target="5u1-Pe-ug6" id="Fkg-J4-ROe"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6PT-Z2-FzE">
+                                <rect key="frame" x="133" y="9" width="78" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="66" id="UbD-WT-2GZ"/>
+                                </constraints>
+                                <buttonCell key="cell" type="push" title="Kind" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="qKh-ig-Kj0">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="radioPressed:" target="5u1-Pe-ug6" id="mof-UC-aXC"/>
+                                </connections>
+                            </button>
                             <scrollView wantsLayer="YES" autohidesScrollers="YES" horizontalLineScroll="30" horizontalPageScroll="10" verticalLineScroll="30" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8wg-Zk-k8i">
-                                <rect key="frame" x="20" y="20" width="418" height="405"/>
+                                <rect key="frame" x="20" y="57" width="418" height="465"/>
                                 <clipView key="contentView" wantsLayer="YES" drawsBackground="NO" copiesOnScroll="NO" id="kT9-vk-v50">
-                                    <rect key="frame" x="1" y="1" width="416" height="403"/>
+                                    <rect key="frame" x="1" y="1" width="416" height="463"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView wantsLayer="YES" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="30" rowSizeStyle="automatic" viewBased="YES" id="ePT-tS-NiO">
-                                            <rect key="frame" x="0.0" y="0.0" width="416" height="403"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="416" height="463"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
@@ -231,24 +257,29 @@
                             </scrollView>
                         </subviews>
                         <constraints>
-                            <constraint firstAttribute="bottom" secondItem="8wg-Zk-k8i" secondAttribute="bottom" constant="20" symbolic="YES" id="9j7-h8-tX8"/>
-                            <constraint firstItem="xOV-DN-5Jd" firstAttribute="trailing" secondItem="8wg-Zk-k8i" secondAttribute="trailing" id="SAW-Y5-hMh"/>
-                            <constraint firstItem="xOV-DN-5Jd" firstAttribute="top" secondItem="IGx-dD-k4I" secondAttribute="top" constant="11" id="SEg-El-rlH"/>
-                            <constraint firstItem="8wg-Zk-k8i" firstAttribute="top" secondItem="xOV-DN-5Jd" secondAttribute="bottom" constant="8" symbolic="YES" id="UhK-8k-8bt"/>
-                            <constraint firstAttribute="trailing" secondItem="xOV-DN-5Jd" secondAttribute="trailing" constant="20" symbolic="YES" id="clj-H9-14D"/>
-                            <constraint firstItem="8wg-Zk-k8i" firstAttribute="top" secondItem="xOV-DN-5Jd" secondAttribute="bottom" constant="8" id="erM-rb-3fb"/>
-                            <constraint firstItem="xOV-DN-5Jd" firstAttribute="leading" secondItem="8wg-Zk-k8i" secondAttribute="leading" id="tWq-jS-Uh3"/>
-                            <constraint firstItem="xOV-DN-5Jd" firstAttribute="leading" secondItem="IGx-dD-k4I" secondAttribute="leading" constant="20" symbolic="YES" id="ySp-qQ-rkj"/>
+                            <constraint firstAttribute="bottom" secondItem="1t3-P3-0i7" secondAttribute="bottom" constant="16" id="0ah-2g-fyd"/>
+                            <constraint firstItem="xOV-DN-5Jd" firstAttribute="trailing" secondItem="8wg-Zk-k8i" secondAttribute="trailing" id="C6k-3x-xFd"/>
+                            <constraint firstItem="1t3-P3-0i7" firstAttribute="baseline" secondItem="6PT-Z2-FzE" secondAttribute="baseline" id="FWW-cG-l3R"/>
+                            <constraint firstItem="xOV-DN-5Jd" firstAttribute="top" secondItem="IGx-dD-k4I" secondAttribute="top" constant="11" id="Ls8-VM-iPy"/>
+                            <constraint firstItem="1t3-P3-0i7" firstAttribute="top" secondItem="8wg-Zk-k8i" secondAttribute="bottom" constant="20" symbolic="YES" id="V3V-pF-Ext"/>
+                            <constraint firstItem="xOV-DN-5Jd" firstAttribute="leading" secondItem="IGx-dD-k4I" secondAttribute="leading" constant="20" symbolic="YES" id="WbV-Pl-j87"/>
+                            <constraint firstItem="xOV-DN-5Jd" firstAttribute="leading" secondItem="8wg-Zk-k8i" secondAttribute="leading" id="aWJ-5k-ytm"/>
+                            <constraint firstItem="8wg-Zk-k8i" firstAttribute="top" secondItem="xOV-DN-5Jd" secondAttribute="bottom" constant="8" symbolic="YES" id="cT1-LQ-M17"/>
+                            <constraint firstItem="6PT-Z2-FzE" firstAttribute="leading" secondItem="1t3-P3-0i7" secondAttribute="trailing" constant="12" symbolic="YES" id="jDw-fj-eyj"/>
+                            <constraint firstAttribute="trailing" secondItem="xOV-DN-5Jd" secondAttribute="trailing" constant="20" symbolic="YES" id="qMY-NF-LhC"/>
+                            <constraint firstItem="1t3-P3-0i7" firstAttribute="leading" secondItem="IGx-dD-k4I" secondAttribute="leading" constant="61" id="rVq-fe-NC1"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="DateRadio" destination="1t3-P3-0i7" id="gwN-XQ-VKC"/>
+                        <outlet property="KindRadio" destination="6PT-Z2-FzE" id="j4l-KN-Cwy"/>
                         <outlet property="legend" destination="xOV-DN-5Jd" id="JZu-Bn-hpc"/>
                         <outlet property="scrollView" destination="8wg-Zk-k8i" id="dQE-Yf-E2x"/>
                     </connections>
                 </viewController>
                 <customObject id="hk0-b7-dEG" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-4139" y="586"/>
+            <point key="canvasLocation" x="-4139" y="634.5"/>
         </scene>
         <!--HelpVC-->
         <scene sceneID="T4p-rg-bZP">

@@ -122,14 +122,9 @@ class WinLightViewController: NSViewController, NSWindowDelegate, WidgetDelegate
     }
     
     override func keyDown(with event: NSEvent) {
-        if widget.keyPress(event) {
+        if widget.keyPress(event,true) {
             displayWidgets()
             instructionsG.refresh()
-            
-            if widget.focus != 0 && event.keyCode != UP_ARROW && event.keyCode != DOWN_ARROW {
-                vc.setShaderToFastRender()
-                vc.flagViewToRecalcFractal()
-            }
         }
         else {
             if !widget.lastKeypressWasArrowKey { vc.keyDown(with:event) }

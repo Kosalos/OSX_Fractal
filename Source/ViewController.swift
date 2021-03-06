@@ -115,7 +115,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.skip = max(control.xSize / 150, 8)
         }
 
-        slowRenderCountDown = 20 // 30 = 1 second
+        slowRenderCountDown = 10 // 30 = 1 second
     }
     
     /// direct 2D fractal view to re-calculate image on next draw call
@@ -180,7 +180,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
           "Monster","Kali Tower","Gold","Spider","Knighty's Kleinian",
           "Half Tetrahedron","Knighty Polychora","3Dickulus Quaternion Julia","Spudsville","Flower Hive",
           "Pupukuusikkos Spiralbox", "SurfBox","TwistBox","Vertebrae", "DarkBeam Surfbox",
-          "Klienian Sponge","Donuts","PDOF" ]
+          "Klienian Sponge","Donuts","PDOF","MagnetoBulb" ]
     
     func updateWindowTitle() {
         let index = Int(control.equation)
@@ -711,6 +711,14 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
                 control.InvRadius =  0.3
                 control.InvAngle =  0.1
             }
+        case EQU_24_MAGNETO :
+            control.dx = 0
+            control.dy = 0
+            control.dz = 0
+            control.ex = 0
+            control.ey = 0
+            control.ez = 0
+            break
         default : break
         }
         
@@ -791,6 +799,9 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             c.v3a = simd_float3(c.dx,c.dy,c.dz)
             c.v3b = simd_float3(c.ex,c.ey,c.ez)
             c.v3c = simd_float3(c.fx,c.fy,c.fz)
+        case EQU_24_MAGNETO :
+            c.v3a = simd_float3(c.dx,c.dy,c.dz)
+            c.v3b = simd_float3(c.ex,c.ey,c.ez)
         default : break
         }
         
@@ -918,7 +929,8 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     var ctrlKeyDown:Bool = false
     var optionKeyDown:Bool = false
     var cmdKeyDown:Bool = false
-
+    var speed1000:Bool = false
+    
     func updateModifierKeyFlags(_ ev:NSEvent) {
         let rv = ev.modifierFlags.intersection(.deviceIndependentFlagsMask).rawValue
         ctrlKeyDown     = rv & (1 << 18) != 0
@@ -931,6 +943,9 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             defineWidgetsForCurrentEquation()
             flagViewToRecalcFractal()
         }
+        
+
+        isKeyDown = true
         
         updateModifierKeyFlags(event)
         widget.updateAlterationSpeed(event)
@@ -1017,9 +1032,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         case "H" : setControlParametersToRandomValues(); flagViewToRecalcFractal()
         case "V" : displayControlParametersInConsoleWindow()
         case "Q" :
-            control.bcx = !control.bcx
-            control.bcw = !control.bcw
-            toggle2()
+            speed1000 = true
         case "W" :
             control.bcy = !control.bcy
             control.bdx = !control.bdx
@@ -1065,12 +1078,19 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     }
     
     override func keyUp(with event: NSEvent) {
+        
+        isKeyDown = false
+        
         super.keyUp(with: event)
         
         switch event.charactersIgnoringModifiers!.uppercased() {
         case "4","$","5","%" : jogRelease(1,0,0)
         case "6","^","7","&" : jogRelease(0,1,0)
         case "8","*","9","(" : jogRelease(0,0,1)
+            
+        case "Q" :
+            speed1000 = false
+
         default : break
         }
     }
@@ -1078,7 +1098,8 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     /// update 2D fractal camera position
     
     var jogAmount:simd_float3 = simd_float3()
-    
+    var isKeyDown:Bool = false
+
     func jogCameraAndFocusPosition(_ dx:Int, _ dy:Int, _ dz:Int) {
         if dx != 0 { jogAmount.x = Float(dx) * alterationSpeed * 0.01 }
         if dy != 0 { jogAmount.y = Float(dy) * alterationSpeed * 0.01 }
@@ -1089,7 +1110,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         if dx != 0 { jogAmount.x = 0 }
         if dy != 0 { jogAmount.y = 0 }
         if dz != 0 { jogAmount.z = 0 }
-    }
+   }
     
     func performJog() -> Bool {
         if jogAmount.x == 0 && jogAmount.y == 0 && jogAmount.z == 0 { return false}
@@ -1260,7 +1281,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         
         widget.reset()
         
-        if control.isStereo { widget.addFloat("Parallax",&control.parallax,0.001,1,0.01) }
+        if control.isStereo { widget.addFloat("Parallax",&control.parallax,0.0001,1,0.001) }
 //        widget.addFloat("Bright",&control.bright,0.01,10,0.02)
 //        
 //        widget.addFloat("Enhance",&control.enhance,0,30,0.03)
@@ -1273,11 +1294,25 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addInt32("Iterations",&control.isteps,3,30,1)
             widget.addFloat("Power",&control.fx,1.5,12,0.02)
         case EQU_02_APOLLONIAN2 :
-            widget.addInt32("Iterations",&control.isteps,2,10,1)
+            widget.addInt32("Iterations",&control.isteps,2,40,1)
             widget.addFloat("Multiplier",&control.cx,10,300,0.2)
             widget.addFloat("Foam",&control.cy,0.1,3,0.02)
             widget.addFloat("Foam2",&control.cz,0.1,3,0.02)
             widget.addFloat("Bend",&control.cw,0.01,0.03,0.0001)
+            
+            
+            widget.addFloat("T",&control.dx,-5,5,0.002)
+            widget.addFloat("U",&control.dy,-5,5,0.002)
+            widget.addFloat("V",&control.dz,-5,5,0.002)
+            widget.addFloat("W",&control.ex,-5,5,0.02)
+            widget.addFloat("-X",&control.ey,-5,5,0.05)
+            widget.addFloat("-Y",&control.ez,-5,5,0.05)
+            widget.addFloat("-Z",&control.ew,-5,5,0.05)
+
+            widget.addFloat("part2",&control.fx,0.001,2,0.01)
+
+            
+            
         case EQU_03_KLEINIAN :
             widget.addInt32("Final Iterations",&control.icx, 1,69,1)
             widget.addInt32("Box Iterations",&control.icy,1,40,1)
@@ -1442,12 +1477,36 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addFloat("Spread",&control.dx, 0.01,2,0.01)
             widget.addFloat("Mult",&control.dy, 0.01,2,0.01)
         case EQU_23_PDOF :
-            widget.addInt32("Iterations",&control.isteps,1,25,1)
-            widget.addFloat("box Size",&control.cx,0,2,0.01)
-            widget.addFloat("size",&control.cy,0,2,0.01)
-            widget.addFloat("Offset",&control.cz,-1,1,0.02)
-            widget.addFloat("DE Offset",&control.cw,0,0.01,0.0001)
+            widget.addInt32("Iterations",&control.isteps,1,75,1)
+            widget.addFloat("box Size",&control.cx,-1,3,0.002)
+            widget.addFloat("size",&control.cy,0,2,0.002)
+            widget.addFloat("Offset",&control.cz,-2,2,0.01)
+            widget.addFloat("DE Offset",&control.cw,0,0.02,0.001)
+            widget.addFloat("mult",&control.dx, 0.01,6,0.01)
             juliaGroup(10,0.01)
+        case EQU_24_MAGNETO :
+            widget.addInt32("Iterations",&control.isteps,1,150,1)
+            widget.addFloat("Power",&control.cx,0,16,0.001)
+            widget.addFloat("Modc",&control.cy,1,8,0.01)
+            widget.addFloat("mult",&control.cz, 0.01,20,0.01)
+            widget.addFloat("m2",&control.cw, 0.1,8,0.01)
+            widget.addFloat("dr",&control.dx,0.1,3,0.1)
+            widget.addFloat("grow",&control.dy,0.1,3,0.1)
+//            widget.addFloat("M1 X",&control.dx,-8,8,0.001)
+//            widget.addFloat("M1 Y",&control.dy,-8,8,0.001)
+//            widget.addFloat("M1 Z",&control.dz,-8,8,0.001)
+//            widget.addFloat("M2 X",&control.ex,-8,8,0.001)
+//            widget.addFloat("M2 Y",&control.ey,-8,8,0.001)
+//            widget.addFloat("M2 Z",&control.ez,-8,8,0.001)
+//            widget.addFloat("Bias",&control.fx,0,2,0.001)
+//            widget.addFloat("Bailout",&control.fy,0,30,1)
+//            widget.addFloat("Angle X",&control.angle1,-4,4,0.05)
+//            widget.addFloat("Angle Y",&control.angle2,-4,4,0.05)
+//            widget.addBoolean("Abs X",&control.bdx)
+//            widget.addBoolean("Abs Y",&control.bdy)
+//            widget.addBoolean("Abs Z",&control.bdz)
+//            widget.addBoolean("Style",&control.bdw)
+//            juliaGroup(8,0.01)
         default : break
         }
 

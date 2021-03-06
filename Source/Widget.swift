@@ -7,6 +7,7 @@ protocol WidgetDelegate {
 
 enum WidgetKind { case integer32,float,legend,boolean }
 
+let NO_FOCUS = -1
 var alterationSpeed:Float = 1
 
 struct WidgetData {
@@ -113,6 +114,11 @@ struct WidgetData {
             return Int((Float(value) - range.x) * 100 / (range.y - range.x))
         }
 
+        if(range.x == range.y) {
+            print("Error:  widget range is zero")
+            exit(-1)
+        }
+        
         let value:Float = valuePtr.load(as:Float.self)
         return Int((value - range.x) * 100 / (range.y - range.x))
     }
@@ -135,8 +141,8 @@ struct WidgetData {
 class Widget {
     var delegate:WidgetDelegate?
     var data:[WidgetData] = []
-    var focus:Int = 0
-    var previousFocus:Int = 0
+    var focus:Int = NO_FOCUS
+    var previousFocus:Int = NO_FOCUS
     
     
     var shiftKeyDown = Bool()
@@ -159,8 +165,8 @@ class Widget {
     }
     
     func loseFocus() {
-        if focus >= 0 { previousFocus = focus }
-        focus = -1
+        if focus != NO_FOCUS { previousFocus = focus }
+        focus = NO_FOCUS
         focusChanged()
     }
     
@@ -252,15 +258,18 @@ class Widget {
         alterationSpeed = 1
         if shiftKeyDown && optionKeyDown { alterationSpeed = 50 } else
             if shiftKeyDown { alterationSpeed = 0.1 } else if optionKeyDown { alterationSpeed = 10 }
+        
+        if vc.speed1000 { alterationSpeed *= 0.01 }
     }
     
     var lastKeypressWasArrowKey = false // if true then do not pass keypress onto main window
     
-    func keyPress(_ event:NSEvent) -> Bool { // true == key caused valie change & reCalc of image
+    func keyPress(_ event:NSEvent, _ flagReCalc:Bool = false) -> Bool { // true == key caused value change & reCalc of image
         updateAlterationSpeed(event)
-
         lastKeypressWasArrowKey = false
 
+        var changeMade:Bool = false
+        
         switch Int32(event.keyCode) {
         case LEFT_ARROW :
             lastKeypressWasArrowKey = true
@@ -268,7 +277,7 @@ class Widget {
                 vc.flagViewToRecalcFractal()
                 if data[focus].showValue { delegate?.displayWidgets() }
                 if data[focus].callbackIndex >= 0 { delegate?.widgetCallback(data[focus].callbackIndex) }
-                return true
+                changeMade = true
             }
         case RIGHT_ARROW :
             lastKeypressWasArrowKey = true
@@ -276,24 +285,27 @@ class Widget {
                 vc.flagViewToRecalcFractal()
                 if data[focus].showValue { delegate?.displayWidgets() }
                 if data[focus].callbackIndex >= 0 { delegate?.widgetCallback(data[focus].callbackIndex) }
-                return true
+                changeMade = true
             }
         case DOWN_ARROW :
             lastKeypressWasArrowKey = true
             moveFocus(+1)
-            return false
         case UP_ARROW :
             lastKeypressWasArrowKey = true
             moveFocus(-1)
-            return false
         default : break
         }
         
-        return false
+        if changeMade && focus != NO_FOCUS && event.keyCode != UP_ARROW && event.keyCode != DOWN_ARROW {
+            vc.setShaderToFastRender()
+            vc.flagViewToRecalcFractal()
+        }
+
+        return changeMade
     }
     
     func focusString() -> String {
-        if focus < 0 { return "" }
+        if focus == NO_FOCUS { return "" }
         return data[focus].displayString()
     }
     

@@ -2,9 +2,16 @@ import Cocoa
 
 struct SLEntry {
     var kind = Int()
+    var dateValue = TimeInterval()
     var dateString = String()
     
-    init(_ k:Int, _ str:String) { kind = k; dateString = str }
+    init(_ k:Int, _ str:String, _ value:TimeInterval) { kind = k; dateString = str; dateValue = value }
+    
+    mutating func copy(_ other:SLEntry) {
+        kind = other.kind
+        dateValue = other.dateValue
+        dateString = other.dateString
+    }
 }
 
 let populatedCellBackgroundColor = NSColor(red:0.1,  green:0.5,  blue:0.1, alpha: 1)
@@ -53,16 +60,26 @@ var slEntry:[SLEntry] = []
 class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableViewDelegate,SLCellDelegate {
     @IBOutlet var legend: NSTextField!
     @IBOutlet var scrollView: NSScrollView!
+    @IBOutlet var DateRadio: NSButton!
+    @IBOutlet var KindRadio: NSButton!
     var tv:NSTableView! = nil
     var dateString:String = ""
     var fileURL:URL! = nil
+    var dateSort:Bool = true
 
     func numberOfSections(in tableView: NSTableView) -> Int { return 1 }
-    func numberOfRows(in tableView: NSTableView) -> Int { return slEntry.count+1 }
+    func numberOfRows(in tableView: NSTableView) -> Int { return slEntry.count }
     
     func didTapButton(_ sender: NSButton) {
         let buttonPosition = sender.convert(CGPoint.zero, to:tv)
         saveAndDismissDialog(tv.row(at:buttonPosition))
+    }
+    
+    @IBAction func radioPressed(_ sender: NSButton) {
+        dateSort = sender == DateRadio
+        updateSortButtons()
+        sortSLEntries()
+        tv.reloadData()
     }
     
     func loadSLEntries() {
@@ -85,11 +102,45 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
                 kind = Int(cc.equation)
             }
 
-            slEntry.append(SLEntry(kind,str))
+            slEntry.append(SLEntry(kind,str,dateValue))
             index += 1
         }
         
-        slEntry.append(SLEntry(0,noFileString))
+        slEntry.append(SLEntry(99,noFileString,0))
+        sortSLEntries()
+    }
+
+    func sortSLEntries() {
+        var okay:Bool = true
+        
+        func swap(_ i:Int) {
+            let t = slEntry[i+1]
+            slEntry[i+1].copy(slEntry[i])
+            slEntry[i].copy(t)
+            okay = false
+        }
+
+        func dSort(_ i:Int) {
+            if slEntry[i].dateValue > slEntry[i+1].dateValue { swap(i) }
+        }
+        
+        while true {
+            okay = true
+            
+            for i in 0 ..< slEntry.count-2 {  // leave "unused" entry at end of list
+                if dateSort {
+                    dSort(i)
+                }
+                else { // Kind sort
+                    if slEntry[i].kind > slEntry[i+1].kind {
+                        swap(i)
+                    }
+              //      else if slEntry[i].kind == slEntry[i-1].kind { dSort(i) }
+                }
+            }
+            
+            if okay { break }
+        }
     }
     
     override func viewDidLoad() {
@@ -98,7 +149,14 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
         tv.dataSource = self
         tv.delegate = self
         
+        updateSortButtons()
+        
         loadSLEntries()
+    }
+
+    func updateSortButtons() {
+        DateRadio.set(textColor: dateSort ? .red : .black)
+        KindRadio.set(textColor: !dateSort ? .red : .black)
     }
     
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
@@ -167,6 +225,8 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     
     //MARK:-
     
+    var dateValue = TimeInterval()
+    
     func determineDateString(_ index:Int) -> String {
         var dStr = noFileString
         
@@ -175,7 +235,10 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
         do {
             let key:Set<URLResourceKey> = [.creationDateKey]
             let value = try fileURL.resourceValues(forKeys: key)
-            if let date = value.creationDate { dStr = date.toString() }
+            if let date = value.creationDate {
+                dateValue = date.timeIntervalSince1970
+                dStr = date.toString()
+            }
         } catch {
             // print(error)
         }
@@ -264,6 +327,20 @@ extension Date {
         let ds = dateFormatter.string(from: self)
         let str:String = String.init(format: "%@_%@.%@",filename,ds,extensionString)
         return str
+    }
+}
+
+extension NSButton {
+
+    func set(textColor color: NSColor) {
+        let newAttributedTitle = NSMutableAttributedString(attributedString: attributedTitle)
+        let range = NSRange(location: 0, length: attributedTitle.length)
+
+        newAttributedTitle.addAttributes([
+            .foregroundColor: color,
+        ], range: range)
+
+        attributedTitle = newAttributedTitle
     }
 }
 
