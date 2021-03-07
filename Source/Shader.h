@@ -114,11 +114,6 @@ typedef struct {
     float coloring1,coloring2,coloring3,coloring4,coloring5;
     float coloring6,coloring7,coloring8,coloring9,coloringa;
     
-    vector_float3 LVIlow,LVIhigh;
-    float fLVIiter,LVIr,LVIg,LVIb;
-    int LVIiter;
-    bool LVIenable;
-    
     float blurFocalDistance,blurStrength;
 
 } Control;

@@ -3,7 +3,7 @@
 
 // Define this to speed up compilation times
 // in the DE() function you are editing: comment out the "#ifdef SINGLE_EQUATION"... and "#endif" lines
-#define SINGLE_EQUATION 1
+//#define SINGLE_EQUATION 1
 
 using namespace metal;
 
@@ -51,7 +51,7 @@ float SphereRadius(float t,float scale) {
 //MARK: - 1 MandelBulb
 // mandelbulb: https://github.com/jtauber/mandelbulb/blob/master/mandel8.py
 
-float DE_MANDELBULB(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+float DE_MANDELBULB(float3 pos,device Control &control,thread float4 &orbitTrap) {
 #ifdef SINGLE_EQUATION
     return 0;
 #else
@@ -61,11 +61,7 @@ float DE_MANDELBULB(float3 pos,thread Control &control,thread float4 &orbitTrap)
     float3 ot,trap = control.otFixed;
     if(control.orbitStyle == 2) trap -= pos;
 
-    control.LVIlow = pos;
-
     for(int i=0; i < control.isteps; ++i) {
-        if(i < control.LVIiter) control.LVIlow = pos;
-
         r = length(pos);
         if(r > 2) break;
 
@@ -77,8 +73,6 @@ float DE_MANDELBULB(float3 pos,thread Control &control,thread float4 &orbitTrap)
         pos.x += pwr * ss * cos(phi * control.fx);
         pos.y += pwr * ss * sin(phi * control.fx);
         pos.z += pwr * cos(theta * control.fx);
-
-        if(i < control.LVIiter) control.LVIhigh = pos;
 
         dr = (pow(r, control.fx - 1.0) * control.fx * dr ) + 1.0;
 
@@ -121,7 +115,7 @@ float DE_MANDELBULB(float3 pos,thread Control &control,thread float4 &orbitTrap)
 //return length(q.xyz)/q.w;
 
 
-float DE_APOLLONIAN2(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+float DE_APOLLONIAN2(float3 pos,device Control &control,thread float4 &orbitTrap) {
 //    #ifdef SINGLE_EQUATION
 //        return 0;
 //    #else
@@ -302,7 +296,7 @@ void TransA(thread float3 &z, thread float &DF, float a, float b) {
 //widget.addBoolean("B: ShowBalls",&control.bcx)
 //widget.addBoolean("F: FourGen",&control.bcz)
 
-float JosKleinian(float3 z,thread Control &control,thread float4 &orbitTrap) {
+float JosKleinian(float3 z,device Control &control,thread float4 &orbitTrap) {
 //    #ifdef SINGLE_EQUATION
 //        return 0;
 //    #else
@@ -315,11 +309,7 @@ float JosKleinian(float3 z,thread Control &control,thread float4 &orbitTrap) {
     float3 ot,trap = control.otFixed;
     if(control.orbitStyle == 2) trap -= z;
     
-    control.LVIlow = z;
-
     for (int i = 0; i < control.icy; i++) {
-        if(i < control.LVIiter) control.LVIlow = z;
-
         z.x=z.x+b/a*z.y;
         if (control.bcz)
             z = wrap(z, float3(2. * control.cz, a, 2. * control.cw), float3(-control.cz, 0., -control.cw));
@@ -343,8 +333,6 @@ float JosKleinian(float3 z,thread Control &control,thread float4 &orbitTrap) {
         //Store previous iterates
         llz=lz; lz=z;
         
-        if(i < control.LVIiter) control.LVIhigh = z;
-
         ot = z;
         if(control.orbitStyle > 0) ot -= trap;
         orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
@@ -364,7 +352,7 @@ float JosKleinian(float3 z,thread Control &control,thread float4 &orbitTrap) {
 //    #endif
 }
 
-float DE_KLEINIAN(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+float DE_KLEINIAN(float3 pos,device Control &control,thread float4 &orbitTrap) {
 //    if(control.bcy) {
 //        pos = pos - control.InvCenter;
 //        float r = length(pos);
@@ -393,7 +381,7 @@ float boxFold2(float v, float fold) { // http://www.fractalforums.com/new-theori
     return v;
 }
 
-float DE_MANDELBOX(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+float DE_MANDELBOX(float3 pos,device Control &control,thread float4 &orbitTrap) {
     #ifdef SINGLE_EQUATION
         return 0;
     #else
@@ -407,11 +395,8 @@ float DE_MANDELBOX(float3 pos,thread Control &control,thread float4 &orbitTrap) 
     float3 ot,trap = control.otFixed;
     if(control.orbitStyle == 2) trap -= pos;
     
-    control.LVIlow = pos;
 
     for(int i = 0; i < control.isteps; ++i) {
-        if(i < control.LVIiter) control.LVIlow = pos;
-
         if(control.bcy) {
             pos.x = boxFold(pos.x,control.cx);
             pos.y = boxFold(pos.y,control.cx);
@@ -439,8 +424,6 @@ float DE_MANDELBOX(float3 pos,thread Control &control,thread float4 &orbitTrap) 
         pos = pos * control.fx + c;
         dr *= control.fx;
         
-        if(i < control.LVIiter) control.LVIhigh = pos;
-
         ot = pos;
         if(control.orbitStyle > 0) ot -= trap;
         orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
@@ -453,7 +436,7 @@ float DE_MANDELBOX(float3 pos,thread Control &control,thread float4 &orbitTrap) 
 //MARK: - 5 Quaternion Julia
 // quat julia 2 : https://github.com/3Dickulus/FragM/blob/master/Fragmentarium-Source/Examples/Experimental/Stereographic4DJulia.frag
 
-float DE_QUATJULIA(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+float DE_QUATJULIA(float3 pos,device Control &control,thread float4 &orbitTrap) {
     #ifdef SINGLE_EQUATION
         return 0;
     #else
@@ -466,11 +449,7 @@ float DE_QUATJULIA(float3 pos,thread Control &control,thread float4 &orbitTrap) 
     float3 ot,trap = control.otFixed;
     if(control.orbitStyle == 2) trap -= pos;
     
-    control.LVIlow = pos;
-
     for(int i=0;i < control.isteps; ++i) {
-        if(i < control.LVIiter) control.LVIlow = pos;
-
         md2 *= 4.0 * mz2;
         nz.x = z.x * z.x - dot(z.yzw,z.yzw);
         nz.yzw = 2.0 * z.x * z.yzw;
@@ -479,8 +458,6 @@ float DE_QUATJULIA(float3 pos,thread Control &control,thread float4 &orbitTrap) 
         mz2 = dot(z,z);
         if(mz2 > 12.0) break;
         
-        if(i < control.LVIiter) control.LVIhigh = pos;
-
         ot = z.xyz;
         if(control.orbitStyle > 0) ot -= trap;
         orbitTrap = min(orbitTrap, float4(abs(ot), mz2));
@@ -504,7 +481,7 @@ float4x4 rotationMat(float3 xyz )
                     0.0,                      0.0,                      0.0,        1.0 );
 }
 
-float DE_MONSTER(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+float DE_MONSTER(float3 pos,device Control &control,thread float4 &orbitTrap) {
 #ifdef SINGLE_EQUATION
     return 0;
 #else
@@ -526,11 +503,7 @@ float DE_MONSTER(float3 pos,thread Control &control,thread float4 &orbitTrap) {
     float3 ot,trap = control.otFixed;
     if(control.orbitStyle == 2) trap -= pos;
     
-    control.LVIlow = pos;
-
     for( int i=0; i < control.isteps; i++ ) {
-        if(i < control.LVIiter) control.LVIlow = pos;
-
         m = min( m, dot(pos,pos) /(k*k) );
         pos = (control.mm * float4((abs(pos)),1.0)).xyz;
         
@@ -539,8 +512,6 @@ float DE_MONSTER(float3 pos,thread Control &control,thread float4 &orbitTrap) {
         
         k *= control.cw;
         
-        if(i < control.LVIiter) control.LVIhigh = pos;
-
         ot = pos;
         if(control.orbitStyle > 0) ot -= trap;
         orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
@@ -568,7 +539,7 @@ float4 rotateXZ(float4 pos, float angle) {
     return pos;
 }
 
-float DE_KALI_TOWER(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+float DE_KALI_TOWER(float3 pos,device Control &control,thread float4 &orbitTrap) {
     #ifdef SINGLE_EQUATION
         return 0;
     #else
@@ -581,18 +552,12 @@ float DE_KALI_TOWER(float3 pos,thread Control &control,thread float4 &orbitTrap)
     float3 ot,trap = control.otFixed;
     if(control.orbitStyle == 2) trap -= pos;
     
-    control.LVIlow = pos;
-
     for (int i=0; i < control.isteps; i++) {
-        if(i < control.LVIiter) control.LVIlow = p.xyz;
-
         p.xyz = abs(p.xyz) - float3(.0,control.cx,.0);
         p = p * 2./clamp(dot(p.xyz,p.xyz),.3,1.) - float4(0.5,1.5,0.5,0.);
         
         p = rotateXZ(p,aa * control.cz);
         
-        if(i < control.LVIiter) control.LVIhigh = p.xyz;
-
         ot = p.xyz;
         if(control.orbitStyle > 0) ot -= trap;
         orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
@@ -613,7 +578,7 @@ float DE_KALI_TOWER(float3 pos,thread Control &control,thread float4 &orbitTrap)
 //MARK: - 8 Gold
 // Gold: https://www.shadertoy.com/view/XdGXRV
 
-float DE_GOLD(float3 p,thread Control &control,thread float4 &orbitTrap) {
+float DE_GOLD(float3 p,device Control &control,thread float4 &orbitTrap) {
     #ifdef SINGLE_EQUATION
         return 0;
     #else
@@ -625,17 +590,11 @@ float DE_GOLD(float3 p,thread Control &control,thread float4 &orbitTrap) {
     float3 ot,trap = control.otFixed;
     if(control.orbitStyle == 2) trap -= p;
     
-    control.LVIlow = p;
-
     for(int i = 0; i < control.isteps; ++i) {
-        if(i < control.LVIiter) control.LVIlow = q.xyz;
-
         q.xyz = abs(q.xyz) - offset1;
         q = 2.0*q/clamp(dot(q.xyz, q.xyz), 0.4, 1.0) - offset2;
         
-        if(i < control.LVIiter) control.LVIhigh = q.xyz;
-
-        ot = q.xyz;
+       ot = q.xyz;
         if(control.orbitStyle > 0) ot -= trap;
         orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
     }
@@ -652,7 +611,7 @@ float smax(float a, float b, float s) { // iq smin
     return mix(b, a, h) + h*(1.0-h)*s;
 }
 
-float DE_SPIDER(float3 p,thread Control &control,thread float4 &orbitTrap) {
+float DE_SPIDER(float3 p,device Control &control,thread float4 &orbitTrap) {
     #ifdef SINGLE_EQUATION
         return 0;
     #else
@@ -663,18 +622,12 @@ float DE_SPIDER(float3 p,thread Control &control,thread float4 &orbitTrap) {
     float3 ot,trap = control.otFixed;
     if(control.orbitStyle == 2) trap -= p;
     
-    control.LVIlow = p;
-
     for(int i = 0; i < 2; ++i) {
-        if(i < control.LVIiter) control.LVIlow = p;
-
         float m = dot(p,p);
         p = abs(fract(p/m)-0.5);
         p = rotatePosition(p,0,q);
         s *= m;
         
-        if(i < control.LVIiter) control.LVIhigh = p;
-
         ot = p;
         if(control.orbitStyle > 0) ot -= trap;
         orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
@@ -688,7 +641,7 @@ float DE_SPIDER(float3 p,thread Control &control,thread float4 &orbitTrap) {
 //MARK: - 10 Knighty's Kleinian
 // knighty's kleinian : https://www.shadertoy.com/view/lstyR4
 
-float DE_KLEINIAN2(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+float DE_KLEINIAN2(float3 pos,device Control &control,thread float4 &orbitTrap) {
     #ifdef SINGLE_EQUATION
         return 0;
     #else
@@ -697,18 +650,12 @@ float DE_KLEINIAN2(float3 pos,thread Control &control,thread float4 &orbitTrap) 
     float3 ot,trap = control.otFixed;
     if(control.orbitStyle == 2) trap -= pos;
     
-    control.LVIlow = pos;
-
     for(int i=0; i < control.isteps; ++i) {
-        if(i < control.LVIiter) control.LVIlow = pos;
-
         pos = 2 * clamp(pos, control.v4a.xyz, control.v4b.xyz) - pos;
         k = max(control.v4a.w / dot(pos,pos), control.fx);
         pos *= k;
         scale *= k;
         
-        if(i < control.LVIiter) control.LVIhigh = pos;
-
         ot = pos;
         if(control.orbitStyle > 0) ot -= trap;
         orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
@@ -722,7 +669,7 @@ float DE_KLEINIAN2(float3 pos,thread Control &control,thread float4 &orbitTrap) 
 //MARK: - 11 IFS Tetrahedron
 // IFS Tetrahedron : https://github.com/3Dickulus/FragM/blob/master/Fragmentarium-Source/Examples/Kaleidoscopic%20IFS/Tetrahedron.frag
 
-float DE_HALF_TETRA(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+float DE_HALF_TETRA(float3 pos,device Control &control,thread float4 &orbitTrap) {
 //    #ifdef SINGLE_EQUATION
 //        return 0;
 //    #else
@@ -731,11 +678,7 @@ float DE_HALF_TETRA(float3 pos,thread Control &control,thread float4 &orbitTrap)
     float3 ot,trap = control.otFixed;
     if(control.orbitStyle == 2) trap -= pos;
     
-    control.LVIlow = pos;
-
     for(i=0;i < control.isteps; ++i) {
-        if(i < control.LVIiter) control.LVIlow = pos;
-
         pos = rotatePosition(pos,0,control.angle1);
         
         if(pos.x - pos.y < 0.0) pos.xy = pos.yx;
@@ -746,8 +689,6 @@ float DE_HALF_TETRA(float3 pos,thread Control &control,thread float4 &orbitTrap)
         pos = pos * control.cx - control.v3a * (control.cx - 1.0);
         if(length(pos) > 4) break;
         
-        if(i < control.LVIiter) control.LVIhigh = pos;
-
         ot = pos;
         if(control.orbitStyle > 0) ot -= trap;
         orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
@@ -759,7 +700,7 @@ float DE_HALF_TETRA(float3 pos,thread Control &control,thread float4 &orbitTrap)
 
 //MARK: - 12 Kaleidoscope
 
-float DE_KALEIDO(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+float DE_KALEIDO(float3 pos,device Control &control,thread float4 &orbitTrap) {
     #ifdef SINGLE_EQUATION
         return 0;
     #else
@@ -768,11 +709,7 @@ float DE_KALEIDO(float3 pos,thread Control &control,thread float4 &orbitTrap) {
     float3 ot,trap = control.otFixed;
     if(control.orbitStyle == 2) trap -= pos;
     
-    control.LVIlow = pos;
-
     for(i=0;i < control.isteps; ++i) {
-        if(i < control.LVIiter) control.LVIlow = pos;
-
         pos = rotatePosition(pos,0,control.angle1);
         
         pos = abs(pos);
@@ -788,8 +725,6 @@ float DE_KALEIDO(float3 pos,thread Control &control,thread float4 &orbitTrap) {
         pos = pos * control.cx - control.v3a * (control.cx - 1.0);
         if(length(pos) > 4) break;
         
-        if(i < control.LVIiter) control.LVIhigh = pos;
-
         ot = pos;
         if(control.orbitStyle > 0) ot -= trap;
         orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
@@ -802,7 +737,7 @@ float DE_KALEIDO(float3 pos,thread Control &control,thread float4 &orbitTrap) {
 //MARK: - 13 Polychora
 // polychora : https://github.com/Syntopia/Fragmentarium/blob/master/Fragmentarium-Source/Examples/Knighty%20Collection/polychora-special.frag
 
-float4 Rotate(float4 p,thread Control &control) {
+float4 Rotate(float4 p,device Control &control) {
     //this is a rotation on the plane defined by RotVector and w axis
     //We do not need more because the remaining 3 rotation are in our 3D space
     //That would be redundant.
@@ -815,7 +750,7 @@ float4 Rotate(float4 p,thread Control &control) {
     return p1;
 }
 
-float4 fold(float4 pos,thread Control &control) {
+float4 fold(float4 pos,device Control &control) {
     for(int i=0;i<3;i++){
         pos.xyz=abs(pos.xyz);
         float t =-2.*min(0.,dot(pos,control.v4a));
@@ -824,7 +759,7 @@ float4 fold(float4 pos,thread Control &control) {
     return pos;
 }
 
-float DDV(float ca, float sa, float r,thread Control &control) {
+float DDV(float ca, float sa, float r,device Control &control) {
     //magic formula to convert from spherical distance to planar distance.
     //involves transforming from 3-plane to 3-sphere, getting the distance
     //on the sphere (which is an angle -read: sa==sin(a) and ca==cos(a))
@@ -833,17 +768,17 @@ float DDV(float ca, float sa, float r,thread Control &control) {
     return (2. * r * control.ex-(1.-r*r) * control.ey)/((1.-r*r) * control.ex + 2.*r * control.ey+1.+r*r)-(2.*r*ca-(1.-r*r)*sa)/((1.-r*r)*ca+2.*r*sa+1.+r*r);
 }
 
-float DDS(float ca, float sa, float r,thread Control &control) {
+float DDS(float ca, float sa, float r,device Control &control) {
     return (2.*r * control.ez-(1.-r*r) * control.ew)/((1.-r*r) * control.ez+2.*r * control.ew+1.+r*r)-(2.*r*ca-(1.-r*r)*sa)/((1.-r*r)*ca+2.*r*sa+1.+r*r);
 }
 
-float dist2Vertex(float4 z, float r,thread Control &control) {
+float dist2Vertex(float4 z, float r,device Control &control) {
     float ca=dot(z,control.v4b);
     float sa=0.5*length(control.v4b-z) * length(control.v4b+z);
     return DDV(ca,sa,r,control);
 }
 
-float dist2Segment(float4 z, float4 n, float r,thread Control &control) {
+float dist2Segment(float4 z, float4 n, float r,device Control &control) {
     //pmin is the orthogonal projection of z onto the plane defined by p and n
     //then pmin is projected onto the unit sphere
     float zn=dot(z,n);
@@ -858,18 +793,16 @@ float dist2Segment(float4 z, float4 n, float r,thread Control &control) {
     return DDS(ca,sa,r,control);//-SRadius;
 }
 
-float dist2Segments(float4 z, float r,thread Control &control) {
+float dist2Segments(float4 z, float r,device Control &control) {
     float da = dist2Segment(z, float4(1,0,0,0), r,control);
     float db = dist2Segment(z, float4(0,1,0,0), r,control);
     float dc = dist2Segment(z, float4(0,0,1,0), r,control);
     float dd = dist2Segment(z, control.v4a, r,control);
     
-    control.LVIhigh = z.xyz;
-
     return min(min(da,db),min(dc,dd));
 }
 
-float DE_POLYCHORA(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+float DE_POLYCHORA(float3 pos,device Control &control,thread float4 &orbitTrap) {
     #ifdef SINGLE_EQUATION
         return 0;
     #else
@@ -881,8 +814,6 @@ float DE_POLYCHORA(float3 pos,thread Control &control,thread float4 &orbitTrap) 
     float3 ot,trap = control.otFixed;
     if(control.orbitStyle == 2) trap -= pos;
     
-    control.LVIlow = pos;
-
     ot = z4.xyz;
     if(control.orbitStyle > 0) ot -= trap;
     orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
@@ -895,14 +826,14 @@ float DE_POLYCHORA(float3 pos,thread Control &control,thread float4 &orbitTrap) 
 //MARK: - 14 Quaternion Julia 2
 // quat julia 2 : https://github.com/3Dickulus/FragM/blob/master/Fragmentarium-Source/Examples/Experimental/Stereographic4DJulia.frag
 
-float4 stereographic3Sphere(float3 pos,thread Control &control) {
+float4 stereographic3Sphere(float3 pos,device Control &control) {
     float n = dot(pos,pos)+1.;
     return float4(control.cx * pos,n-2.) / n;
 }
 
 float2 complexMul(float2 a, float2 b) { return float2(a.x*b.x - a.y*b.y, a.x*b.y + a.y * b.x); }
 
-float DE_QUATJULIA2(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+float DE_QUATJULIA2(float3 pos,device Control &control,thread float4 &orbitTrap) {
     #ifdef SINGLE_EQUATION
         return 0;
     #else
@@ -918,19 +849,13 @@ float DE_QUATJULIA2(float3 pos,thread Control &control,thread float4 &orbitTrap)
     float3 ot,trap = control.otFixed;
     if(control.orbitStyle == 2) trap -= pos;
     
-    control.LVIlow = pos;
-
     for (int i = 0; i < control.isteps; ++i) {
-        if(i < control.LVIiter) control.LVIlow = pos;
-
         dp = 2.0 * length(p) * dp + 1.0;
         p = complexMul(p,p) + c;
         
         d = dot(p,p);
         if(d > 10) break;
         
-        if(i < control.LVIiter) control.LVIhigh = pos;
-
         ot = float3(p,1);
         if(control.orbitStyle > 0) ot -= trap;
         orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
@@ -944,7 +869,7 @@ float DE_QUATJULIA2(float3 pos,thread Control &control,thread float4 &orbitTrap)
 //MARK: - 15 Spudsville
 // spudsville : https://github.com/3Dickulus/FragM/blob/master/Fragmentarium-Source/Examples/Experimental/Spudsville2.frag
 
-void spudsSphereFold(thread float3 &z, thread float &dz,thread Control &control) {
+void spudsSphereFold(thread float3 &z, thread float &dz,device Control &control) {
     float r2 = dot(z,z);
     if (r2< control.cx) {
         float temp = (control.cy / control.cx);
@@ -957,15 +882,17 @@ void spudsSphereFold(thread float3 &z, thread float &dz,thread Control &control)
     }
 }
 
-void spudsBoxFold(thread float3 &z, thread float &dz,thread Control &control) {
+void spudsBoxFold(thread float3 &z, thread float &dz,device Control &control) {
     z = clamp(z, -control.cz, control.cz) * 2.0 - z;
 }
 
-void spudsBoxFold3(thread float3 &z, thread float &dz,thread Control &control) {
+void spudsBoxFold3(thread float3 &z, thread float &dz,device Control &control) {
     z = clamp(z, -control.cw,control.cw) * 2.0 - z;
 }
 
-void spudsPowN2(thread float3 &z, float zr0, thread float &dr,thread Control &control) {
+float3 triPow(float power, float3 a);
+
+void spudsPowN2(thread float3 &z, float zr0, thread float &dr,device Control &control) {
     float zo0 = asin( z.z/zr0 );
     float zi0 = atan2( z.y,z.x );
     float zr = pow( zr0, control.fx-1.0 );
@@ -976,53 +903,133 @@ void spudsPowN2(thread float3 &z, float zr0, thread float &dr,thread Control &co
     z = zr*float3( cos(zo)*cos(zi), cos(zo)*sin(zi), control.dx * sin(zo) );
 }
 
-float DE_SPUDS(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+//float DE_SPUDS(float3 pos,device Control &control,thread float4 &orbitTrap) {
+//    #ifdef SINGLE_EQUATION
+//        return 0;
+//    #else
+//    int i = 0;
+//    float dz = 1.0;
+//    float r = 1;
+//
+//    float3 ot,trap = control.otFixed;
+//    if(control.orbitStyle == 2) trap -= pos;
+//
+//    while(r < 10 && i < control.isteps) {
+//        if (i <=  control.isteps/2) {
+//            spudsBoxFold(pos,dz,control);
+//            spudsSphereFold(pos,dz,control);
+//            pos = control.dz * pos;
+//            dz *= abs(control.dz);
+//            r = length(pos);
+//        } else {
+//            spudsBoxFold3(pos,dz,control);
+//            r = length(pos);
+//            spudsPowN2(pos,r,dz,control);
+//            pos = control.dw * pos;
+//            dz *= abs(control.dw);
+//        }
+//
+//        ot = pos;
+//        if(control.orbitStyle > 0) ot -= trap;
+//        orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
+//
+//        i++;
+//    }
+//
+//    return r * log(r) / dz;
+//    #endif
+//}
+
+
+// https://www.shadertoy.com/view/ltjBRz
+float apollonian(float3 p,device Control &control)
+{
+    float scale = 1.0;
+    
+    for( int i=0; i < control.isteps;i++) {
+        p = -1.0 + 2.0*fract(0.5*p+0.5);
+        float r2 = dot(p,p);
+        float k = 2./ r2;
+        p *= k;
+        scale *= k;
+    }
+    
+    return 0.25*abs(p.y)/scale;
+}
+
+float box(float3 p, float3 b,device Control &control)
+{
+      float3 d = abs(p) - b;
+      return min(max(d.x,max(d.y,d.z)),0.0) + length(max(d,0.0));
+}
+
+float DE_SPUDS(float3 p,device Control &control,thread float4 &orbitTrap) {
     #ifdef SINGLE_EQUATION
         return 0;
     #else
-    int i = 0;
-    float dz = 1.0;
-    float r = length(pos);
-    
-    float3 ot,trap = control.otFixed;
-    if(control.orbitStyle == 2) trap -= pos;
-    
-    control.LVIlow = pos;
-
-    while(r < 5 && i < control.isteps) {
-        if(i < control.LVIiter) control.LVIlow = pos;
-
-        if (i < control.isteps/2) {
-            spudsBoxFold(pos,dz,control);
-            spudsSphereFold(pos,dz,control);
-            pos = control.dz * pos;
-            dz *= abs(control.dz);
-            r = length(pos);
-        } else {
-            spudsBoxFold3(pos,dz,control);
-            r = length(pos);
-            spudsPowN2(pos,r,dz,control);
-            pos = control.dw * pos;
-            dz *= abs(control.dw);
-        }
-        
-        if(i < control.LVIiter) control.LVIhigh = pos;
-
-        ot = pos;
-        if(control.orbitStyle > 0) ot -= trap;
-        orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
-        
-        i++;
-    }
-    
-    return r * log(r) / dz;
+    p = rotatePosition(p,1,control.cx);
+    float3 q = p;
+    float d0 = apollonian(p * 0.5,control) * control.dz;
+    float d1=abs(p.y + 0.2);
+    float d3 = box(q + float3(0.,control.cy,0.), control.cz * float3(control.cw,control.dx,control.dy),control);
+    float d = max(d0, d3);
+    return min(d,d1);
     #endif
 }
 
+
+
+//// https://www.shadertoy.com/view/4sGyRR
+//float DE_SPUDS(float3 p,device Control &control,thread float4 &orbitTrap) {
+//    #ifdef SINGLE_EQUATION
+//        return 0;
+//    #else
+//    float scale = 1.0;
+//    float3 c = float3(control.cx,control.cy,control.cz);
+//
+//    for(int i=0; i < control.isteps;i++)  {
+//        p = 2.0*clamp(p, -c, c) - p;
+//        float r2 = dot(p,p);
+//        float k = max((1.)/(r2), 0.03);
+//        p *= k;
+//        scale *= k;
+//    }
+//    float l = length(p.xy);
+//    float rxy = l - 3.;
+//    float n = l * p.z;
+//    rxy = max(rxy, -(n) / (length(p))-0.02);
+//    return (rxy) / abs(scale);
+//    #endif
+//}
+
+
+
+/*
+//==========  spudsville ===========================
+const vec3 c = vec3(.808, .7, 1.137);
+float f(vec3 p)
+{
+    float scale = 1.0;
+    
+    for(int i=0; i < DE_ITER;i++)
+    {
+        p = 2.0*clamp(p, -c, c) - p;
+        float r2 = dot(p,p);
+        float k = max((1.)/(r2), 0.03);
+        p *= k;
+        scale *= k;
+    }
+    float l = length(p.xy);
+    float rxy = l - 3.;
+    float n = l * p.z;
+    rxy = max(rxy, -(n) / (length(p))-0.02);
+    return (rxy) / abs(scale);
+}
+*/
 //MARK: - 16 Flower Hive
 // FlowerHive: https://www.shadertoy.com/view/lt3Gz8
 
-float DE_FLOWER(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+float DE_FLOWER(float3 pos,device Control &control,thread float4 &orbitTrap) {
     #ifdef SINGLE_EQUATION
         return 0;
     #else
@@ -1032,18 +1039,12 @@ float DE_FLOWER(float3 pos,thread Control &control,thread float4 &orbitTrap) {
     float3 ot,trap = control.otFixed;
     if(control.orbitStyle == 2) trap -= pos;
     
-    control.LVIlow = pos;
-
     for(int i = 0; i < control.isteps; ++i) { //kaliset fractal with no mirroring offset
-        if(i < control.LVIiter) control.LVIlow = q.xyz;
-
         q.xyz = abs(q.xyz);
         float r = dot(q.xyz, q.xyz);
         q /= clamp(r, 0.0, control.cx);
         
         q = 2.0 * q - juliaOffset;
-        
-        if(i < control.LVIiter) control.LVIhigh = q.xyz;
 
         ot = q.xyz;
         if(control.orbitStyle > 0) ot -= trap;
@@ -1057,7 +1058,7 @@ float DE_FLOWER(float3 pos,thread Control &control,thread float4 &orbitTrap) {
 //MARK: - 17 SpiralBox
 // SpiralBox : https://fractalforums.org/fragmentarium/17/last-length-increase-colouring-well-sort-of/2515
 
-float DE_SPIRALBOX(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+float DE_SPIRALBOX(float3 pos,device Control &control,thread float4 &orbitTrap) {
     #ifdef SINGLE_EQUATION
         return 0;
     #else
@@ -1068,11 +1069,7 @@ float DE_SPIRALBOX(float3 pos,thread Control &control,thread float4 &orbitTrap) 
     float3 ot,trap = control.otFixed;
     if(control.orbitStyle == 2) trap -= pos;
     
-    control.LVIlow = pos;
-
     for(int i=0; i < control.isteps; ++i) {
-        if(i < control.LVIiter) control.LVIlow = z;
-
         z.xyz = clamp(z.xyz, -control.cx, control.cx)*2. - z.xyz;
         
         r = dot(z,z);
@@ -1083,8 +1080,6 @@ float DE_SPIRALBOX(float3 pos,thread Control &control,thread float4 &orbitTrap) 
         z.xz *= -1.;
         z += offset;
         
-        if(i < control.LVIiter) control.LVIhigh = z;
-
         ot = z;
         if(control.orbitStyle > 0) ot -= trap;
         orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
@@ -1108,7 +1103,7 @@ float surfBoxFold(float v, float fold, float foldModX) {
     return v;
 }
 
-float DE_SURFBOX(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+float DE_SURFBOX(float3 pos,device Control &control,thread float4 &orbitTrap) {
     #ifdef SINGLE_EQUATION
         return 0;
     #else
@@ -1120,11 +1115,7 @@ float DE_SURFBOX(float3 pos,thread Control &control,thread float4 &orbitTrap) {
     float3 ot,trap = control.otFixed;
     if(control.orbitStyle == 2) trap -= pos;
     
-    control.LVIlow = pos;
-
     for(int i = 0; i < control.isteps; ++i) {
-        if(i < control.LVIiter) control.LVIlow = pos;
-
         pos.x = surfBoxFold(pos.x,control.cx,control.dx);
         pos.y = surfBoxFold(pos.y,control.cx,control.dx);
         pos.z = surfBoxFold(pos.z,control.cx,control.dx);
@@ -1145,8 +1136,6 @@ float DE_SURFBOX(float3 pos,thread Control &control,thread float4 &orbitTrap) {
         pos = pos * control.fx + c;
         dr *= control.fx;
         
-        if(i < control.LVIiter) control.LVIhigh = pos;
-
         ot = pos;
         if(control.orbitStyle > 0) ot -= trap;
         orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
@@ -1159,7 +1148,7 @@ float DE_SURFBOX(float3 pos,thread Control &control,thread float4 &orbitTrap) {
 //MARK: - 19 Twistbox
 // Twistbox: http://www.fractalforums.com/amazing-box-amazing-surf-and-variations/twistbox-spiralling-1-scale-box-variant/
 
-float DE_TWISTBOX(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+float DE_TWISTBOX(float3 pos,device Control &control,thread float4 &orbitTrap) {
     #ifdef SINGLE_EQUATION
         return 0;
     #else
@@ -1169,11 +1158,7 @@ float DE_TWISTBOX(float3 pos,thread Control &control,thread float4 &orbitTrap) {
     float3 ot,trap = control.otFixed;
     if(control.orbitStyle == 2) trap -= pos;
     
-    control.LVIlow = pos;
-
     for(int i = 0; i < control.isteps; ++i) {
-        if(i < control.LVIiter) control.LVIlow = pos;
-
         pos = clamp(pos, -control.cx,control.cx)*2 - pos;
         
         r = dot(pos,pos);
@@ -1182,8 +1167,6 @@ float DE_TWISTBOX(float3 pos,thread Control &control,thread float4 &orbitTrap) {
         DF/= r;
         pos.xz *= -1;
         pos += c;
-
-        if(i < control.LVIiter) control.LVIhigh = pos;
 
         ot = pos;
         if(control.orbitStyle > 0) ot -= trap;
@@ -1197,7 +1180,7 @@ float DE_TWISTBOX(float3 pos,thread Control &control,thread float4 &orbitTrap) {
 
 //MARK: - 20 Vertebrae
 
-float DE_VERTEBRAE(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+float DE_VERTEBRAE(float3 pos,device Control &control,thread float4 &orbitTrap) {
 //#ifdef SINGLE_EQUATION
 //    return 0;
 //#else
@@ -1222,11 +1205,7 @@ float DE_VERTEBRAE(float3 pos,thread Control &control,thread float4 &orbitTrap) 
     float3 ot,trap = control.otFixed;
     if(control.orbitStyle == 2) trap -= pos;
     
-    control.LVIlow = pos;
-
     for(int i=0;i < control.isteps; ++i) {
-        if(i < control.LVIiter) control.LVIlow = pos;
-
         md2 *= 4.0 * mz2;
         nz.x = z.x * z.x - dot(z.yzw,z.yzw);
         nz.yzw = 2.0 * z.x * z.yzw;
@@ -1242,8 +1221,6 @@ float DE_VERTEBRAE(float3 pos,thread Control &control,thread float4 &orbitTrap) 
         mz2 = dot(z,z);
         if(mz2 > 12.0) break;
         
-        if(i < control.LVIiter) control.LVIhigh = pos;
-
         ot = z.xyz;
         if(control.orbitStyle > 0) ot -= trap;
         orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
@@ -1255,7 +1232,7 @@ float DE_VERTEBRAE(float3 pos,thread Control &control,thread float4 &orbitTrap) 
 
 //MARK: - 21 DarkSurf
 
-float DE_DARKSURF(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+float DE_DARKSURF(float3 pos,device Control &control,thread float4 &orbitTrap) {
 #ifdef SINGLE_EQUATION
     return 0;
 #else
@@ -1272,11 +1249,7 @@ float DE_DARKSURF(float3 pos,thread Control &control,thread float4 &orbitTrap) {
     float3 ot,trap = control.otFixed;
     if(control.orbitStyle == 2) trap -= pos;
     
-    control.LVIlow = pos;
-
     for(int i=0;i < control.isteps; ++i) {
-        if(i < control.LVIiter) control.LVIlow = p.xyz;
-
         p.xyz = rotatePosition(p.xyz,0,control.angle1);
         p.xyz = rotatePosition(p.xyz,1,control.angle1);
         
@@ -1309,8 +1282,6 @@ float DE_DARKSURF(float3 pos,thread Control &control,thread float4 &orbitTrap) {
         p = p * scale_43 + p0;
         if ( r2>1000.0) break;
         
-        if(i < control.LVIiter) control.LVIhigh = p.xyz;
-
         ot = p.xyz;
         if(control.orbitStyle > 0) ot -= trap;
         orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
@@ -1323,7 +1294,7 @@ float DE_DARKSURF(float3 pos,thread Control &control,thread float4 &orbitTrap) {
 //MARK: - 22 Sponge
 // Sponge : https://www.shadertoy.com/view/3dlXWn
 
-float sdSponge(float3 z,thread Control &control) {
+float sdSponge(float3 z,device Control &control) {
     z *= control.ey; //3;
     //folding
     for (int i=0; i < 4; i++) {
@@ -1342,7 +1313,7 @@ float sdSponge(float3 z,thread Control &control) {
     return dis * 0.2 * pow(3.0, -3.0);
 }
 
-float DE_SPONGE(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+float DE_SPONGE(float3 pos,device Control &control,thread float4 &orbitTrap) {
 #ifdef SINGLE_EQUATION
     return 0;
 #else
@@ -1354,18 +1325,12 @@ float DE_SPONGE(float3 pos,thread Control &control,thread float4 &orbitTrap) {
     float3 ot,trap = control.otFixed;
     if(control.orbitStyle == 2) trap -= pos;
     
-    control.LVIlow = pos;
-
     for (int i=0; i < control.isteps; i++) {
-        if(i < control.LVIiter) control.LVIlow = pos;
-
         pos = 2.0 * clamp(pos, param_min.xyz, param_max.xyz) - pos;
         r2 = dot(pos, pos);
         k = max(param_min.w / r2, 1.0);
         pos *= k;
         scale *= k;
-
-        if(i < control.LVIiter) control.LVIhigh = pos;
 
         ot = pos;
         if(control.orbitStyle > 0) ot -= trap;
@@ -1380,7 +1345,7 @@ float DE_SPONGE(float3 pos,thread Control &control,thread float4 &orbitTrap) {
 //MARK: - 23 Donuts
 // Donuts : https://www.shadertoy.com/view/lttcWn
 
-float DE_DONUTS(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+float DE_DONUTS(float3 pos,device Control &control,thread float4 &orbitTrap) {
 #ifdef SINGLE_EQUATION
     return 0;
 #else
@@ -1395,11 +1360,7 @@ float DE_DONUTS(float3 pos,thread Control &control,thread float4 &orbitTrap) {
     float3 ot,trap = control.otFixed;
     if(control.orbitStyle == 2) trap -= pos;
     
-    control.LVIlow = pos;
-
     for (int i=0; i < control.isteps; i++) {
-        if(i < control.LVIiter) control.LVIlow = pos;
-
         q = float2(length(pos.xz) - MAJOR_RADIUS,pos.y);
         
         newdis = (length(q)-MINOR_RADIUS)*s;
@@ -1420,8 +1381,6 @@ float DE_DONUTS(float3 pos,thread Control &control,thread float4 &orbitTrap) {
         pos *= SCALE;
         s /= SCALE;
 
-        if(i < control.LVIiter) control.LVIhigh = pos;
-
         ot = pos;
         if(control.orbitStyle > 0) ot -= trap;
         orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
@@ -1434,7 +1393,7 @@ float DE_DONUTS(float3 pos,thread Control &control,thread float4 &orbitTrap) {
 //MARK: - 24 PDOF
 // PDOF : https://fractalforums.org/fragmentarium/17/fragm-2-5-5/4006/msg26494#msg26494
 
-float DE_PDOF(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+float DE_PDOF(float3 pos,device Control &control,thread float4 &orbitTrap) {
 #ifdef SINGLE_EQUATION_disabled
     return 0;
 #else
@@ -1501,7 +1460,7 @@ float3 triDiv(float3 a, float3 b) {
     return triMul(a, triPow(-1.0, b) );
 }
 
-float3 Magnetobulb1(float3 z, float3 c,thread Control &control)
+float3 Magnetobulb1(float3 z, float3 c,device Control &control)
 {
     float3 a = triMul(z,z) + c - control.v3a;
     float3 b = triMul(float3(2.,0.,0.), z) + c - control.v3b;
@@ -1511,7 +1470,7 @@ float3 Magnetobulb1(float3 z, float3 c,thread Control &control)
     return z;
 }
 
-float3 Magnetobulb2(float3 z, float3 c,thread Control &control)
+float3 Magnetobulb2(float3 z, float3 c,device Control &control)
 {
     z = triPow(    control.cx,(
                         triMul(
@@ -1555,7 +1514,7 @@ float3 Magnetobulb2(float3 z, float3 c,thread Control &control)
 //}
     
 
-float DE_MAGNETO(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+float DE_MAGNETO(float3 pos,device Control &control,thread float4 &orbitTrap) {
 #ifdef SINGLE_EQUATION_disabled
     return 0;
 #else
@@ -1614,7 +1573,7 @@ float DE_MAGNETO(float3 pos,thread Control &control,thread float4 &orbitTrap) {
 //MARK: - distance estimate
 // ===========================================
 
-float DE_Inner(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+float DE_Inner(float3 pos,device Control &control,thread float4 &orbitTrap) {
     switch(control.equation) {
         case EQU_01_MANDELBULB  : return DE_MANDELBULB(pos,control,orbitTrap);
         case EQU_02_APOLLONIAN2 : return DE_APOLLONIAN2(pos,control,orbitTrap);
@@ -1645,7 +1604,7 @@ float DE_Inner(float3 pos,thread Control &control,thread float4 &orbitTrap) {
     return 0;
 }
 
-float DE(float3 pos,thread Control &control,thread float4 &orbitTrap) {
+float DE(float3 pos,device Control &control,thread float4 &orbitTrap) {
     if(control.bcy) {
         pos = pos - control.InvCenter;
         float r = length(pos);
@@ -1667,7 +1626,7 @@ float DE(float3 pos,thread Control &control,thread float4 &orbitTrap) {
 //MARK: -
 // x = distance, y = iteration count, z = average distance hop
 
-float3 shortest_dist(float3 eye, float3 marchingDirection,thread Control &control,thread float4 &orbitTrap) {
+float3 shortest_dist(float3 eye, float3 marchingDirection,device Control &control,thread float4 &orbitTrap) {
     float dist,hop = 0;
     float3 ans = float3(MIN_DIST,0,0);
 //    float secondSurface = control.secondSurface;
@@ -1693,7 +1652,7 @@ float3 shortest_dist(float3 eye, float3 marchingDirection,thread Control &contro
     return ans;
 }
 
-float3 calcNormal(float3 pos, float epsFactor, thread Control &control) {
+float3 calcNormal(float3 pos, float epsFactor, device Control &control) {
 float4 temp = float4(10000);
     float2 e = float2(1.0,-1.0) * epsFactor;
     float3 ans = normalize(e.xyy * DE( pos + e.xyy, control,temp) +
@@ -1706,7 +1665,7 @@ float4 temp = float4(10000);
 
 //MARK: -
 // boxplorer's method altered
-float3 getBlinnShading(float3 normal, float3 direction, float3 light,thread Control &control) {
+float3 getBlinnShading(float3 normal, float3 direction, float3 light,device Control &control) {
     float3 halfLV = normalize(light + direction);
     float dif = dot(normal, light) * 0.5 + 0.75;
 
@@ -1900,7 +1859,7 @@ float3 applyColoring2
  texture2d <float, access::read> vcoloringTexture,
  float3 distAns,
  float3 normal,
- thread Control &control)
+ device Control &control)
 {
     matrix_float4x4 paletteVal = matrix_float4x4
     ( 0.5 , 0.5 , 0.5 , 0,
@@ -1951,7 +1910,7 @@ float3 applyColoringBody
  texture2d <float, access::read> coloringTexture,
  float3 distAns,
  float3 normal,
- thread Control &control)
+ device Control &control)
 {
     float3 cc,nn,ans = float3();
     float f1,f2,f3,f4,f5,iterationCount = distAns.y;
@@ -2010,7 +1969,7 @@ float3 applyColoring
  texture2d <float, access::read> coloringTexture,
  float3 distAns,
  float3 normal,
- thread Control &control)
+ device Control &control)
 {
     float3 ans = applyColoringBody(position,direction,coloringTexture,distAns,normal,control);
     
@@ -2030,12 +1989,12 @@ float3 applyColoring
 
 //MARK: -
 
-float3 cycle(float3 c, float s, thread Control &control) {
+float3 cycle(float3 c, float s, device Control &control) {
     float ss = s * control.Cycles;
     return float3(0.5) + 0.5 * float3( cos(ss + c.x), cos(ss + c.y), cos(ss + c.z));
 }
 
-float3 getOrbitColor(thread Control &control,float4 orbitTrap) {
+float3 getOrbitColor(device Control &control,float4 orbitTrap) {
     orbitTrap.w = sqrt(orbitTrap.w);
     
     float3 orbitColor;
@@ -2063,12 +2022,10 @@ kernel void rayMarchShader
 (
  texture2d<float, access::write> outTexture     [[texture(0)]],
  texture2d<float, access::read> coloringTexture [[texture(1)]],
- device Control &ccc    [[ buffer(0) ]],
+ device Control &c    [[ buffer(0) ]],
  uint2 p [[thread_position_in_grid]]
  )
 {
-    thread Control c = ccc;
-    
     uint2 srcP = p; // copy of pixel coordinate, altered during radial symmetry
     if(srcP.x >= uint(c.xSize)) return; // screen size not evenly divisible by threadGroups
     if(srcP.y >= uint(c.ySize)) return;
@@ -2172,9 +2129,6 @@ kernel void rayMarchShader
         
         color += applyColoring(position,direction,coloringTexture,distAns,normal,c);
 
-        if(c.LVIenable)
-            color *= abs(c.LVIhigh / c.LVIlow) * float3(c.LVIr,c.LVIg,c.LVIb);
-        
        // second surface
        if(c.secondSurface > 0) {
            float3 position = camera + distAns2.x * direction;

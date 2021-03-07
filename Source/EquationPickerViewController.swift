@@ -1,6 +1,10 @@
 import Cocoa
 
-class EquationPickerViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate {
+protocol NSTableViewClickableDelegate: NSTableViewDelegate {
+    func tableView(_ tableView: NSTableView, didClickRow row: Int, didClickColumn: Int)
+}
+
+class EquationPickerViewController: NSViewController, NSTableViewDataSource, NSTableViewClickableDelegate {
     @IBOutlet var scrollView: NSScrollView!
     var tv:NSTableView! = nil
 
@@ -26,11 +30,45 @@ class EquationPickerViewController: NSViewController, NSTableViewDataSource, NST
         view.backgroundColor = .clear
         return view
     }
-
+    
+    var selectedRow:Int = 0
+    
     func tableView(_ tableView: NSTableView, shouldSelectRow row: Int) -> Bool {
-        vc.control.equation = Int32(row)
-        vc.reset()  // stomp on all params
-        vc.controlJustLoaded()
+        selectedRow = row
         return true
+    }
+    
+    func loadRow(_ row:Int) {
+        vc.control.equation = Int32(row)
+        vc.reset()
+        vc.controlJustLoaded()
+        self.dismiss(self)
+    }
+    
+    func tableView(_ tableView: NSTableView, didClickRow row: Int, didClickColumn: Int) {
+        loadRow(row)
+    }
+    
+    override func keyDown(with event: NSEvent) {
+        if event.keyCode == 36 {    // Return key
+            loadRow(selectedRow)
+        }
+    }
+}
+
+// https://blog.kulman.sk/detecting-click-on-a-nstableviewcell/
+extension NSTableView {
+    open override func mouseDown(with event: NSEvent) {
+        let localLocation = self.convert(event.locationInWindow, to: nil)
+        let clickedRow = self.row(at: localLocation)
+        let clickedColumn = self.column(at: localLocation)
+
+        super.mouseDown(with: event)
+
+        guard clickedRow >= 0, clickedColumn >= 0, let delegate = self.delegate as? NSTableViewClickableDelegate else {
+            return
+        }
+
+        delegate.tableView(self, didClickRow: clickedRow, didClickColumn: clickedColumn)
     }
 }

@@ -217,8 +217,6 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         control.Cycles = 0
         control.orbitStyle = 0
         control.fog = 0
-        control.LVIenable = false
-        control.LVIiter = 5
         control.isteps = 5
         
         control.blurStrength = 0    // no blurring
@@ -481,27 +479,38 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
                 control.InvAngle =  0.1
             }
         case EQU_14_SPUDS :
-            control.camera = simd_float3(0.98336715, -1.2565054, -3.960955)
-            control.cx = 3.7524672
-            control.cy = 1.0099992
-            control.cz = -1.0059854
-            control.cw = -1.0534152
-            control.dx = 1.1883448
-            control.dz = -4.100001
-            control.dw = -3.2119942
-            control.isteps = 8
-            control.bright = 0.92
-            control.fx = 3.2999988
+            control.camera = SIMD3<Float>(-0.017165225, -11.63782, -12.160562)
+            updateShaderDirectionVector( SIMD3<Float>(0.0, 0.09950372, 0.9950372) )
+            control.cx = 0.01
+            control.cy = 2.9100008
+            control.cz = 2.0900004
+            control.cw = 2.1300004
+            control.dx = 2.2099998
+            control.dz = 0.61
+            control.dw = 4.049999
+            control.fx = 1.2000002
+            control.isteps = 9
+            control.bright = 2.3600001
+            control.contrast = 0.16
             
             if control.bcy {
-                control.camera = simd_float3( 0.18336754 , -0.29131955 , -4.057477 )
-                updateShaderDirectionVector(simd_float3( 0.0 , 0.09950372 , 0.9950372 ))
-                control.InvCx =  -0.544
-                control.InvCy =  -0.18200001
-                control.InvCz =  -0.44799998
-                control.InvRadius =  1.3700002
-                control.InvAngle =  0.1
+                control.camera = SIMD3<Float>(0.44283432, -0.5461547, -1.4410573)
+                updateShaderDirectionVector( SIMD3<Float>(0.0, 0.09950371, 0.99503714) )
+                control.cx = 0.31
+                control.cy = 1.9300008
+                control.cz = 1.2500002
+                control.cw = 2.1300004
+                control.dx = 2.51
+                control.dz = 0.61
+                control.dw = 4.049999
+                control.fx = 1.2000002
+                control.InvCx =  0.40399995
+                control.InvCy =  -0.398
+                control.InvCz =  0.24200001
+                control.InvRadius =  1.7400002
+                control.InvAngle =  -4.48
             }
+
         case EQU_15_FLOWER :
             control.camera = simd_float3(-0.16991696, -2.5964863, -12.54011)
             control.cx = 1.6740334
@@ -1069,10 +1078,6 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         case ".",">" : adjustWindowSize(+1)
         case "[" : launchVideoRecorder()
         case "]" : if let vr = vr { vr.addKeyFrame() }
-            
-        case "Z" :
-            control.LVIenable = !control.LVIenable; toggle2()
-
         default : break
         }
     }
@@ -1141,17 +1146,8 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     
     /// press 'V' to display control parameter values in console window
     func displayControlParametersInConsoleWindow() {
-        print("camera =",control.camera.debugDescription)
-        print("viewVector = ",control.viewVector.debugDescription)
-        print("topVector = ",control.topVector.debugDescription)
-        print("sideVector = ",control.sideVector.debugDescription)
-        print("cx = ",control.cx)
-        print("cy = ",control.cy)
-        print("cz = ",control.cz)
-        print("cw = ",control.cw)
-        print("InvCenter = ",control.InvCx,",",control.InvCy,",",control.InvCz)
-        print("InvRadius = ",control.InvRadius)
-        print(" ")
+        print("control.camera =",control.camera.debugDescription)
+        print("updateShaderDirectionVector(",control.viewVector.debugDescription,")")
         print("control.cx =",control.cx)
         print("control.cy =",control.cy)
         print("control.cz =",control.cz)
@@ -1170,50 +1166,16 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         print("control.fw =",control.fw)
         
         print("control.isteps =",control.isteps)
-        
+        print("control.bright =",control.bright)
+        print("control.contrast =",control.contrast)
+        print("control.specular =",control.specular)
+
         print("control.angle1 =",control.angle1)
         print("control.angle2 =",control.angle2)
         print("control.juliaX = ",control.juliaX)
         print("control.juliaY = ",control.juliaY)
         print("control.juliaZ = ",control.juliaZ)
         print("control.fx =",control.fx)
-        
-        print("control.bright =",control.bright)
-        print("control.contrast =",control.contrast)
-        print("control.specular =",control.specular)
-        
-        print("updateShaderDirectionVector(",control.viewVector.debugDescription,")")
-
-        
-        print("control.icx =",control.cx)
-        print("control.icy =",control.cy)
-        print("control.dz =",control.dz)
-        print("control.dw =",control.dw)
-        print("control.dx =",control.dx)
-        print("control.dy =",control.dy)
-        print("control.cw =",control.cw)
-        print("control.cz =",control.cz)
-        
-        print("radial symmetry =",control.radialAngle)
-
-//        int icx;
-//        int icy;
-//        int isteps;
-//        
-//        float cx;
-//        float cy;
-//        float isteps;
-//        bool bcx;
-//        bool bcy;
-//        bool bcz;
-//        
-//        float dz;
-//        float dw;
-//        float cw;
-//        float cz;
-//        
-//        float dx;
-//        float dy;
         
         //----------------------------------
         print(" ")
@@ -1233,26 +1195,44 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         func fRandom() -> Float { return Float.random(in: -1 ..< 0) }
         func fRandom2() -> Float { return Float.random(in: 0 ..< 1) }
         func fRandom3() -> Float { return Float.random(in: -5 ..< 5) }
-        
-        //control.camera.x = Float.random(in: -2 ..< 2)
-        //control.camera.y = Float.random(in: -2 ..< 2)
-        //control.camera.z = Float.random(in: -2 ..< 2)
-        control.cx = fRandom3()
-        control.cy = fRandom3()
-        control.cz = fRandom3()
-        control.cw = fRandom3()
-        control.dx = fRandom3()
-        control.dy = fRandom3()
-        control.dz = fRandom3()
-        control.dw = fRandom3()
-        control.ex = fRandom3()
-        control.ey = fRandom3()
-        control.ez = fRandom3()
-        control.ew = fRandom3()
-        control.fx = fRandom3()
-        control.fy = fRandom3()
-        control.fz = fRandom3()
-        control.fw = fRandom3()
+        func fRandom3Tweak() -> Float { return Float.random(in: 0.01 ... 0.01) }
+
+        if optionKeyDown {
+            control.cx += fRandom3Tweak()
+            control.cy += fRandom3Tweak()
+            control.cz += fRandom3Tweak()
+            control.cw += fRandom3Tweak()
+            control.dx += fRandom3Tweak()
+            control.dy += fRandom3Tweak()
+            control.dz += fRandom3Tweak()
+            control.dw += fRandom3Tweak()
+            control.ex += fRandom3Tweak()
+            control.ey += fRandom3Tweak()
+            control.ez += fRandom3Tweak()
+            control.ew += fRandom3Tweak()
+            control.fx += fRandom3Tweak()
+            control.fy += fRandom3Tweak()
+            control.fz += fRandom3Tweak()
+            control.fw += fRandom3Tweak()
+        }
+        else {
+            control.cx = fRandom3()
+            control.cy = fRandom3()
+            control.cz = fRandom3()
+            control.cw = fRandom3()
+            control.dx = fRandom3()
+            control.dy = fRandom3()
+            control.dz = fRandom3()
+            control.dw = fRandom3()
+            control.ex = fRandom3()
+            control.ey = fRandom3()
+            control.ez = fRandom3()
+            control.ew = fRandom3()
+            control.fx = fRandom3()
+            control.fy = fRandom3()
+            control.fz = fRandom3()
+            control.fw = fRandom3()
+        }
     }
     
     //MARK: -
@@ -1394,16 +1374,25 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addFloat("Offset X",&control.juliaX,-15,15,0.1)
             widget.addFloat("Offset Y",&control.juliaY,-15,15,0.1)
             widget.addFloat("Offset Z",&control.juliaZ,-15,15,0.1)
+//        case EQU_14_SPUDS :
+//            widget.addInt32("Iterations",&control.isteps,2,30,1)
+//            widget.addFloat("Power",&control.fx,0.5,20,0.1)
+//            widget.addFloat("MinRad",&control.cx,0.01,8,0.1)
+//            widget.addFloat("FixedRad",&control.cy,0.01,8,0.02)
+//            widget.addFloat("Fold Limit",&control.cz,0.01,8,0.02)
+//            widget.addFloat("Fold Limit2",&control.cw,0.01,8,0.02)
+//            widget.addFloat("ZMUL",&control.dx,0.01,8,0.1)
+//            widget.addFloat("Scale",&control.dz,0.01,8,0.1)
+//            widget.addFloat("Scale2",&control.dw,0.01,8,0.1)
         case EQU_14_SPUDS :
-            widget.addInt32("Iterations",&control.isteps,3,30,1)
-            widget.addFloat("Power",&control.fx,1.5,12,0.1)
-            widget.addFloat("MinRad",&control.cx,-5,5,0.1)
-            widget.addFloat("FixedRad",&control.cy,-5,5,0.02)
-            widget.addFloat("Fold Limit",&control.cz,-5,5,0.02)
-            widget.addFloat("Fold Limit2",&control.cw,-5,5,0.02)
-            widget.addFloat("ZMUL",&control.dx,-5,5,0.1)
-            widget.addFloat("Scale",&control.dz,-5,5,0.1)
-            widget.addFloat("Scale2",&control.dw,-5,5,0.1)
+            widget.addInt32("Iterations",&control.isteps,2,30,1)
+            widget.addFloat("X",&control.cx,-3,3,0.01)
+            widget.addFloat("Y",&control.cy,0.01,10,0.01)
+            widget.addFloat("Z",&control.cz,0.01,10,0.01)
+            widget.addFloat("W",&control.cw,0.01,10,0.01)
+            widget.addFloat("X",&control.dx,0.01,10,0.01)
+            widget.addFloat("Y",&control.dy,0.01,10,0.01)
+            widget.addFloat("Z",&control.dz,0.01,10,0.01)
         case EQU_15_FLOWER :
             widget.addInt32("Iterations",&control.isteps,2,30,1)
             widget.addFloat("Scale",&control.cx,0.5,3,0.01)
@@ -1428,7 +1417,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addFloat("Box",&control.cx, 0,10,0.001)
             juliaGroup(10,0.0001)
         case EQU_19_VERTEBRAE :
-            widget.addInt32("Iterations",&control.isteps,1,50,1)
+            widget.addInt32("Iterations",&control.isteps,1,10,1)
             widget.addFloat("X",&control.cx,       -10,10,0.1)
             widget.addFloat("Y",&control.cy,       -10,10,0.1)
             widget.addFloat("Z",&control.cz,       -10,10,0.1)
@@ -1519,23 +1508,15 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addFloat("   Scale",&control.tScale,0.01,1,0.02)
         }
         
-        widget.addBoolean(" Spherical Inversion",&control.bcy,1)
+        widget.addBoolean(" Spherical Inversion",&control.bcy,99)
         if control.bcy {
-            widget.addFloat("   X",&control.InvCx,-5,5,0.002)
-            widget.addFloat("   Y",&control.InvCy,-5,5,0.002)
-            widget.addFloat("   Z",&control.InvCz,-5,5,0.002)
+            widget.addFloat("   X",&control.InvCx,-5,5,0.01)
+            widget.addFloat("   Y",&control.InvCy,-5,5,0.01)
+            widget.addFloat("   Z",&control.InvCz,-5,5,0.01)
             widget.addFloat("   Radius",&control.InvRadius,0.01,10,0.01)
             widget.addFloat("   Angle",&control.InvAngle,-10,10,0.01)
         }
         
-        widget.addBoolean(" LVI enable",&control.LVIenable)
-        if control.LVIenable {
-            widget.addInt32("   LVI Iter",&control.LVIiter,0,20,1)
-            widget.addFloat("   LVI r",&control.LVIr,0,1,0.01)
-            widget.addFloat("   LVI g",&control.LVIg,0,1,0.01)
-            widget.addFloat("   LVI b",&control.LVIb,0,1,0.01)
-        }
-
         displayWidgets()
         updateWindowTitle()
     }
@@ -1554,12 +1535,19 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
                 loadImageFile()
                 return
             }
+        case 99 :  // toggle inversion
+            let index = widget.focus
+            defineWidgetsForCurrentEquation()
+            reset()
+            widget.focus = index
+            displayWidgets()
+            flagViewToRecalcFractal()
+            return
         default : break
         }
-
+        
         let index = widget.focus
         defineWidgetsForCurrentEquation()
-  //gus      reset()
         widget.focus = index
         displayWidgets()
         flagViewToRecalcFractal()
