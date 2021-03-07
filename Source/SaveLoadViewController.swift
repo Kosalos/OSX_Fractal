@@ -57,7 +57,7 @@ let versionNumber:Int32 = 0x55ac
 var loadNextIndex:Int = -1   // first use will bump this to zero
 var slEntry:[SLEntry] = []
 
-class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableViewDelegate,SLCellDelegate {
+class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableViewClickableDelegate,SLCellDelegate {
     @IBOutlet var legend: NSTextField!
     @IBOutlet var scrollView: NSScrollView!
     @IBOutlet var DateRadio: NSButton!
@@ -180,6 +180,10 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     
     func tableViewSelectionDidChange(_ notification: Notification) {
         loadAndDismissDialog(tv.selectedRow)
+    }
+    
+    func tableView(_ tableView: NSTableView, didClickRow row: Int, didClickColumn: Int) {
+        loadAndDismissDialog(row)
     }
     
     //MARK:-

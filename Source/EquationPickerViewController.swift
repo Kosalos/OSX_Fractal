@@ -70,5 +70,7 @@ extension NSTableView {
         }
 
         delegate.tableView(self, didClickRow: clickedRow, didClickColumn: clickedColumn)
+        
+        print(clickedRow)
     }
 }
