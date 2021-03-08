@@ -80,8 +80,6 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         ensureWindowSizeIsNotTooSmall()
         
         resetAllLights()
-//        showLightWindow()
-//        showColorWindow()
         showControlWindow()
         
         winHandler = WindowHandler()
@@ -721,13 +719,36 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
                 control.InvAngle =  0.1
             }
         case EQU_24_MAGNETO :
-            control.dx = 0
-            control.dy = 0
-            control.dz = 0
-            control.ex = 0
-            control.ey = 0
-            control.ez = 0
-            break
+            control.camera = SIMD3<Float>(4.238563, 0.035811555, -31.506575)
+            updateShaderDirectionVector( SIMD3<Float>(0.0, 0.09950372, 0.9950372) )
+            control.cx = 6.0619698
+            control.cy = 2.6
+            control.cz = 13.099998
+            control.cw = 2.5199995
+            control.dx = 2.6000004
+            control.dy = 0.33999997
+            control.isteps = 28
+            control.bright = 2.14
+            control.contrast = 0.29999998
+            control.specular = 0.0
+             
+            if control.bcy {
+                control.camera = simd_float3( 4.238563 , 0.035811555 , -31.506575 )
+                updateShaderDirectionVector(simd_float3( 0.0 , 0.09950372 , 0.9950372 ))
+                control.InvCx =  0.1
+                control.InvCy =  0.1
+                control.InvCz =  0.1
+                control.InvRadius =  0.3
+                control.InvAngle =  0.1
+
+                control.cx = 5.945974
+                control.cy = 2.21
+                control.cz = 11.610017
+                control.cw = 1.9099996
+                control.dx = 1.6099997
+                control.dy = 0.4099999
+                control.isteps = 15
+            }
         default : break
         }
         
