@@ -4,13 +4,15 @@ struct SLEntry {
     var kind = Int()
     var dateValue = TimeInterval()
     var dateString = String()
+    var rawIndex = Int()
     
-    init(_ k:Int, _ str:String, _ value:TimeInterval) { kind = k; dateString = str; dateValue = value }
+    init(_ k:Int, _ str:String, _ value:TimeInterval, _ index:Int) { kind = k; dateString = str; dateValue = value; rawIndex = index }
     
     mutating func copy(_ other:SLEntry) {
         kind = other.kind
         dateValue = other.dateValue
         dateString = other.dateString
+        rawIndex = other.rawIndex
     }
 }
 
@@ -56,8 +58,9 @@ class SaveLoadCell: NSTableCellView {
 let versionNumber:Int32 = 0x55ac
 var loadNextIndex:Int = -1   // first use will bump this to zero
 var slEntry:[SLEntry] = []
+var dateSort:Bool = true
 
-class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableViewClickableDelegate,SLCellDelegate {
+class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableViewDelegate,SLCellDelegate {
     @IBOutlet var legend: NSTextField!
     @IBOutlet var scrollView: NSScrollView!
     @IBOutlet var DateRadio: NSButton!
@@ -65,7 +68,6 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     var tv:NSTableView! = nil
     var dateString:String = ""
     var fileURL:URL! = nil
-    var dateSort:Bool = true
 
     func numberOfSections(in tableView: NSTableView) -> Int { return 1 }
     func numberOfRows(in tableView: NSTableView) -> Int { return slEntry.count }
@@ -95,18 +97,18 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
             
             // ------------------------
             kind = 0
-            determineURL(index)
+            determineURL(index,false)
             let data = NSData(contentsOf: fileURL)
             if data != nil {
                 data?.getBytes(&cc, length:sz)
                 kind = Int(cc.equation)
             }
 
-            slEntry.append(SLEntry(kind,str,dateValue))
+            slEntry.append(SLEntry(kind,str,dateValue,index))
             index += 1
         }
         
-        slEntry.append(SLEntry(99,noFileString,0))
+        slEntry.append(SLEntry(99,noFileString,0,0))
         sortSLEntries()
     }
 
@@ -135,7 +137,7 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
                     if slEntry[i].kind > slEntry[i+1].kind {
                         swap(i)
                     }
-              //      else if slEntry[i].kind == slEntry[i-1].kind { dSort(i) }
+                    else if slEntry[i].kind == slEntry[i+1].kind { dSort(i) }
                 }
             }
             
@@ -182,15 +184,14 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
         loadAndDismissDialog(tv.selectedRow)
     }
     
-    func tableView(_ tableView: NSTableView, didClickRow row: Int, didClickColumn: Int) {
-        loadAndDismissDialog(row)
-    }
-    
     //MARK:-
     
     let sz = MemoryLayout<Control>.size
     
-    func determineURL(_ index:Int) {
+    func determineURL(_ index:Int, _ useRawIndex:Bool) {
+        var index = index
+        if useRawIndex { index = slEntry[index].rawIndex }
+        
         let name = String(format:"Store%d.dat",index)
         fileURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false).appendingPathComponent(name)
     }
@@ -198,7 +199,7 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     func saveAndDismissDialog(_ index:Int) {
         func performSave() {
             do {
-                self.determineURL(index)
+                self.determineURL(index,true)
                 vc.control.version = versionNumber
                 let data:NSData = NSData(bytes:&vc.control, length:self.sz)
                 try data.write(to: self.fileURL, options: .atomic)
@@ -234,7 +235,7 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     func determineDateString(_ index:Int) -> String {
         var dStr = noFileString
         
-        determineURL(index)
+        determineURL(index,false)
         
         do {
             let key:Set<URLResourceKey> = [.creationDateKey]
@@ -269,7 +270,7 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     @discardableResult func loadData(_ index:Int) -> Bool {
         memorizeControlData()
         
-        determineURL(index)
+        determineURL(index,true)
         
         let data = NSData(contentsOf: fileURL)
         if data == nil { return false } // clicked on empty entry
@@ -300,7 +301,7 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
             
             print(loadNextIndex)
             
-            determineURL(loadNextIndex)
+            determineURL(loadNextIndex,true)
             let data = NSData(contentsOf: fileURL)
             
             if data != nil {

@@ -4,7 +4,7 @@ protocol NSTableViewClickableDelegate: NSTableViewDelegate {
     func tableView(_ tableView: NSTableView, didClickRow row: Int, didClickColumn: Int)
 }
 
-class EquationPickerViewController: NSViewController, NSTableViewDataSource, NSTableViewClickableDelegate {
+class EquationPickerViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate {
     @IBOutlet var scrollView: NSScrollView!
     var tv:NSTableView! = nil
 
@@ -45,32 +45,9 @@ class EquationPickerViewController: NSViewController, NSTableViewDataSource, NST
         self.dismiss(self)
     }
     
-    func tableView(_ tableView: NSTableView, didClickRow row: Int, didClickColumn: Int) {
-        loadRow(row)
-    }
-    
     override func keyDown(with event: NSEvent) {
         if event.keyCode == 36 {    // Return key
             loadRow(selectedRow)
         }
-    }
-}
-
-// https://blog.kulman.sk/detecting-click-on-a-nstableviewcell/
-extension NSTableView {
-    open override func mouseDown(with event: NSEvent) {
-        let localLocation = self.convert(event.locationInWindow, to: nil)
-        let clickedRow = self.row(at: localLocation)
-        let clickedColumn = self.column(at: localLocation)
-
-        super.mouseDown(with: event)
-
-        guard clickedRow >= 0, clickedColumn >= 0, let delegate = self.delegate as? NSTableViewClickableDelegate else {
-            return
-        }
-
-        delegate.tableView(self, didClickRow: clickedRow, didClickColumn: clickedColumn)
-        
-        print(clickedRow)
     }
 }
