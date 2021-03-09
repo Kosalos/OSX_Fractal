@@ -178,7 +178,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
           "Monster","Kali Tower","Gold","Spider","Knighty's Kleinian",
           "Half Tetrahedron","Knighty Polychora","3Dickulus Quaternion Julia","Spudsville","Flower Hive",
           "Pupukuusikkos Spiralbox", "SurfBox","TwistBox","Vertebrae", "DarkBeam Surfbox",
-          "Klienian Sponge","Donuts","PDOF","MagnetoBulb" ]
+          "Klienian Sponge","Donuts","PDOF","MagnetoBulb","Spuds2018" ]
     
     func updateWindowTitle() {
         let index = Int(control.equation)
@@ -697,26 +697,45 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
                 control.InvAngle =  -2.7999995
             }
         case EQU_23_PDOF :
-            control.camera = simd_float3(-0.1589123, -0.17758754, -2.984771)
-            updateShaderDirectionVector(simd_float3(0.0, 0.09950372, 0.9950372))
-            control.isteps = 15
-            control.cx = 0.94000006
-            control.cy = 0.42999986
-            control.cz = -0.42000043
-            control.cw = 0.0010999999
+            control.camera = SIMD3<Float>(1.0010874, -1.3243248, -2.3396168)
+            updateShaderDirectionVector( SIMD3<Float>(0.0, 0.9521193, 0.30572683) )
+            control.cx = -1.0
+            control.cy = 0.55399966
+            control.cz = -1.4999998
+            control.cw = 0.0
+            control.dx = 1.8990033
+            control.dy = 0.33999997
+            control.dz = 1.2400001
+            control.dw = 4.049999
+            control.isteps = 8
+            control.bright = 1.1
+            control.contrast = 0.5
+            control.specular = 0.0
             control.juliaboxMode = true
-            control.juliaX =  0.109999985
-            control.juliaY =  0.11999998
-            control.juliaZ =  -0.55999994
-            
+            control.juliaX =  1.0300001
+            control.juliaY =  -2.0
+            control.juliaZ =  -1.4300003
+             
             if control.bcy {
-                control.camera = simd_float3( -0.1589123 , -0.4561975 , -1.5499284 )
-                updateShaderDirectionVector(simd_float3( 0.0 , 0.09950371 , 0.99503714 ))
-                control.InvCx =  0.07000005
+                control.camera = SIMD3<Float>(-1.1020072, -2.851365, -1.6521813)
+                updateShaderDirectionVector( SIMD3<Float>(0.59026825, 0.5066203, 0.6284261) )
+                control.cx = -1.0
+                control.cy = 0.55399966
+                control.cz = -2.0
+                control.cw = 0.0
+                control.dx = 1.8990033
+                control.dy = 0.33999997
+                control.dz = 1.2400001
+                control.dw = 4.049999
+                control.isteps = 8
+                control.bright = 1.3599999
+                control.contrast = 0.3399999
+                control.specular = 0.0
+                control.InvCx =  0.15999997
                 control.InvCy =  0.1
-                control.InvCz =  0.1
-                control.InvRadius =  0.3
-                control.InvAngle =  0.1
+                control.InvCz =  0.14
+                control.InvRadius =  0.38999993
+                control.InvAngle =  0.95000005
             }
         case EQU_24_MAGNETO :
             control.camera = SIMD3<Float>(4.238563, 0.035811555, -31.506575)
@@ -749,6 +768,44 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
                 control.dy = 0.4099999
                 control.isteps = 15
             }
+        case EQU_25_SPUDS2018 :
+            control.camera = SIMD3<Float>(-0.7171651, -10.105468, -12.313804)
+            updateShaderDirectionVector( SIMD3<Float>(0.0, 0.09950371, 0.99503714) )
+            control.cx = 2.4999998
+            control.cy = 6.9599986
+            control.cz = 2.0000005
+            control.cw = 3.0699995
+            control.dx = 3.3399987
+            control.dy = 1.7500002
+            control.dz = 1.2400001
+            control.dw = 4.049999
+            control.isteps = 9
+            control.bright = 2.3600001
+            control.contrast = 0.16
+            control.specular = 0.0
+             
+            if control.bcy {
+                control.camera = SIMD3<Float>(-2.227165, -1.3660691, -5.0172186)
+                updateShaderDirectionVector( SIMD3<Float>(0.0, 0.09950371, 0.99503714) )
+                control.cx = 2.4570065
+                control.cy = 6.8719945
+                control.cz = 7.669999
+                control.cw = 2.1799974
+                control.dx = 5.01
+                control.dy = 1.2599983
+                control.dz = 2.0
+                control.dw = 4.049999
+                control.isteps = 8
+                control.bright = 2.1800013
+                control.contrast = 0.21999998
+                control.specular = 0.0
+                control.InvCx =  -1.8670013
+                control.InvCy =  0.0010001041
+                control.InvCz =  2.053997
+                control.InvRadius =  0.5029997
+                control.InvAngle =  0.631
+            }
+
         default : break
         }
         
@@ -1517,6 +1574,15 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
 //            widget.addBoolean("Abs Z",&control.bdz)
 //            widget.addBoolean("Style",&control.bdw)
 //            juliaGroup(8,0.01)
+        case EQU_25_SPUDS2018 :
+            widget.addInt32("Iterations",&control.isteps,2,30,1)
+            widget.addFloat("X",&control.cx,-3,3,0.01)
+            widget.addFloat("Y",&control.cy,0.01,10,0.01)
+            widget.addFloat("Z",&control.cz,0.01,10,0.01)
+            widget.addFloat("W",&control.cw,0.01,10,0.01)
+            widget.addFloat("X",&control.dx,0.01,10,0.01)
+            widget.addFloat("Y",&control.dy,0.01,10,0.01)
+            widget.addFloat("Z",&control.dz,0.01,10,0.01)
         default : break
         }
 

@@ -903,80 +903,80 @@ void spudsPowN2(thread float3 &z, float zr0, thread float &dr,device Control &co
     z = zr*float3( cos(zo)*cos(zi), cos(zo)*sin(zi), control.dx * sin(zo) );
 }
 
-//float DE_SPUDS(float3 pos,device Control &control,thread float4 &orbitTrap) {
-//    #ifdef SINGLE_EQUATION
-//        return 0;
-//    #else
-//    int i = 0;
-//    float dz = 1.0;
-//    float r = 1;
-//
-//    float3 ot,trap = control.otFixed;
-//    if(control.orbitStyle == 2) trap -= pos;
-//
-//    while(r < 10 && i < control.isteps) {
-//        if (i <=  control.isteps/2) {
-//            spudsBoxFold(pos,dz,control);
-//            spudsSphereFold(pos,dz,control);
-//            pos = control.dz * pos;
-//            dz *= abs(control.dz);
-//            r = length(pos);
-//        } else {
-//            spudsBoxFold3(pos,dz,control);
-//            r = length(pos);
-//            spudsPowN2(pos,r,dz,control);
-//            pos = control.dw * pos;
-//            dz *= abs(control.dw);
-//        }
-//
-//        ot = pos;
-//        if(control.orbitStyle > 0) ot -= trap;
-//        orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
-//
-//        i++;
-//    }
-//
-//    return r * log(r) / dz;
-//    #endif
-//}
-
-
-// https://www.shadertoy.com/view/ltjBRz
-float apollonian(float3 p,device Control &control)
-{
-    float scale = 1.0;
-    
-    for( int i=0; i < control.isteps;i++) {
-        p = -1.0 + 2.0*fract(0.5*p+0.5);
-        float r2 = dot(p,p);
-        float k = 2./ r2;
-        p *= k;
-        scale *= k;
-    }
-    
-    return 0.25*abs(p.y)/scale;
-}
-
-float box(float3 p, float3 b,device Control &control)
-{
-      float3 d = abs(p) - b;
-      return min(max(d.x,max(d.y,d.z)),0.0) + length(max(d,0.0));
-}
-
-float DE_SPUDS(float3 p,device Control &control,thread float4 &orbitTrap) {
+float DE_SPUDS(float3 pos,device Control &control,thread float4 &orbitTrap) {
     #ifdef SINGLE_EQUATION
         return 0;
     #else
-    p = rotatePosition(p,1,control.cx);
-    float3 q = p;
-    float d0 = apollonian(p * 0.5,control) * control.dz;
-    float d1=abs(p.y + 0.2);
-    float d3 = box(q + float3(0.,control.cy,0.), control.cz * float3(control.cw,control.dx,control.dy),control);
-    float d = max(d0, d3);
-    return min(d,d1);
+    int i = 0;
+    float dz = 1.0;
+    float r = 1;
+
+    float3 ot,trap = control.otFixed;
+    if(control.orbitStyle == 2) trap -= pos;
+
+    while(r < 10 && i < control.isteps) {
+        if (i <=  control.isteps/2) {
+            spudsBoxFold(pos,dz,control);
+            spudsSphereFold(pos,dz,control);
+            pos = control.dz * pos;
+            dz *= abs(control.dz);
+            r = length(pos);
+        } else {
+            spudsBoxFold3(pos,dz,control);
+            r = length(pos);
+            spudsPowN2(pos,r,dz,control);
+            pos = control.dw * pos;
+            dz *= abs(control.dw);
+        }
+
+        ot = pos;
+        if(control.orbitStyle > 0) ot -= trap;
+        orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
+
+        i++;
+    }
+
+    return r * log(r) / dz;
     #endif
 }
 
+
+//// https://www.shadertoy.com/view/ltjBRz
+//float apollonian(float3 p,device Control &control)
+//{
+//    float scale = 1.0;
+//
+//    for( int i=0; i < control.isteps;i++) {
+//        p = -1.0 + 2.0*fract(0.5*p+0.5);
+//        float r2 = dot(p,p);
+//        float k = 2./ r2;
+//        p *= k;
+//        scale *= k;
+//    }
+//
+//    return 0.25*abs(p.y)/scale;
+//}
+//
+//float box(float3 p, float3 b,device Control &control)
+//{
+//      float3 d = abs(p) - b;
+//      return min(max(d.x,max(d.y,d.z)),0.0) + length(max(d,0.0));
+//}
+//
+//float DE_SPUDS(float3 p,device Control &control,thread float4 &orbitTrap) {
+//    #ifdef SINGLE_EQUATION
+//        return 0;
+//    #else
+//    p = rotatePosition(p,1,control.cx);
+//    float3 q = p;
+//    float d0 = apollonian(p * 0.5,control) * control.dz;
+//    float d1=abs(p.y + 0.2);
+//    float d3 = box(q + float3(0.,control.cy,0.), control.cz * float3(control.cw,control.dx,control.dy),control);
+//    float d = max(d0, d3);
+//    return min(d,d1);
+//    #endif
+//}
+//
 
 
 //// https://www.shadertoy.com/view/4sGyRR
@@ -1422,97 +1422,6 @@ float DE_PDOF(float3 pos,device Control &control,thread float4 &orbitTrap) {
 }
 
 //MARK: - 25 MagnetoBulb
-// PDOF : https://fractalforums.org/code-snippets-fragments/74/magnetobulb/3824
-
-float3 triPow(float power, float3 a) {
-    // Power function for s = x + iy + jz expressed in spherical coordinates
-    float r = sqrt( a.x*a.x + a.y*a.y + a.z*a.z )+1e-10;
-    float phi = atan2(a.y,a.x);  // azimuth
-    float theta = 0.0;
-
-    theta = asin(a.z/r);
-
-    r = pow(r,power);
-    phi = power*phi;
-    theta = power*theta;
-
-    return float3(r*cos(theta)*cos(phi),
-                r*cos(theta)*sin(phi),
-                r*sin(theta));
-}
-
-// non-trig version
-
-float3 triMul(float3 lc, float3 z1)
-{
-float r1 = sqrt(z1.x * z1.x + z1.y * z1.y);
-float r2 = sqrt(lc.x * lc.x + lc.y * lc.y);
-float temp = z1.x;
-float a = 1.0 - z1.z * lc.z / (r1 * r2);
-z1.x = a * (z1.x * lc.x - z1.y * lc.y);
-z1.y = a * (lc.x * z1.y + temp * lc.y);
-z1.z = r2 * z1.z + r1 * lc.z;
-
-return z1;
-}
-
-float3 triDiv(float3 a, float3 b) {
-    return triMul(a, triPow(-1.0, b) );
-}
-
-float3 Magnetobulb1(float3 z, float3 c,device Control &control)
-{
-    float3 a = triMul(z,z) + c - control.v3a;
-    float3 b = triMul(float3(2.,0.,0.), z) + c - control.v3b;
-    z = triMul( a, b );
-    z = triPow(control.cx,z);
-
-    return z;
-}
-
-float3 Magnetobulb2(float3 z, float3 c,device Control &control)
-{
-    z = triPow(    control.cx,(
-                        triMul(
-                            triPow(3.,z) + triMul(triMul(float3(3.,0.,0.),(c-control.v3a)),z) + triMul((c-control.v3a),(c-control.v3b)) ,
-                                triPow(2.,triMul(float3(3.,0.,0.),z)) + triMul(triMul(float3(3.,0.,0.),(c-control.v3b)),z) + triMul((c-control.v3a),(c-control.v3b)) + float3(1.,0.,0.)
-            )
-        )
-    );
-
-    return z;
-}
-
-//inline float CalcDistance(float3 pos, int iter)
-//{
-//    float clock = sin(_Time.w * 0.01);
-//    float p0 = clock * 0.2 + 0.4;
-//    float4 z = float4(modc(pos, 2.0), 0.5);
-//    for (int n = 0; n < iter; n++) {
-//        z.xyz = clamp(z.xyz, -p0, p0) * 2.0 - z.xyz;
-//        z *= 3 / max(dot(z.xyz, z.xyz), 0.0);
-//    }
-//    return (length(max(abs(z.xyz) - float3(0.0, 20.0, 0.0), 0.0))) / z.w;
-
-
-//float3 modc(float3 num, float den) {
-//    if(den == 0) return 0;
-//
-//    float3 ans = num;
-//    float t = num.x /den;
-//    int ti = int(t + 0.5);
-//    ans.x = num.x - float(ti) * den;
-//
-//    t = num.y /den;
-//    ti = int(t + 0.5);
-//    ans.y = num.y - float(ti) * den;
-//
-//    t = num.z /den;
-//    ti = int(t + 0.5);
-//    ans.z = num.z - float(ti) * den;
-//    return ans;
-//}
-    
 
 float DE_MAGNETO(float3 pos,device Control &control,thread float4 &orbitTrap) {
 #ifdef SINGLE_EQUATION_disabled
@@ -1531,44 +1440,43 @@ float DE_MAGNETO(float3 pos,device Control &control,thread float4 &orbitTrap) {
 #endif
 }
 
-//float DE_MAGNETO(float3 pos,thread Control &control,thread float4 &orbitTrap) {
-//#ifdef SINGLE_EQUATION_disabled
-//    return 0;
-//#else
-//    float3 z = control.juliaboxMode ? pos : float3(1e-14);
-//    float dr = 1.0;
-//    float r = dot(z,z);
-//
-//    for(int i=0; i < control.isteps; ++i) {
-//        if(r >= control.fy) break;
-//
-//        if(control.bdx) z.x = abs(z.x);
-//        if(control.bdy) z.y = abs(z.y);
-//        if(control.bdz) z.z = abs(z.z);
-//
-//        if(control.bdw) {
-//            z = Magnetobulb2(z, control.juliaboxMode ? control.julia : pos,control);
-//        } else {
-//            z = Magnetobulb1(z, control.juliaboxMode ? control.julia : pos,control);
-//        }
-//
-//        //z += (control.juliaboxMode ? control.julia : pos);
-//
-//        r = length(z);
-//
-////        // mermelada's tweak
-////        // http://www.fractalforums.com/new-theories-and-research/error-estimation-of-distance-estimators/msg102670/?topicseen#msg102670
-//        dr = max(dr * control.fx, pow( r, control.cx-1.0 ) * dr * control.cx + 1.0);
-////
-////        if (i<ColorIterations) orbitTrap = min(orbitTrap, abs(vec4(z.x,z.y,z.z,r*dr)));
-//
-//        z = rotatePosition(z,0,control.angle1);
-//        z = rotatePosition(z,1,control.angle2);
-//    }
-//
-//    return 0.5*log(r)*r/dr;
-//#endif
-//}
+//MARK: - 26 Spuds2018
+// https://www.shadertoy.com/view/ltjBRz
+
+float spuds2018_apollonian(float3 p,device Control &control)
+{
+    float scale = 1.0;
+    
+    for( int i=0; i < control.isteps;i++) {
+        p = -1.0 + 2.0*fract(0.5*p+0.5);
+        float r2 = dot(p,p);
+        float k = 2./ r2;
+        p *= k;
+        scale *= k;
+    }
+    
+    return 0.25*abs(p.y)/scale;
+}
+
+float spuds2018_box(float3 p, float3 b,device Control &control)
+{
+      float3 d = abs(p) - b;
+      return min(max(d.x,max(d.y,d.z)),0.0) + length(max(d,0.0));
+}
+
+float DE_SPUDS2018(float3 p,device Control &control,thread float4 &orbitTrap) {
+    #ifdef SINGLE_EQUATION
+        return 0;
+    #else
+    p = rotatePosition(p,1,control.cx);
+    float3 q = p;
+    float d0 = spuds2018_apollonian(p * 0.5,control) * control.dz;
+    float d1=abs(p.y + 0.2);
+    float d3 = spuds2018_box(q + float3(0.,control.cy,0.), control.cz * float3(control.cw,control.dx,control.dy),control);
+    float d = max(d0, d3);
+    return min(d,d1);
+    #endif
+}
 
 //MARK: - distance estimate
 // ===========================================
@@ -1599,6 +1507,7 @@ float DE_Inner(float3 pos,device Control &control,thread float4 &orbitTrap) {
         case EQU_22_DONUTS      : return DE_DONUTS(pos,control,orbitTrap);
         case EQU_23_PDOF        : return DE_PDOF(pos,control,orbitTrap);
         case EQU_24_MAGNETO     : return DE_MAGNETO(pos,control,orbitTrap);
+        case EQU_25_SPUDS2018   : return DE_SPUDS2018(pos,control,orbitTrap);
     }
     
     return 0;

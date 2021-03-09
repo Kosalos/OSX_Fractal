@@ -69,6 +69,12 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     var dateString:String = ""
     var fileURL:URL! = nil
 
+    @IBAction func saveNewPressed(_ sender: NSButton) {
+        let index = slEntry.count
+        slEntry.append(SLEntry(99,noFileString,0,0))
+        saveAndDismissDialog(index)
+    }
+    
     func numberOfSections(in tableView: NSTableView) -> Int { return 1 }
     func numberOfRows(in tableView: NSTableView) -> Int { return slEntry.count }
     
@@ -108,7 +114,6 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
             index += 1
         }
         
-        slEntry.append(SLEntry(99,noFileString,0,0))
         sortSLEntries()
     }
 
@@ -129,7 +134,7 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
         while true {
             okay = true
             
-            for i in 0 ..< slEntry.count-2 {  // leave "unused" entry at end of list
+            for i in 0 ..< slEntry.count-1 {
                 if dateSort {
                     dSort(i)
                 }

@@ -14,8 +14,8 @@
             filePath = "Source/ViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1151"
-            endingLineNumber = "1151"
+            startingLineNumber = "1208"
+            endingLineNumber = "1208"
             landmarkName = "performJog()"
             landmarkType = "7">
          </BreakpointContent>
@@ -30,8 +30,8 @@
             filePath = "Source/ViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1173"
-            endingLineNumber = "1173"
+            startingLineNumber = "1230"
+            endingLineNumber = "1230"
             landmarkName = "displayControlParametersInConsoleWindow()"
             landmarkType = "7">
          </BreakpointContent>
