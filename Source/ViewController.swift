@@ -178,7 +178,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
           "Monster","Kali Tower","Gold","Spider","Knighty's Kleinian",
           "Half Tetrahedron","Knighty Polychora","3Dickulus Quaternion Julia","Spudsville","Flower Hive",
           "Pupukuusikkos Spiralbox", "SurfBox","TwistBox","Vertebrae", "DarkBeam Surfbox",
-          "Klienian Sponge","Donuts","PDOF","MagnetoBulb","Spuds2018" ]
+          "Klienian Sponge","Donuts","PDOF","MagnetoBulb","Spuds2018","KaleidoScope" ]
     
     func updateWindowTitle() {
         let index = Int(control.equation)
@@ -193,6 +193,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
 
         vcControl.refreshControlPanels()
         vcColor.defineWidgets()
+        
         winHandler.refreshWidgetsAndImage()
     }
     
@@ -229,7 +230,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.fx = 8
             control.isteps = 10
             
-            if control.bcy {
+            if control.doInversion {
                 control.camera = simd_float3( -0.138822 , -1.4459486 , -1.9716375 )
                 updateShaderDirectionVector(simd_float3( 0.012995179 , 0.54515165 , 0.8382366 ))
                 control.InvCenter = simd_float3( -0.10600001 , -0.74200004 , -1.3880001 )
@@ -245,7 +246,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.cx = 25
             control.isteps = 8
             
-            if control.bcy {
+            if control.doInversion {
                 control.camera = simd_float3(-4.4953876, -6.3138175, -29.144863)
                 updateShaderDirectionVector(simd_float3(0.0, 0.09950372, 0.9950372))
                 control.cy =  1.0326525
@@ -273,7 +274,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.InvAngle = 5.5392437
             control.InvRadius = 2.06132293
             
-            if control.bcy {
+            if control.doInversion {
                 control.camera = simd_float3(-1.5613757, -0.61350304, 0.41508165)
                 updateShaderDirectionVector(simd_float3(0.0, 0.09950372, 0.9950372))
                 control.InvCx = -1.67399943
@@ -304,7 +305,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.fx = 2.42
             control.juliaboxMode = true
             
-            if control.bcy {
+            if control.doInversion {
                 control.camera = simd_float3( -1.4471021 , 0.23879418 , -4.3080645 )
                 updateShaderDirectionVector(simd_float3( 0.0 , 0.09950371 , 0.99503714 ))
                 control.InvCenter = simd_float3( -0.13600002 , 0.30600032 , 0.011999967 )
@@ -321,7 +322,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.contrast = 0.28
             control.specular = 0.9
             
-            if control.bcy {
+            if control.doInversion {
                 control.camera = simd_float3( -0.010578117 , -0.49170083 , -2.4 )
                 updateShaderDirectionVector(simd_float3( 0.0 , 0.09950371 , 0.99503714 ))
                 control.InvCx =  0.098000005
@@ -338,7 +339,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.cw = 1.3
             control.isteps = 10
             
-            if control.bcy {
+            if control.doInversion {
                 control.camera = simd_float3( 0.0012031387 , -0.106357165 , -1.1865364 )
                 updateShaderDirectionVector(simd_float3( 0.0 , 0.09950372 , 0.9950372 ))
                 control.InvCx =  0.025999993
@@ -355,7 +356,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.cw = 0.13
             control.isteps = 2
             
-            if control.bcy {
+            if control.doInversion {
                 control.camera = simd_float3( 0.06890213 , 4.266852 , -1.0111475 )
                 updateShaderDirectionVector(simd_float3( 0.0 , 0.09950372 , 0.9950372 ))
                 control.InvCx =  0.29999992
@@ -376,7 +377,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.dz = 0
             control.isteps = 15
             
-            if control.bcy {
+            if control.doInversion {
                 control.camera = simd_float3( 0.042072453 , -0.99094355 , -1.6142143 )
                 updateShaderDirectionVector(simd_float3( 0.012995181 , 0.54515177 , 0.83823675 ))
                 control.InvCx =  0.036
@@ -391,7 +392,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.cy = 0.21100003
             control.cz = 0.041
             
-            if control.bcy {
+            if control.doInversion {
                 control.camera = simd_float3( 0.04676684 , -0.46387178 , -3.0737557 )
                 updateShaderDirectionVector(simd_float3( 0.0 , 0.09950372 , 0.9950372 ))
                 control.InvCx =  0.28600028
@@ -412,7 +413,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.dw = 0.9000002
             control.fx = 1
             
-            if control.bcy {
+            if control.doInversion {
                 control.camera = simd_float3( 4.1487565 , 2.6955016 , 1.3862593 )
                 updateShaderDirectionVector(simd_float3( 0.0 , 0.09950372 , 0.9950372 ))
                 control.InvCx =  -0.092
@@ -429,7 +430,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.angle2 = 0.79159856
             control.isteps = 53
             
-            if control.bcy {
+            if control.doInversion {
                 control.camera = simd_float3( 0.13613744 , 0.07272194 , -0.85636866 )
                 updateShaderDirectionVector(simd_float3( 0.0 , 0.09950372 , 0.9950372 ))
                 control.InvCx =  0.07199999
@@ -448,7 +449,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.dy = 0.008000016
             control.dz = -1.5999997
             
-            if control.bcy {
+            if control.doInversion {
                 control.camera = simd_float3( 0.54899234 , -0.03701113 , -0.7053995 )
                 updateShaderDirectionVector(simd_float3( 0.0 , 0.09950372 , 0.9950372 ))
                 control.InvCx =  0.5320001
@@ -467,7 +468,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.juliaZ =  0.0
             control.bright = 0.9000001
             
-            if control.bcy {
+            if control.doInversion {
                 control.camera = simd_float3( -0.010578117 , -0.49170083 , -2.4 )
                 updateShaderDirectionVector(simd_float3( 0.0 , 0.09950372 , 0.9950372 ))
                 control.InvCx =  0.1
@@ -491,7 +492,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.bright = 2.3600001
             control.contrast = 0.16
             
-            if control.bcy {
+            if control.doInversion {
                 control.camera = SIMD3<Float>(0.44283432, -0.5461547, -1.4410573)
                 updateShaderDirectionVector( SIMD3<Float>(0.0, 0.09950371, 0.99503714) )
                 control.cx = 0.31
@@ -519,7 +520,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.juliaZ =  3.0999992
             control.bright = 1.5000001
             
-            if control.bcy {
+            if control.doInversion {
                 control.camera = simd_float3( -0.16991696 , -2.5964863 , -12.54011 )
                 updateShaderDirectionVector(simd_float3( 0.0 , 0.09950372 , 0.9950372 ))
                 control.InvCx =  0.03800006
@@ -536,7 +537,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.juliaZ =  0.19999993
             control.isteps = 9
             
-            if control.bcy {
+            if control.doInversion {
                 control.camera = simd_float3( 0.047575176 , -0.122939646 , 1.5686907 )
                 updateShaderDirectionVector(simd_float3( 0.0 , 0.09950372 , 0.9950372 ))
                 control.InvCx =  0.1
@@ -561,7 +562,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.fx = 2.5600004
             control.juliaboxMode = true
             
-            if control.bcy {
+            if control.doInversion {
                 control.camera = simd_float3( -0.37710285 , 0.4399976 , -5.937426 )
                 updateShaderDirectionVector(simd_float3( 0.0 , 0.09950372 , 0.9950372 ))
                 control.InvCx =  0.10799999
@@ -574,6 +575,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.camera = simd_float3(0.24289839, -2.1800025, -9.257425)
             control.cx = 1.5611011
             control.isteps = 24
+            control.juliaboxMode = true
             control.juliaX =  3.2779012
             control.juliaY =  -3.0104024
             control.juliaZ =  -3.2913034
@@ -581,7 +583,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.contrast = 0.3399999
             control.fx = 8.21999
             
-            if control.bcy {
+            if control.doInversion {
                 control.camera = simd_float3( 0.23289838 , 0.048880175 , -1.2394277 )
                 updateShaderDirectionVector(simd_float3( 0.0 , 0.09950372 , 0.9950372 ))
                 control.InvCx =  0.068000056
@@ -613,7 +615,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.contrast = 0.22000006
             control.specular = 2.0
             
-            if control.bcy {
+            if control.doInversion {
                 control.camera = simd_float3( 1.0229 , -1.1866168 , -8.713577 )
                 updateShaderDirectionVector(simd_float3( 0.0 , 0.09950372 , 0.9950372 ))
                 control.InvCx =  -0.9600001
@@ -639,7 +641,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.contrast = 0.5
             control.specular = 0.0
             
-            if control.bcy {
+            if control.doInversion {
                 control.camera = simd_float3( -0.10709968 , -0.06923248 , -1.9424983 )
                 updateShaderDirectionVector(simd_float3( 0.0 , 0.09950372 , 0.9950372 ))
                 control.InvCx =  0.068000056
@@ -665,7 +667,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.contrast = 0.17999999
             control.specular = 0.3
             
-            if control.bcy {
+            if control.doInversion {
                 control.camera = simd_float3( 0.25108737 , -0.9736173 , -2.603676 )
                 updateShaderDirectionVector(simd_float3( 0.0 , 0.09950372 , 0.9950372 ))
                 control.InvCx =  0.35200006
@@ -687,7 +689,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.specular = 1.2000002
             updateShaderDirectionVector( simd_float3(-2.0272768e-08, 0.46378687, 0.89157283) )
             
-            if control.bcy {
+            if control.doInversion {
                 control.camera = simd_float3( -0.2254057 , -7.728364 , -19.269318 )
                 updateShaderDirectionVector(simd_float3( -2.0172154e-08 , 0.4614851 , 0.8871479 ))
                 control.InvCx =  -1.8719988
@@ -716,7 +718,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.juliaY =  -2.0
             control.juliaZ =  -1.4300003
              
-            if control.bcy {
+            if control.doInversion {
                 control.camera = SIMD3<Float>(-1.1020072, -2.851365, -1.6521813)
                 updateShaderDirectionVector( SIMD3<Float>(0.59026825, 0.5066203, 0.6284261) )
                 control.cx = -1.0
@@ -751,7 +753,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.contrast = 0.29999998
             control.specular = 0.0
              
-            if control.bcy {
+            if control.doInversion {
                 control.camera = simd_float3( 4.238563 , 0.035811555 , -31.506575 )
                 updateShaderDirectionVector(simd_float3( 0.0 , 0.09950372 , 0.9950372 ))
                 control.InvCx =  0.1
@@ -784,7 +786,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.contrast = 0.16
             control.specular = 0.0
              
-            if control.bcy {
+            if control.doInversion {
                 control.camera = SIMD3<Float>(-2.227165, -1.3660691, -5.0172186)
                 updateShaderDirectionVector( SIMD3<Float>(0.0, 0.09950371, 0.99503714) )
                 control.cx = 2.4570065
@@ -805,7 +807,25 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
                 control.InvRadius =  0.5029997
                 control.InvAngle =  0.631
             }
-
+            
+        case EQU_26_KALEIDO :
+            control.camera = simd_float3(-0.00100744, -0.1640267, -1.7581517)
+            control.cx = 1.1259973
+            control.cy = 0.8359996
+            control.cz = -0.016000029
+            control.angle1 = 1.7849922
+            control.angle2 = -1.2375059
+            control.isteps = 35
+            
+            if control.doInversion {
+                control.camera = simd_float3( -0.00100744 , -0.1640267 , -1.7581517 )
+                updateShaderDirectionVector(simd_float3( 0.0 , 0.09950372 , 0.9950372 ))
+                control.InvCx =  0.034000028
+                control.InvCy =  -0.026000002
+                control.InvCz =  -1.082
+                control.InvRadius =  0.97000015
+                control.InvAngle =  -0.17
+            }
         default : break
         }
         
@@ -889,11 +909,13 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         case EQU_24_MAGNETO :
             c.v3a = simd_float3(c.dx,c.dy,c.dz)
             c.v3b = simd_float3(c.ex,c.ey,c.ez)
+        case EQU_26_KALEIDO :
+            c.v3a = normalize(simd_float3(-1.0,control.cy-1.0,1.0/control.cy-1.0))
         default : break
         }
         
         prepareJulia()
-
+        
         if let vr = vr { if vr.isRecording { c.skip = 1 }}  // editing params while recording was causing 'blocky fast renders' to be recorded
         
         controlBuffer.contents().copyMemory(from:&c, byteCount:MemoryLayout<Control>.stride)
@@ -957,7 +979,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     //MARK: -
     
     func toggleInversion() {
-        control.bcy = !control.bcy
+        control.doInversion = !control.doInversion
         defineWidgetsForCurrentEquation()
         reset()
         flagViewToRecalcFractal()
@@ -1031,6 +1053,9 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             flagViewToRecalcFractal()
         }
         
+        func delayedRender() {
+            flagViewToRecalcFractal()
+        }
 
         isKeyDown = true
         
@@ -1121,7 +1146,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         case "Q" :
             speed1000 = true
         case "W" :
-            control.bcy = !control.bcy
+            control.doInversion = !control.doInversion
             control.bdx = !control.bdx
             toggle2()
         case "E" :
@@ -1257,7 +1282,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         
         //----------------------------------
         print(" ")
-        print("if control.bcy {")
+        print("if control.doInversion {")
         print("    control.camera = simd_float3(",control.camera.x,",",control.camera.y,",",control.camera.z,")")
         print("    updateShaderDirectionVector(simd_float3(",control.viewVector.x,",",control.viewVector.y,",",control.viewVector.z,"))")
         print("    control.InvCx = ",control.InvCx)
@@ -1463,7 +1488,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
 //            widget.addFloat("Scale",&control.dz,0.01,8,0.1)
 //            widget.addFloat("Scale2",&control.dw,0.01,8,0.1)
         case EQU_14_SPUDS :
-            widget.addInt32("Iterations",&control.isteps,2,30,1)
+            widget.addInt32("Iterations",&control.isteps,2,60,1)
             widget.addFloat("X",&control.cx,-3,3,0.01)
             widget.addFloat("Y",&control.cy,0.01,10,0.01)
             widget.addFloat("Z",&control.cz,0.01,10,0.01)
@@ -1491,9 +1516,9 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             juliaGroup(10,0.01)
         case EQU_18_TWISTBOX :
             widget.addInt32("Iterations",&control.isteps,3,60,1)
-            widget.addFloat("Scale Factor",&control.fx,0.6,10,0.2)
-            widget.addFloat("Box",&control.cx, 0,10,0.001)
-            juliaGroup(10,0.0001)
+            widget.addFloat("Scale Factor",&control.fx,1.2,12,0.1)
+            widget.addFloat("Box",&control.cx,1.35,1.77,0.01)
+            juliaGroup(10,0.01)
         case EQU_19_VERTEBRAE :
             widget.addInt32("Iterations",&control.isteps,1,10,1)
             widget.addFloat("X",&control.cx,       -10,10,0.1)
@@ -1513,7 +1538,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addFloat("Offset Z",&control.fx,-10,10,0.05)
             widget.addFloat("Slope Z",&control.fw, -10,10,0.05)
         case EQU_20_DARKSURF :
-            widget.addInt32("Iterations",&control.isteps,2,10,1)
+            widget.addInt32("Iterations",&control.isteps,2,30,1)
             widget.addFloat("scale",&control.cx,    -10,10,0.05)
             widget.addFloat("MinRad",&control.cy,   -10,10,0.05)
             widget.addFloat("Scale",&control.cz,    -10,10,0.5)
@@ -1553,12 +1578,12 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             juliaGroup(10,0.01)
         case EQU_24_MAGNETO :
             widget.addInt32("Iterations",&control.isteps,1,150,1)
-            widget.addFloat("Power",&control.cx,0,16,0.001)
+            widget.addFloat("Power",&control.cx,0,16,0.01)
             widget.addFloat("Modc",&control.cy,1,8,0.01)
             widget.addFloat("mult",&control.cz, 0.01,20,0.01)
             widget.addFloat("m2",&control.cw, 0.1,8,0.01)
             widget.addFloat("dr",&control.dx,0.1,3,0.1)
-            widget.addFloat("grow",&control.dy,0.1,3,0.1)
+            widget.addFloat("grow",&control.dy,0.1,1,0.01)
 //            widget.addFloat("M1 X",&control.dx,-8,8,0.001)
 //            widget.addFloat("M1 Y",&control.dy,-8,8,0.001)
 //            widget.addFloat("M1 Z",&control.dz,-8,8,0.001)
@@ -1577,12 +1602,21 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         case EQU_25_SPUDS2018 :
             widget.addInt32("Iterations",&control.isteps,2,30,1)
             widget.addFloat("X",&control.cx,-3,3,0.01)
-            widget.addFloat("Y",&control.cy,0.01,10,0.01)
-            widget.addFloat("Z",&control.cz,0.01,10,0.01)
-            widget.addFloat("W",&control.cw,0.01,10,0.01)
-            widget.addFloat("X",&control.dx,0.01,10,0.01)
-            widget.addFloat("Y",&control.dy,0.01,10,0.01)
             widget.addFloat("Z",&control.dz,0.01,10,0.01)
+
+            widget.addFloat("Box1",&control.cy,0.01,3,0.01)
+            widget.addFloat("Box2",&control.cz,0.01,3,0.01)
+            widget.addFloat("Box3",&control.cw,0.01,3,0.01)
+            widget.addFloat("Box4",&control.dx,0.01,3,0.01)
+            widget.addFloat("Box5",&control.dy,0.01,3,0.01)
+            
+        case EQU_26_KALEIDO :
+            widget.addInt32("Iterations",&control.isteps,10,200,1)
+            widget.addFloat("Scale",&control.cx,0.5,2,0.0005)
+            widget.addFloat("Y",&control.cy,-5,5,0.004)
+            widget.addFloat("Z",&control.cz,-5,5,0.004)
+            widget.addFloat("Angle1",&control.angle1,-4,4,0.005)
+            widget.addFloat("Angle2",&control.angle2,-4,4,0.005)
         default : break
         }
 
@@ -1595,8 +1629,8 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addFloat("   Scale",&control.tScale,0.01,1,0.02)
         }
         
-        widget.addBoolean(" Spherical Inversion",&control.bcy,99)
-        if control.bcy {
+        widget.addBoolean(" Spherical Inversion",&control.doInversion,99)
+        if control.doInversion {
             widget.addFloat("   X",&control.InvCx,-5,5,0.01)
             widget.addFloat("   Y",&control.InvCy,-5,5,0.01)
             widget.addFloat("   Z",&control.InvCz,-5,5,0.01)

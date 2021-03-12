@@ -288,7 +288,7 @@ class VideoRecorderViewController: NSViewController, NSTableViewDataSource, NSTa
     
     /// retrieve parameter dataset from keyframe storage.
     ///
-    /// Certain fields are NOT retreived, but instead maintain the curent user settings (so different recordings can be made from keyframe data)
+    /// Certain fields are NOT retrieved, but instead maintain the curent user settings (so different recordings can be made from keyframe data)
     func loadKeyframe(_ index:Int) -> Control {
         var temp = keyFrames[index]
         temp.bright = vc.control.bright     // all these fields are not overwritten by keyframe data
@@ -301,14 +301,14 @@ class VideoRecorderViewController: NSViewController, NSTableViewDataSource, NSTa
         temp.cy = vc.control.cy
         temp.cx = vc.control.cx
         temp.bcx = vc.control.bcx
-        temp.bcy = vc.control.bcy
+        temp.doInversion = vc.control.doInversion
         temp.bcz = vc.control.bcz
         temp.juliaboxMode = vc.control.juliaboxMode
         temp.icx = vc.control.icx
         temp.icx = vc.control.icx
         temp.bcx = vc.control.bcx
         temp.bcx = vc.control.bcx
-        temp.bcy = vc.control.bcy
+        temp.doInversion = vc.control.doInversion
         temp.bcz = vc.control.bcz
         temp.bcw = vc.control.bcw
         temp.bdx = vc.control.bdx

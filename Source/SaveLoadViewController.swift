@@ -38,12 +38,12 @@ class SaveLoadCell: NSTableCellView {
             context?.setFillColor(NSColor.darkGray.cgColor)
         }
         else {
-            let cMap:[CGFloat] = [ 0.4, 0.5, 0.6, 1 ]
-            var k = kind % 64
-            let r = cMap[k % 4]; k /= 4
-            let g = cMap[k % 4] + 0.1; k /= 4
-            let b = cMap[k % 4]
-
+            let cMap:[CGFloat] = [ 0.3, 0.6, 1 ]
+            var k = kind % 27
+            let r = cMap[k % 3]; k /= 3
+            let g = cMap[k % 3] + 0.1; k /= 3
+            let b = cMap[k % 3]
+            
             context?.setFillColor(NSColor(red:r, green:g, blue:b, alpha:1).cgColor)
         }
         
@@ -59,6 +59,7 @@ let versionNumber:Int32 = 0x55ac
 var loadNextIndex:Int = -1   // first use will bump this to zero
 var slEntry:[SLEntry] = []
 var dateSort:Bool = true
+var dateAscending:Bool = true
 
 class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableViewDelegate,SLCellDelegate {
     @IBOutlet var legend: NSTextField!
@@ -68,11 +69,11 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     var tv:NSTableView! = nil
     var dateString:String = ""
     var fileURL:URL! = nil
-
+    
     @IBAction func saveNewPressed(_ sender: NSButton) {
         let index = slEntry.count
         slEntry.append(SLEntry(99,noFileString,0,0))
-        saveAndDismissDialog(index)
+        overwriteAndDismissDialog(index)
     }
     
     func numberOfSections(in tableView: NSTableView) -> Int { return 1 }
@@ -80,11 +81,17 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     
     func didTapButton(_ sender: NSButton) {
         let buttonPosition = sender.convert(CGPoint.zero, to:tv)
-        saveAndDismissDialog(tv.row(at:buttonPosition))
+        if buttonPosition.x < 400 { overwriteAndDismissDialog(tv.row(at:buttonPosition)) }
+        deleteAndReloadList(tv.row(at:buttonPosition))
     }
     
     @IBAction func radioPressed(_ sender: NSButton) {
-        dateSort = sender == DateRadio
+        if sender == DateRadio {
+            if dateSort { dateAscending = !dateAscending }
+            dateSort = true
+        }
+        else { dateSort = false }
+        
         updateSortButtons()
         sortSLEntries()
         tv.reloadData()
@@ -93,13 +100,12 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     func loadSLEntries() {
         slEntry.removeAll()
         
-        var index = 0
         var cc = Control()
         var kind = Int()
         
-        while(true) {
+        for index in 0 ..< 1000 {
             let str = determineDateString(index)
-            if str == noFileString { break }
+            if str == noFileString { continue }
             
             // ------------------------
             kind = 0
@@ -109,14 +115,13 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
                 data?.getBytes(&cc, length:sz)
                 kind = Int(cc.equation)
             }
-
+            
             slEntry.append(SLEntry(kind,str,dateValue,index))
-            index += 1
         }
         
         sortSLEntries()
     }
-
+    
     func sortSLEntries() {
         var okay:Bool = true
         
@@ -126,9 +131,10 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
             slEntry[i].copy(t)
             okay = false
         }
-
+        
         func dSort(_ i:Int) {
-            if slEntry[i].dateValue > slEntry[i+1].dateValue { swap(i) }
+            if dateAscending { if slEntry[i].dateValue > slEntry[i+1].dateValue { swap(i) }}
+            else { if slEntry[i].dateValue < slEntry[i+1].dateValue { swap(i) }}
         }
         
         while true {
@@ -160,7 +166,7 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
         
         loadSLEntries()
     }
-
+    
     func updateSortButtons() {
         DateRadio.set(textColor: dateSort ? .red : .black)
         KindRadio.set(textColor: !dateSort ? .red : .black)
@@ -168,7 +174,7 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         let cell:SaveLoadCell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "SLCell"), owner: self) as! SaveLoadCell
-
+        
         if row >= slEntry.count { return cell }
         
         if slEntry[row].dateString == noFileString {
@@ -201,10 +207,12 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
         fileURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false).appendingPathComponent(name)
     }
     
-    func saveAndDismissDialog(_ index:Int) {
+    func overwriteAndDismissDialog(_ index:Int) {
+        var useRawIndex = true
+        
         func performSave() {
             do {
-                self.determineURL(index,true)
+                self.determineURL(index,useRawIndex)
                 vc.control.version = versionNumber
                 let data:NSData = NSData(bytes:&vc.control, length:self.sz)
                 try data.write(to: self.fileURL, options: .atomic)
@@ -219,17 +227,44 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
         }
         
         if slEntry[index].dateString == noFileString { // an 'add' session
+            useRawIndex = false
             finishSession()
         }
         else {
             let alert = NSAlert()
-            alert.messageText = "Save Settings"
-            alert.informativeText = "Confirm overwrite of Settings storage"
+            alert.messageText = "Overwrite Entry"
+            alert.informativeText = "Confirm overwrite of Entry"
             alert.addButton(withTitle: "NO")
             alert.addButton(withTitle: "YES")
             alert.beginSheetModal(for: self.view.window!) {( returnCode: NSApplication.ModalResponse) -> Void in
-                finishSession()
+                if returnCode.rawValue == 1001 { do { finishSession() }}
+                else { self.dismiss(self) }
             }
+        }
+    }
+    
+    func deleteEntry(_ index:Int) {
+        self.determineURL(index,true)
+        
+        do {
+            let fileManager = FileManager.default
+            
+            if fileManager.fileExists(atPath: fileURL.path) {
+                try fileManager.removeItem(atPath: fileURL.path)
+            }
+        }
+        catch let error as NSError { print("delete error: \(error)") }
+    }
+    
+    func deleteAndReloadList(_ index:Int) {
+        let alert = NSAlert()
+        alert.messageText = "Delete Entry"
+        alert.informativeText = "Confirm deletion of Entry"
+        alert.addButton(withTitle: "NO")
+        alert.addButton(withTitle: "YES")
+        alert.beginSheetModal(for: self.view.window!) {( returnCode: NSApplication.ModalResponse) -> Void in
+            if returnCode.rawValue == 1001 { do { self.deleteEntry(index); self.loadSLEntries(); self.tv.reloadData() }}
+            else { self.dismiss(self) }
         }
     }
     
@@ -302,7 +337,7 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
         
         while true {
             loadNextIndex += 1
-            if loadNextIndex >= slEntry.count-1 { loadNextIndex = 0 } // skip past the last entry ("unused")
+            if loadNextIndex >= slEntry.count { loadNextIndex = 0 }
             
             print(loadNextIndex)
             
@@ -341,15 +376,15 @@ extension Date {
 }
 
 extension NSButton {
-
+    
     func set(textColor color: NSColor) {
         let newAttributedTitle = NSMutableAttributedString(attributedString: attributedTitle)
         let range = NSRange(location: 0, length: attributedTitle.length)
-
+        
         newAttributedTitle.addAttributes([
             .foregroundColor: color,
         ], range: range)
-
+        
         attributedTitle = newAttributedTitle
     }
 }
