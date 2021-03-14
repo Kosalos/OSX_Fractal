@@ -148,29 +148,16 @@
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1t3-P3-0i7">
-                                <rect key="frame" x="13" y="9" width="78" height="32"/>
+                                <rect key="frame" x="13" y="9" width="103" height="32"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="66" id="vPx-gh-eMQ"/>
+                                    <constraint firstAttribute="width" constant="91" id="vPx-gh-eMQ"/>
                                 </constraints>
-                                <buttonCell key="cell" type="push" title="Date" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="8FP-CA-pqV">
+                                <buttonCell key="cell" type="push" title="Date Asc" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="8FP-CA-pqV">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
                                     <action selector="radioPressed:" target="5u1-Pe-ug6" id="Fkg-J4-ROe"/>
-                                </connections>
-                            </button>
-                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6PT-Z2-FzE">
-                                <rect key="frame" x="91" y="9" width="78" height="32"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="66" id="lEE-vj-FBp"/>
-                                </constraints>
-                                <buttonCell key="cell" type="push" title="Kind" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="qKh-ig-Kj0">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="radioPressed:" target="5u1-Pe-ug6" id="mof-UC-aXC"/>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mbq-kQ-qgX">
@@ -282,13 +269,26 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6PT-Z2-FzE">
+                                <rect key="frame" x="125" y="9" width="78" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="66" id="lEE-vj-FBp"/>
+                                </constraints>
+                                <buttonCell key="cell" type="push" title="Kind" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="qKh-ig-Kj0">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="radioPressed:" target="5u1-Pe-ug6" id="mof-UC-aXC"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="8wg-Zk-k8i" firstAttribute="centerY" secondItem="IGx-dD-k4I" secondAttribute="centerY" id="El7-Hx-7vI"/>
                             <constraint firstItem="xOV-DN-5Jd" firstAttribute="leading" secondItem="8wg-Zk-k8i" secondAttribute="leading" id="FcX-eb-iUV"/>
                             <constraint firstItem="xOV-DN-5Jd" firstAttribute="trailing" secondItem="8wg-Zk-k8i" secondAttribute="trailing" id="Ftz-wz-v9L"/>
                             <constraint firstItem="1t3-P3-0i7" firstAttribute="leading" secondItem="IGx-dD-k4I" secondAttribute="leading" constant="19" id="LYA-SU-IJ2"/>
-                            <constraint firstItem="6PT-Z2-FzE" firstAttribute="leading" secondItem="1t3-P3-0i7" secondAttribute="trailing" constant="12" symbolic="YES" id="M8X-G5-MIR"/>
+                            <constraint firstItem="6PT-Z2-FzE" firstAttribute="leading" secondItem="1t3-P3-0i7" secondAttribute="trailing" constant="21" id="M8X-G5-MIR"/>
                             <constraint firstItem="xOV-DN-5Jd" firstAttribute="leading" secondItem="IGx-dD-k4I" secondAttribute="leading" constant="20" symbolic="YES" id="UaK-f8-Iqf"/>
                             <constraint firstAttribute="bottom" secondItem="1t3-P3-0i7" secondAttribute="bottom" constant="16" id="VtN-m5-wXd"/>
                             <constraint firstItem="8wg-Zk-k8i" firstAttribute="trailing" secondItem="mbq-kQ-qgX" secondAttribute="trailing" id="WSW-nl-zYE"/>

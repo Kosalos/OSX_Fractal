@@ -91,7 +91,9 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
             dateSort = true
         }
         else { dateSort = false }
-        
+
+        DateRadio.title = dateAscending ? "Date Asc" : "Date Desc"
+
         updateSortButtons()
         sortSLEntries()
         tv.reloadData()
