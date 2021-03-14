@@ -7,6 +7,10 @@
 
 using namespace metal;
 
+typedef float2 vec2;
+typedef float3 vec3;
+typedef float4 vec4;
+
 constant int MAX_MARCHING_STEPS = 255;
 constant float MIN_DIST = 0.00002;
 constant float MAX_DIST = 60;
@@ -57,31 +61,31 @@ float DE_MANDELBULB(float3 pos,device Control &control,thread float4 &orbitTrap)
 #else
     float dr = 1;
     float r,theta,phi,pwr,ss;
-
+    
     float3 ot,trap = control.otFixed;
-    if(control.orbitStyle == 2) trap -= pos;
-
+    if(int(control.orbitStyle + 0.5) == 2) trap -= pos;
+    
     for(int i=0; i < control.isteps; ++i) {
         r = length(pos);
         if(r > 2) break;
-
+        
         theta = atan2(sqrt(pos.x * pos.x + pos.y * pos.y), pos.z);
         phi = atan2(pos.y,pos.x);
         pwr = pow(r,control.fx);
         ss = sin(theta * control.fx);
-
+        
         pos.x += pwr * ss * cos(phi * control.fx);
         pos.y += pwr * ss * sin(phi * control.fx);
         pos.z += pwr * cos(theta * control.fx);
-
+        
         dr = (pow(r, control.fx - 1.0) * control.fx * dr ) + 1.0;
-
+        
         ot = pos;
         if(control.orbitStyle > 0) ot -= trap;
         float4 hk = float4(ot,r);
         orbitTrap = min(orbitTrap, dot(hk,hk));
     }
-
+    
     return 0.5 * log(r) * r/dr;
 #endif
 }
@@ -89,179 +93,34 @@ float DE_MANDELBULB(float3 pos,device Control &control,thread float4 &orbitTrap)
 //MARK: - 2 Apollonian2
 // apollonian2: https://www.shadertoy.com/view/llKXzh
 
-//p.xz = mod(p.xz + 1.0, 2.0) - 1.0;
-//float4 q = float4(p, 1);
-//float3 offset1 = float3(control.cx, control.cy, control.cz);
-//float4 offset2 = float4(control.cw, control.dx, control.dy, control.dz);
-//
-//float3 ot,trap = control.otFixed;
-//if(control.orbitStyle == 2) trap -= p;
-//
-//control.LVIlow = p;
-//
-//for(int i = 0; i < control.isteps; ++i) {
-//    if(i < control.LVIiter) control.LVIlow = q.xyz;
-//
-//    q.xyz = abs(q.xyz) - offset1;
-//    q = 2.0*q/clamp(dot(q.xyz, q.xyz), 0.4, 1.0) - offset2;
-//
-//    if(i < control.LVIiter) control.LVIhigh = q.xyz;
-//
-//    ot = q.xyz;
-//    if(control.orbitStyle > 0) ot -= trap;
-//    orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
-//}
-//
-//return length(q.xyz)/q.w;
-
-
 float DE_APOLLONIAN2(float3 pos,device Control &control,thread float4 &orbitTrap) {
-//    #ifdef SINGLE_EQUATION
-//        return 0;
-//    #else
-    
+#ifdef SINGLE_EQUATION
+    return 0;
+#else
     float t = control.cz + 0.25 * cos(control.cw * PI * control.cx * (pos.z - pos.x));
-    float hk,scale = 1;
-    bool part2 = false;
-
-//    float4 q = float4(pos, 1);
-//    float3 offset1 = float3(control.dx, control.dy, control.dz);
-//    float4 offset2 = float4(control.ex, control.ey, control.ez, control.ew);
-
+    float scale = 1;
+    
+    float3 ot,trap = control.otFixed;
+    if(control.orbitStyle == 2) trap -= pos;
+    
     for(int i=0; i< control.isteps; ++i) {
-        float3 old = pos;
-        if(!part2) {
-//            pos = -1.0 + 2.0 * fract(0.5 * pos + 0.5);
-            pos = -control.dz/2 + control.dz * fract(pos/control.dz + control.dz);
-            pos -= sign(pos) * control.cy / control.dy;
-            hk = dot(pos,pos);
-
-            if(hk < control.fx) {
-                hk *= control.dx;
-            }
-
-            float k = t / hk;
-            pos *= k;
-            scale *= k;
-       }
-       else {
-           pos = control.dz * clamp(pos, -control.dz, control.dz) - pos;
-            float k = max(control.cy/dot(pos,pos), 1.0);
-            pos *= k;
-            scale *= k;
-
-//            if(control.juliaboxMode)
-//                pos += control.julia;
-        }
+        pos = -1.0 + 2.0 * fract(0.5 * pos + 0.5);
+        pos -= sign(pos) * control.cy / 20;
         
+        float k = t / dot(pos,pos);
+        pos *= k;
+        scale *= k;
         
-        if(length(old-pos) < control.fx) part2 = true;
+        ot = pos;
+        if(control.orbitStyle > 0) ot -= trap;
+        orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
     }
-
- //   if(!part2) {
-        float d1 = sqrt( min( min( dot(pos.xy,pos.xy), dot(pos.yz,pos.yz) ), dot(pos.zx,pos.zx) ) ) - 0.02;
-        float dmi = min(d1,abs(pos.y));
-        return 0.5 * dmi / scale;
-  //  }
-
-   // return length(q.xyz)/q.w;
-
-//    #endifv
+    
+    float d1 = sqrt( min( min( dot(pos.xy,pos.xy), dot(pos.yz,pos.yz) ), dot(pos.zx,pos.zx) ) ) - 0.02;
+    float dmi = min(d1,abs(pos.y));
+    return 0.5 * dmi / scale;
+#endif
 }
-
-
-//    for(int i=0; i< control.isteps; ++i) {
-////        if(!part2) {
-////            pos = -1.0 + 2.0 * fract(0.5 * pos + 0.5);
-//            pos = -control.dz/2 + control.dz * fract(pos/control.dz + control.dz);
-//            pos -= sign(pos) * control.cy / control.dy;
-//            hk = dot(pos,pos);
-//
-//            if(hk < control.fx) {
-//                hk *= control.dx;
-//            }
-//
-//            float k = t / hk;
-//            pos *= k;
-//            scale *= k;
-////  /      }
-////        else {
-////            q.xyz = abs(q.xyz) - offset1;
-////            q = 2.0*q/clamp(dot(q.xyz, q.xyz), 0.4, 1.0) - offset2;
-////            pos = q.xyz;
-////        }
-//    }
-//
-// //   if(!part2) {
-//        float d1 = sqrt( min( min( dot(pos.xy,pos.xy), dot(pos.yz,pos.yz) ), dot(pos.zx,pos.zx) ) ) - 0.02;
-//        float dmi = min(d1,abs(pos.y));
-//        return 0.5 * dmi / scale;
-//  //  }
-//
-//   // return length(q.xyz)/q.w;
-//
-////    #endifv
-//}
-
-
-//float DEfactor = 1;
-//float3 ap;
-//
-//for(int i=0; i < control.isteps; ++i) {
-//    ap = pos;
-//    pos = control.dx * clamp(pos, -control.cx, control.cx) - pos;
-//
-//    float r2=dot(pos,pos);
-//    orbitTrap = min(orbitTrap, abs(float4(pos,r2)));
-//
-//    float k = max(control.cy/r2, 1.0);
-//    pos *= k;
-//    DEfactor *= k;
-//
-//    if(control.juliaboxMode)
-//        pos += control.julia;
-//
-//    orbitTrap = min(orbitTrap, abs(float4(pos,dot(pos,pos))));
-//}
-//
-//return abs(0.5 * abs(pos.z - control.cz)/DEfactor - control.cw);
-
-
-//float DE_APOLLONIAN2(float3 pos,thread Control &control,thread float4 &orbitTrap) {
-////    #ifdef SINGLE_EQUATION
-////        return 0;
-////    #else
-//
-//    control.LVIlow = pos;
-//
-//    float t = control.cz + 0.25 * cos(control.cw * PI * control.cx * (pos.z - pos.x));
-//    float scale = 1;
-//
-//    float3 ot,trap = control.otFixed;
-//    if(control.orbitStyle == 2) trap -= pos;
-//
-//    for(int i=0; i< control.isteps; ++i) {
-//        if(i < control.LVIiter) control.LVIlow = pos;
-//
-//        pos = -1.0 + 2.0 * fract(0.5 * pos + 0.5);
-//        pos -= sign(pos) * control.cy / 20;
-//
-//        float k = t / dot(pos,pos);
-//        pos *= k;
-//        scale *= k;
-//
-//        if(i < control.LVIiter) control.LVIhigh = pos;
-//
-//        ot = pos;
-//        if(control.orbitStyle > 0) ot -= trap;
-//        orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
-//    }
-//
-//    float d1 = sqrt( min( min( dot(pos.xy,pos.xy), dot(pos.yz,pos.yz) ), dot(pos.zx,pos.zx) ) ) - 0.02;
-//    float dmi = min(d1,abs(pos.y));
-//    return 0.5 * dmi / scale;
-////    #endif
-//}
 
 //MARK: - 3 JosKleinian
 
@@ -1514,6 +1373,39 @@ float DE_KALEIDO(float3 pos,device Control &control,thread float4 &orbitTrap) {
 #endif
 }
 
+
+//MARK: - 27 MandelNest
+
+float DE_MANDELNEST(float3 pos,device Control &control,thread float4 &orbitTrap) {
+#ifdef zzzSINGLE_EQUATION
+    return 0;
+#else
+    float r,dr = 1;
+    float2 shift = float2(control.cx * PI);
+    
+    for(int i=0; i < control.isteps; ++i) {
+        r = length(pos);
+        if(r > 200) break;
+        
+        if(control.bcx && !(i & 2)) {
+            pos = sin(shift.x + control.fx * asin(pos/r));
+        } else {
+            pos = cos(shift.y + control.fx * acos(pos/r));
+        }
+        
+        pos *= pow(r,control.fx);
+        pos += control.juliaboxMode ? control.julia : pos;
+        
+        dr = (pow(r, control.fx - 1.0) * control.fx * dr ) + 1.0;
+        
+        float4 hk = float4(pos,r);
+        orbitTrap = min(orbitTrap, dot(hk,hk));
+    }
+    
+    return 0.25 * log(r) * r/dr;
+#endif
+}
+
 //MARK: - distance estimate
 // ===========================================
 
@@ -1545,7 +1437,7 @@ float DE_Inner(float3 pos,device Control &control,thread float4 &orbitTrap) {
         case EQU_24_MAGNETO     : return DE_MAGNETO(pos,control,orbitTrap);
         case EQU_25_SPUDS2018   : return DE_SPUDS2018(pos,control,orbitTrap);
         case EQU_26_KALEIDO     : return DE_KALEIDO(pos,control,orbitTrap);
-
+        case EQU_27_MANDELNEST  : return DE_MANDELNEST(pos,control,orbitTrap);
     }
     
     return 0;
@@ -1850,7 +1742,45 @@ float3 applyColoring2
     return refCol +  (palCol  * refrCol);
 }
 
-float3 applyColoringBody
+float MarbVol (vec3 p,device Control &control)
+{
+    vec3 q;
+    float f;
+    f = 0.;
+    q = p;
+    int count = int(control.coloring4 * 20);
+    for (int j = 0; j < count; j ++) {
+        q = 0.7 * (abs (q) / dot (q, q) - 1.);
+        q.yz = vec2 (q.y * q.y - q.z * q.z, 2. * q.y * q.z);
+        q = q.zxy;
+        f += exp (-15. * abs (dot (p, q)));
+    }
+    return f;
+}
+
+float3 applyColoring3
+(
+ float3 position,
+ float3 direction,
+ texture2d <float, access::read> vcoloringTexture,
+ float3 distAns,
+ float3 normal,
+ device Control &control)
+{
+    vec3 col;
+    float t, dt, c;
+    col = vec3 (0.);
+    dt = 0.08 - 0.01 * cos (0.05 * 2. * PI);
+    t = 0.;
+    for (int j = 0; j < 64; j ++) {
+        t += dt;
+        c = MarbVol (position + t * direction,control);
+        col = 0.95 * col + 0.05 * vec3 (1.7 * c - 0.7 * c * c, c, 0.4 * c * c * c);
+    }
+    return clamp (col, 0., 1.);
+}
+
+float3 applyColoring
 (
  float3 position,
  float3 direction,
@@ -1904,33 +1834,10 @@ float3 applyColoringBody
             break;
         case 6 :
             return applyColoring2(position,direction,coloringTexture,distAns,normal,control);
+        case 7 :
+            return applyColoring3(position,direction,coloringTexture,distAns,normal,control);
     }
 
-    return ans;
-}
-
-float3 applyColoring
-(
- float3 position,
- float3 direction,
- texture2d <float, access::read> coloringTexture,
- float3 distAns,
- float3 normal,
- device Control &control)
-{
-    float3 ans = applyColoringBody(position,direction,coloringTexture,distAns,normal,control);
-    
-//    // blur ------------------------------------------
-//    if(control.blurFocalDistance > 0) {
-//        float blurFocalDistance = length(control.camera - position) - control.blurFocalDistance;
-//        float blurAmount = abs(blurFocalDistance / control.blurStrength);
-//
-//        float3 ans2 = applyColoringBody(position + direction * control.blurOffset,direction,coloringTexture,distAns,normal,control);
-//
-////        ans = mix(ans,ans2,abs(1-blurAmount));
-//        ans = (ans * blurAmount + ans2 * (1 - blurAmount));
-//    }
-    
     return ans;
 }
 
@@ -2074,7 +1981,7 @@ kernel void rayMarchShader
             color = coloringTexture.read(pt).xyz;
         }
         
-        color += applyColoring(position,direction,coloringTexture,distAns,normal,c);
+       color += applyColoring(position,direction,coloringTexture,distAns,normal,c);
 
        // second surface
        if(c.secondSurface > 0) {
@@ -2082,9 +1989,6 @@ kernel void rayMarchShader
            float3 normal = calcNormal(position,c.normalOffset,c);
 
            float3 color2 = applyColoring2(position,direction,coloringTexture,distAns,normal,c);
-
-//harry          color = mix(color, color2,c.transparentAmount);
-           
            color = saturate(color + color2 * c.transparentAmount);
        }
         

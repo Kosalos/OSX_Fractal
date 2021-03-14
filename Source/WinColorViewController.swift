@@ -59,7 +59,7 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
         widget.addFloat("Light Position",&vc.lightAngle,-3,3,0.3)
         
         widget.addLegend(" ")
-        widget.addInt32("Style#",&vc.control.colorScheme,0,6,1,true,1)
+        widget.addInt32("Style#",&vc.control.colorScheme,0,7,1,true,98)
         widget.addLegend(" ")
         
         switch vc.control.colorScheme {
@@ -90,6 +90,11 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
             widget.addFloat("Color 8",&vc.control.coloring8,-1,1,0.01)
             widget.addFloat("Color 9",&vc.control.coloring9,-1,1,0.01)
             widget.addFloat("Color a",&vc.control.coloringa,-1,1,0.01)
+        case 7 :
+            widget.addFloat("Color 1",&vc.control.coloring1,0,1,0.01)
+            widget.addFloat("Color 2",&vc.control.coloring2,0,1,0.01)
+            widget.addFloat("Color 3",&vc.control.coloring3,0,1,0.01)
+            widget.addFloat("Color 4",&vc.control.coloring4,0,1,0.01)
         default : break
         }
         
@@ -97,10 +102,10 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
         widget.addFloat("Second Surface",&vc.control.secondSurface,0,12,0.02)
         widget.addFloat("Reflect 1",&vc.control.refractAmount, 0,0.25,0.01)
         widget.addFloat("Reflect 2",&vc.control.transparentAmount, 0,3,0.01)
-
+        
         widget.addLegend(" ")
         widget.addFloat("C Normal",&vc.control.normalOffset, 0.00001,1,0.0001)
-
+        
         widget.addLegend(" ")
         widget.addLegend("Blur")
         widget.addFloat("Strength (0 = Off)", &vc.control.blurStrength, 0,500,5)
@@ -108,7 +113,7 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
         
         widget.addLegend(" ")
         widget.addFloat("Radial Symmetry",&vc.control.radialAngle,0,Float.pi,0.03)
-
+        
         displayWidgets()
     }
     
@@ -122,6 +127,15 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
     func widgetCallback(_ index:Int) {
         switch(index) {
         case 1 :
+            defineWidgets()
+            vc.flagViewToRecalcFractal()
+        case 98 :  // change color scheme
+            if vc.control.colorScheme == 7 {
+                vc.control.coloring1 = 0.1
+                vc.control.coloring2 = 1
+                vc.control.coloring3 = 0
+                vc.control.coloring4 = 0.5
+            }
             defineWidgets()
             vc.flagViewToRecalcFractal()
         default : break

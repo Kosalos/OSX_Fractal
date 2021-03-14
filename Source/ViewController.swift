@@ -178,7 +178,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
           "Monster","Kali Tower","Gold","Spider","Knighty's Kleinian",
           "Half Tetrahedron","Knighty Polychora","3Dickulus Quaternion Julia","Spudsville","Flower Hive",
           "Pupukuusikkos Spiralbox", "SurfBox","TwistBox","Vertebrae", "DarkBeam Surfbox",
-          "Klienian Sponge","Donuts","PDOF","MagnetoBulb","Spuds2018","KaleidoScope" ]
+          "Klienian Sponge","Donuts","PDOF","MagnetoBulb","Spuds2018","KaleidoScope","Mandel Nest" ]
     
     func updateWindowTitle() {
         let index = Int(control.equation)
@@ -258,36 +258,33 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
                 control.InvRadius = 2.7199993
             }
         case EQU_03_KLEINIAN :
-            control.camera = simd_float3(0.5586236, 1.1723881, -1.8257363)
+            control.camera = SIMD3<Float>(0.5586236, 0.9136781, -1.7998652)
+            updateShaderDirectionVector( SIMD3<Float>(0.0, 0.09950372, 0.9950372) )
+            control.cx = 21.0
+            control.cy = 17.0
+            control.cz = 0.31
+            control.cw = 1.6059995
+            control.dx = 2.0024
+            control.dy = 0.40583003
+            control.dz = 0.64099985
+            control.dw = 0.8109997
+            control.fx = 2.0
             control.isteps = 70
-            control.cx = 21
-            control.cy = 17
+            control.bright = 1.1
+            control.contrast = 0.5
+            control.specular = 0.0
             control.bcx = true
-            control.bcz = false
-            control.dz = 0.221299887
-            control.dw = 0.00999999977
-            control.cz = 0.6318979
-            control.cw = 1.3839532
-            control.dx = 1.9324
-            control.dy = 0.04583
-            control.InvCenter = simd_float3(1.0517285, 0.7155759, 0.9883028)
-            control.InvAngle = 5.5392437
-            control.InvRadius = 2.06132293
-            
+             control.icx = 10
+            control.icy = 10
+
             if control.doInversion {
-                control.camera = simd_float3(-1.5613757, -0.61350304, 0.41508165)
-                updateShaderDirectionVector(simd_float3(0.0, 0.09950372, 0.9950372))
-                control.InvCx = -1.67399943
-                control.InvCy = -0.494000345
-                control.InvCz = 0.721998572
-                control.InvAngle = 4.15921211
-                control.InvRadius = 0.639999986
-                control.cw = 0.38800019
-                control.cz = 0.6880005
-                control.dx = 1.97239995
-                control.dy = 0.00999999977
-                control.dz = 0.201299876
-                control.dw = 0.00999999977
+                control.camera = simd_float3( 0.5586236 , 0.9136781 , -1.7998652 )
+                updateShaderDirectionVector(simd_float3( 0.0 , 0.09950372 , 0.9950372 ))
+                control.InvCx =  0.1
+                control.InvCy =  0.1
+                control.InvCz =  0.1
+                control.InvRadius =  2.061323
+                control.InvAngle =  5.5392437
             }
         case EQU_04_MANDELBOX :
             control.camera = simd_float3(-1.3771019, 0.9999971, -5.037427)
@@ -771,16 +768,21 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
                 control.isteps = 15
             }
         case EQU_25_SPUDS2018 :
-            control.camera = SIMD3<Float>(-0.7171651, -10.105468, -12.313804)
+            control.camera = SIMD3<Float>(-0.7171651, -5.8964715, -12.734718)
             updateShaderDirectionVector( SIMD3<Float>(0.0, 0.09950371, 0.99503714) )
             control.cx = 2.4999998
-            control.cy = 6.9599986
+            control.cy = 3.0
             control.cz = 2.0000005
-            control.cw = 3.0699995
-            control.dx = 3.3399987
+            control.cw = 3.0
+            control.dx = 3.0
             control.dy = 1.7500002
             control.dz = 1.2400001
             control.dw = 4.049999
+            control.fx = 6.3199983
+            control.juliaX =  0.1700013
+            control.juliaY =  0.11999908
+            control.juliaZ =  0.25999972
+            control.fx = 6.3199983
             control.isteps = 9
             control.bright = 2.3600001
             control.contrast = 0.16
@@ -826,6 +828,38 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
                 control.InvRadius =  0.97000015
                 control.InvAngle =  -0.17
             }
+            
+         case EQU_27_MANDELNEST :
+            control.camera = SIMD3<Float>(0.3348719, 0.20734961, -2.7391717)
+            updateShaderDirectionVector( SIMD3<Float>(-0.055478435, -0.03817645, 0.9977297) )
+            control.cx = 0.46000007
+            control.fx = 6.3199983
+            control.isteps = 7
+            control.bright = 1.3199999
+            control.contrast = 0.29999998
+            control.specular = 0.0
+            control.bcx = true
+            control.juliaboxMode = true
+            control.juliaX =  0.1700013
+            control.juliaY =  0.11999908
+            control.juliaZ =  0.25999972
+            control.fx = 6.3199983
+            
+            if control.doInversion {
+                control.camera = SIMD3<Float>(-1.581975, -0.5953002, -0.07344448)
+                updateShaderDirectionVector( SIMD3<Float>(0.7436566, -0.062111095, 0.6656704) )
+                control.cx = 0.46000007
+                control.fx = 6.3199983
+                control.juliaX =  0.1700013
+                control.juliaY =  0.11999908
+                control.juliaZ =  0.25999972
+                control.InvCx =  -1.3299999
+                control.InvCy =  -0.6999999
+                control.InvCz =  0.28000003
+                control.InvRadius =  0.4299999
+                control.InvAngle =  0.5
+            }
+
         default : break
         }
         
@@ -1171,7 +1205,9 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             toggle2()
         case "G" :
             control.colorScheme += 1
-            if control.colorScheme > 6 { control.colorScheme = 0 }
+            if control.colorScheme > 7 { control.colorScheme = 0 }
+            vcColor.widgetCallback(98)
+            
             defineWidgetsForCurrentEquation()
             vcColor.defineWidgets()
             flagViewToRecalcFractal()
@@ -1275,10 +1311,11 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
 
         print("control.angle1 =",control.angle1)
         print("control.angle2 =",control.angle2)
+
+        print("control.juliaboxMode =",control.juliaboxMode)
         print("control.juliaX = ",control.juliaX)
         print("control.juliaY = ",control.juliaY)
         print("control.juliaZ = ",control.juliaZ)
-        print("control.fx =",control.fx)
         
         //----------------------------------
         print(" ")
@@ -1347,6 +1384,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             if control.equation < 0 { control.equation = Int32(EQU_MAX - 1) }
         reset()
         defineWidgetsForCurrentEquation()
+        controlJustLoaded()
         flagViewToRecalcFractal()
     }
     
@@ -1365,37 +1403,22 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         widget.reset()
         
         if control.isStereo { widget.addFloat("Parallax",&control.parallax,0.0001,1,0.001) }
-//        widget.addFloat("Bright",&control.bright,0.01,10,0.02)
-//        
-//        widget.addFloat("Enhance",&control.enhance,0,30,0.03)
-//        widget.addFloat("Contrast",&control.contrast,0.1,0.7,0.02)
-//        widget.addFloat("Specular",&control.specular,0,2,0.1)
-//        widget.addFloat("Light Position",&lightAngle,-3,3,0.3)
         
         switch Int(control.equation) {
         case EQU_01_MANDELBULB :
-            widget.addInt32("Iterations",&control.isteps,3,30,1)
-            widget.addFloat("Power",&control.fx,1.5,12,0.02)
+            widget.addInt32("Iterations",&control.isteps,3,130,1)
+            widget.addFloat("Power",&control.fx,0.5,12,0.02)
+            
+            widget.addFloat("CX",&control.cx,-2,10,0.1)
+            widget.addBoolean("Switch",&control.bcx)
+            juliaGroup(8,0.01)
+            
         case EQU_02_APOLLONIAN2 :
             widget.addInt32("Iterations",&control.isteps,2,40,1)
             widget.addFloat("Multiplier",&control.cx,10,300,0.2)
             widget.addFloat("Foam",&control.cy,0.1,3,0.02)
             widget.addFloat("Foam2",&control.cz,0.1,3,0.02)
             widget.addFloat("Bend",&control.cw,0.01,0.03,0.0001)
-            
-            
-            widget.addFloat("T",&control.dx,-5,5,0.002)
-            widget.addFloat("U",&control.dy,-5,5,0.002)
-            widget.addFloat("V",&control.dz,-5,5,0.002)
-            widget.addFloat("W",&control.ex,-5,5,0.02)
-            widget.addFloat("-X",&control.ey,-5,5,0.05)
-            widget.addFloat("-Y",&control.ez,-5,5,0.05)
-            widget.addFloat("-Z",&control.ew,-5,5,0.05)
-
-            widget.addFloat("part2",&control.fx,0.001,2,0.01)
-
-            
-            
         case EQU_03_KLEINIAN :
             widget.addInt32("Final Iterations",&control.icx, 1,69,1)
             widget.addInt32("Box Iterations",&control.icy,1,40,1)
@@ -1609,7 +1632,6 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addFloat("Box3",&control.cw,0.01,3,0.01)
             widget.addFloat("Box4",&control.dx,0.01,3,0.01)
             widget.addFloat("Box5",&control.dy,0.01,3,0.01)
-            
         case EQU_26_KALEIDO :
             widget.addInt32("Iterations",&control.isteps,10,200,1)
             widget.addFloat("Scale",&control.cx,0.5,2,0.0005)
@@ -1617,6 +1639,14 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addFloat("Z",&control.cz,-5,5,0.004)
             widget.addFloat("Angle1",&control.angle1,-4,4,0.005)
             widget.addFloat("Angle2",&control.angle2,-4,4,0.005)
+        case EQU_27_MANDELNEST :
+            widget.addInt32("Iterations",&control.isteps,3,130,1)
+            widget.addFloat("Power",&control.fx,0.5,12,0.02)
+            
+            widget.addFloat("CX",&control.cx,-2,10,0.1)
+            widget.addBoolean("Switch",&control.bcx)
+            juliaGroup(8,0.01)
+            
         default : break
         }
 
