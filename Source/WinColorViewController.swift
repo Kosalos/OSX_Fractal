@@ -130,12 +130,7 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
             defineWidgets()
             vc.flagViewToRecalcFractal()
         case 98 :  // change color scheme
-            if vc.control.colorScheme == 7 {
-                vc.control.coloring1 = 0.1
-                vc.control.coloring2 = 1
-                vc.control.coloring3 = 0
-                vc.control.coloring4 = 0.5
-            }
+            vc.changeColorScheme()
             defineWidgets()
             vc.flagViewToRecalcFractal()
         default : break

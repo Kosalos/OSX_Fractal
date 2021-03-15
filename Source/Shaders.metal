@@ -1340,9 +1340,9 @@ float3 shortest_dist(float3 eye, float3 marchingDirection,device Control &contro
     return ans;
 }
 
-float3 calcNormal(float3 pos, float epsFactor, device Control &control) {
+float3 calcNormal(float3 pos, device Control &control) {
     float4 temp = float4(10000);
-    float2 e = float2(1.0,-1.0) * epsFactor;
+    float2 e = float2(1.0,-1.0) * control.normalOffset;
     float3 ans = normalize(e.xyy * DE( pos + e.xyy, control,temp) +
                            e.yyx * DE( pos + e.yyx, control,temp) +
                            e.yxy * DE( pos + e.yxy, control,temp) +
@@ -1387,160 +1387,16 @@ float3 HSVtoRGB(float3 hsv) {
 }
 
 
-/*
- 
- 
- // shade
- float3 col = float3(0.0);
- if( tmat.z>-0.5 )
- {
- // geometry
- float3 pos = ro + tmat.x*rd;
- float3 nor = calcNormal(pos, 0.005);
- float3 sor = calcNormal(pos, 0.010);
- 
- // material
- float3 mate = float3(1.0);
- mate = mix( float3(0.5,0.5,0.2), float3(0.5,0.3,0.0), 0.5 + 0.5*sin(4.0+8000.0*tmat.y)  );
- mate = mix( float3(1.0,0.9,0.8), mate, 0.5 + 0.5*sin(4.0+20.0*tmat.z) );
- mate.x *= 1.15;
- 
- // lighting
- float occ = 1.1*calcAO( pos, nor );
- occ *= 0.75 + 0.25*clamp(tmat.y*400.0,0.0,1.0);
- 
- // diffuse
- col = float3(0.0);
- for( int i=0; i<32; i++ )
- {
- //float3 rr = normalize(-1.0 + 2.0*texture( iChannel2, vec2((0.5+float(i)),0.5)/256.0,-100.0).xyz);
- float3 rr = normalize(-1.0 + 2.0*hash3(float(i)*123.5463));
- rr = normalize( nor + 7.0*rr );
- rr = rr * sign(dot(nor,rr));
- float ds = occ;//softshadow( pos, rr, 0.01, 32.0 );
- col += pow( texture( iChannel0, rr ).xyz, float3(2.2) ) * dot(rr,nor) * ds;
- }
- col /= 32.0;
- 
- col *= 1.8;
- 
- // subsurface
- col *= 1.0 + 1.0*float3(1.0,0.6,0.1)*pow(clamp(1.0+dot(rd,sor),0.0,1.0),2.0)*float3(1.0);
- 
- // specular
- float fre = pow( clamp(1.0+dot(rd,nor),0.0,1.0), 5.0 );
- float3 ref = reflect( rd, nor );
- float rs = softshadow( pos, ref, 0.01, 32.0 );
- col += 1.8 * (0.04 + 12.0*fre) * occ * pow( texture( iChannel0, ref ).xyz, float3(2.0) ) * rs;
- 
- col *= mate;
- }
- else
- {
- // background
- col = pow( texture( iChannel0, rd ).xyz, float3(2.2) );
- }
- tot += col;
- #if AA>1
- }
- tot /= float(AA*AA);
- #endif
- 
- // gamma
- tot = pow( clamp( tot*1.5, 0.0, 1.0 ), float3(0.45) );
- 
- // vigneting
- {
- vec2 q = fragCoord/ iResolution.xy;
- tot *= 0.5 + 0.5*pow( 16.0*q.x*q.y*(1.0-q.x)*(1.0-q.y), 0.1 );
- }
- 
- fragColor = vec4( tot, 1.0 );
- }
- 
- 
- 
- 
- 
- 
- 
- 
- 
- typedef float3 float3;
- 
- float3 monsterColor(float3 pos, float3 distAns, float3 normal, thread Control &control) {
- float3 ans = float3();
- float iterationCount = distAns.y;
- 
- return float3(1 - (normal / 10 + sqrt(iterationCount / 80)));
- 
- // geometry
- float3 nor = calcNormal(pos, 0.005,control);
- float3 sor = calcNormal(pos, 0.010,control);
- 
- // tmat.x = dist
- // y = min orbit
- // z =
- 
- // material
- float3 mate = float3(1.0);
- mate = mix( float3(0.5,0.5,0.2), float3(0.5,0.3,0.0), 0.5 + 0.5*sin(4.0+8000.0*tmat.y)  );
- mate = mix( float3(1.0,0.9,0.8), mate, 0.5 + 0.5*sin(4.0+20.0*tmat.z) );
- mate.x *= 1.15;
- 
- // lighting
- float occ = 1.1*calcAO( pos, nor );
- occ *= 0.75 + 0.25*clamp(tmat.y*400.0,0.0,1.0);
- 
- // diffuse
- col = float3(0.0);
- for( int i=0; i<32; i++ )
- {
- //float3 rr = normalize(-1.0 + 2.0*texture( iChannel2, vec2((0.5+float(i)),0.5)/256.0,-100.0).xyz);
- float3 rr = normalize(-1.0 + 2.0*hash3(float(i)*123.5463));
- rr = normalize( nor + 7.0*rr );
- rr = rr * sign(dot(nor,rr));
- float ds = occ;//softshadow( pos, rr, 0.01, 32.0 );
- col += pow( texture( iChannel0, rr ).xyz, float3(2.2) ) * dot(rr,nor) * ds;
- }
- col /= 32.0;
- 
- col *= 1.8;
- 
- // subsurface
- col *= 1.0 + 1.0*float3(1.0,0.6,0.1)*pow(clamp(1.0+dot(rd,sor),0.0,1.0),2.0)*float3(1.0);
- 
- // specular
- float fre = pow( clamp(1.0+dot(rd,nor),0.0,1.0), 5.0 );
- float3 ref = reflect( rd, nor );
- float rs = softshadow( pos, ref, 0.01, 32.0 );
- col += 1.8 * (0.04 + 12.0*fre) * occ * pow( texture( iChannel0, ref ).xyz, float3(2.0) ) * rs;
- 
- col *= mate;
- 
- 
- 
- 
- 
- 
- }
- 
- */
-
-
 float3 palette(float t, float3 a, float3 b, float3 c, float3 d)
 {
     return a + b*cos( 6.28318*(c*t+d) );
 }
 
 float3 doPalette(float val, matrix_float4x4 pType ) {
-    
-    
     return palette( val ,  pType[0].xyz , pType[1].xyz , pType[2].xyz , pType[3].xyz );
 }
 
-
-float3 applyColoring2
+float3 applyColoring6
 (
  float3 position,
  float3 direction,
@@ -1591,24 +1447,31 @@ float3 applyColoring2
     return refCol +  (palCol  * refrCol);
 }
 
-float MarbVol (vec3 p,device Control &control)
+//MARK: -
+// https://www.shadertoy.com/view/MtlyRf
+
+float marbVol(vec3 p,device Control &control)
 {
-    vec3 q;
-    float f;
-    f = 0.;
-    q = p;
+    vec3 q = p;
+    float f = 0;
     int count = int(control.coloring4 * 20);
+    
     for (int j = 0; j < count; j ++) {
         q = 0.7 * (abs (q) / dot (q, q) - 1.);
         q.yz = vec2 (q.y * q.y - q.z * q.z, 2. * q.y * q.z);
         q = q.zxy;
         f += exp (-15. * abs (dot (p, q)));
     }
+    
     return f;
 }
 
-// https://www.shadertoy.com/view/MtlyRf
-float3 applyColoring3
+float SmoothBump (float lo, float hi, float w, float x)
+{
+    return (1. - smoothstep (hi - w, hi + w, x)) * smoothstep (lo - w, lo + w, x);
+}
+
+float3 applyColoring7
 (
  float3 position,
  float3 direction,
@@ -1619,16 +1482,24 @@ float3 applyColoring3
 {
     vec3 col;
     float t, dt, c;
-    col = vec3 (0.);
-    dt = 0.08; // - 0.01 * cos (0.05 * 2. * PI);
+    col = vec3();
+    dt = 0.08;
     t = 0.;
     for (int j = 0; j < 64; j ++) {
         t += dt;
-        c = MarbVol (position + t * direction,control);
+        c = marbVol(position + t * direction,control);
         col = 0.95 * col + 0.05 * vec3 (1.7 * c - 0.7 * c * c, c, 0.4 * c * c * c);
     }
+    
+    col *= 1. -
+    smoothstep (0.1, 0.3, normal.y) *
+    smoothstep ( 0., 0.7, normal.z) *
+    SmoothBump (0.3, 0.5, 0.05, normal.x);
+    
     return clamp (col, 0., 1.);
 }
+
+//MARK: -
 
 float3 applyColoring
 (
@@ -1665,8 +1536,8 @@ float3 applyColoring
             ans = mix(ans,cc,0.5);
             break;
         case 3 :
-            f1 = 0.01 + control.coloring1 / 2;
-            f2 = 0.01 + control.coloring2 * 4;
+            f1 = 0.01 + control.coloring1 * 0.05;
+            f2 = 0.01 + control.coloring2 * 0.1;
             ans = abs(normal) * f1;
             ans += HSVtoRGB(ans * iterationCount * f2);
             break;
@@ -1683,9 +1554,9 @@ float3 applyColoring
             ans = hsv2rgb(normalize(0.5 - nn));
             break;
         case 6 :
-            return applyColoring2(position,direction,coloringTexture,distAns,normal,control);
+            return applyColoring6(position,direction,coloringTexture,distAns,normal,control);
         case 7 :
-            return applyColoring3(position,direction,coloringTexture,distAns,normal,control);
+            return applyColoring7(position,direction,coloringTexture,distAns,normal,control);
     }
     
     return ans;
@@ -1720,6 +1591,26 @@ float3 getOrbitColor(device Control &control,float4 orbitTrap) {
     return orbitColor;
 }
 
+
+//        if(c.refractAmount > 0) { // refraction enabled
+//            orbitTrap = float4(10000.0);
+//            direction =  refract(direction, normal,c.refractAmount - 0.5);
+//
+//            distAns2 = shortest_dist(position + direction,direction,c,orbitTrap);
+//
+//            position = camera + distAns2.x * direction;
+//            normal = calcNormal(position,c);
+//        }
+//
+////        // second surface
+////        if(c.secondSurface > 0) {
+////            float3 position = camera + distAns.x * direction;
+////            float3 distAns2 = shortest_dist(position + direction * c.secondSurface,direction,c,orbitTrap);
+////
+////            distAns = mix(distAns,distAns2,c.transparentAmount);
+////        }
+//
+
 //MARK: -
 
 kernel void rayMarchShader
@@ -1753,8 +1644,6 @@ kernel void rayMarchShader
         srcP.y = uint(centerY + sin(angle) * dist);
     }
     
-    float3 color = float3();
-    
     uint2 q = srcP;                 // copy of current pixel coordinate; x is altered for stereo
     unsigned int xsize = c.xSize;   // copy of current window size; x is altered for stereo
     float3 camera = c.camera;       // copy of camera position; x is altered for stereo
@@ -1772,6 +1661,7 @@ kernel void rayMarchShader
         }
     }
     
+    float3 color = float3();
     float4 orbitTrap = float4(10000.0);
     
     float den = float(xsize);
@@ -1779,29 +1669,11 @@ kernel void rayMarchShader
     float dy = -1.5 * (float(q.y)/den - 0.5);
     float3 direction = normalize((c.sideVector * dx) + (c.topVector * dy) + c.viewVector);
     
-    float3 distAns2,distAns = shortest_dist(camera,direction,c,orbitTrap);
+    float3 distAns = shortest_dist(camera,direction,c,orbitTrap);
     
     if (distAns.x <= MAX_DIST) { // hit object
         float3 position = camera + distAns.x * direction;
-        float3 normal = calcNormal(position,c.normalOffset,c);
-        
-        if(c.refractAmount > 0) { // refraction enabled
-            orbitTrap = float4(10000.0);
-            direction =  refract(direction, normal,c.refractAmount - 0.5);
-            
-            distAns2 = shortest_dist(position + direction,direction,c,orbitTrap);
-            
-            position = camera + distAns2.x * direction;
-            normal = calcNormal(position,c.normalOffset,c);
-        }
-        
-        // second surface
-        if(c.secondSurface > 0) {
-            float3 position = camera + distAns.x * direction;
-            float3 distAns2 = shortest_dist(position + direction * c.secondSurface,direction,c,orbitTrap);
-            
-            distAns = mix(distAns,distAns2,c.transparentAmount);
-        }
+        float3 normal = calcNormal(position,c);
         
         // use texture
         if(c.txtOnOff) {
@@ -1824,8 +1696,15 @@ kernel void rayMarchShader
         
         // second surface
         if(c.secondSurface > 0) {
-            float3 position = camera + distAns2.x * direction;
-            float3 normal = calcNormal(position,c.normalOffset,c);
+            if(c.refractAmount > 0)
+                direction = refract(direction, normal / 10,c.refractAmount - 0.5);
+            
+            float3 distAns2 = shortest_dist(position + direction * c.secondSurface,direction,c,orbitTrap);
+            
+            distAns = mix(distAns,distAns2,c.transparentAmount);
+            position = camera + distAns.x * direction;
+            normal = calcNormal(position,c);
+            
             float3 color2 = applyColoring(position,direction,coloringTexture,distAns,normal,c);
             color = saturate(color + color2 * c.transparentAmount);
         }
@@ -1891,10 +1770,9 @@ kernel void rayMarchShader
         }
     }
     
-    float alpha = distAns.x; // length(distAns.x * direction);
+    float alpha = distAns.x;
     
     if(c.skip == 1) { // drawing high resolution final image
-        //        outTexture.write(float4(color.xyz,1),p);
         outTexture.write(float4(color.xyz,alpha),p);  // depth in alpha
     }
     else { // low resolution 'quick draw'

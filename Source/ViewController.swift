@@ -1424,6 +1424,22 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     
     //MARK: -
     
+    func changeColorScheme() {
+        switch(vc.control.colorScheme) {
+        case 3 :
+            vc.control.coloring1 = 0
+            vc.control.coloring2 = 0.120000005
+        case 7 :
+            vc.control.coloring1 = 0.1
+            vc.control.coloring2 = 1
+            vc.control.coloring3 = 0
+            vc.control.coloring4 = 0.5
+        default : break
+        }
+    }
+
+    //MARK: -
+    
     /// alter equation selection, reset it's parameters, display it's widgets, calculate fractal
     func changeEquationIndex(_ dir:Int) {
         control.equation += Int32(dir)

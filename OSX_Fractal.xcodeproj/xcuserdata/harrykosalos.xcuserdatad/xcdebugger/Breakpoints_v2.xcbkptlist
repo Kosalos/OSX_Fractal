@@ -7,15 +7,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "2CA9C011-6BE4-493B-8976-0D70E31CD97A"
+            uuid = "646EC19F-E6A3-4873-8453-8D6D79FA5CD7"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Source/Shaders.metal"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1822"
-            endingLineNumber = "1822"
+            startingLineNumber = "1678"
+            endingLineNumber = "1678"
             landmarkName = "rayMarchShader ( texture2d&lt;float, access::write&gt; outTexture [[texture(0)]], texture2d&lt;float, access::read&gt; coloringTexture [[texture(1)]], device Control &amp;c [[ buffer(0) ]], uint2 p [[thread_position_in_grid]] )"
             landmarkType = "9">
          </BreakpointContent>
@@ -23,49 +23,17 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "D77C7D2D-DFE3-4E21-A776-8C06322C971C"
+            uuid = "A3D02B2E-A847-41B2-AE6F-607AB514DC58"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Source/ViewController.swift"
+            filePath = "Source/Shaders.metal"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "865"
-            endingLineNumber = "865"
-            landmarkName = "reset()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "D4F33838-E9FD-4DAC-8FAA-7A0E661024B8"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Source/ViewController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1425"
-            endingLineNumber = "1425"
-            landmarkName = "ViewController"
-            landmarkType = "3">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "E7B7B5E4-93E8-4B03-8AC7-1C0BA555B915"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Source/ViewController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "313"
-            endingLineNumber = "313"
-            landmarkName = "reset()"
-            landmarkType = "7">
+            startingLineNumber = "1483"
+            endingLineNumber = "1483"
+            landmarkName = "applyColoring7 ( float3 position, float3 direction, texture2d &lt;float, access::read&gt; vcoloringTexture, float3 distAns, float3 normal, device Control &amp;control)"
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
