@@ -66,6 +66,7 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     @IBOutlet var scrollView: NSScrollView!
     @IBOutlet var DateRadio: NSButton!
     @IBOutlet var KindRadio: NSButton!
+    @IBOutlet var saveNewButton: NSButton!
     var tv:NSTableView! = nil
     var dateString:String = ""
     var fileURL:URL! = nil
@@ -170,8 +171,9 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     }
     
     func updateSortButtons() {
-        DateRadio.set(textColor: dateSort ? .red : .black)
-        KindRadio.set(textColor: !dateSort ? .red : .black)
+        DateRadio.set(textColor: dateSort ? .red : .white)
+        KindRadio.set(textColor: !dateSort ? .red : .white)
+        saveNewButton.set(textColor: .white)
     }
     
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {

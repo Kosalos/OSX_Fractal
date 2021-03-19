@@ -89,7 +89,7 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
             widget.addFloat("Color 7",&vc.control.coloring7,-1,1,0.01)
             widget.addFloat("Color 8",&vc.control.coloring8,-1,1,0.01)
             widget.addFloat("Color 9",&vc.control.coloring9,-1,1,0.01)
-            widget.addFloat("Color a",&vc.control.coloringa,-1,1,0.01)
+           // widget.addFloat("Color a",&vc.control.coloringa,-1,1,0.01)
         case 7 :
             widget.addFloat("Color 1",&vc.control.coloring1,0,1,0.01)
             widget.addFloat("Color 2",&vc.control.coloring2,0,1,0.01)
@@ -97,7 +97,9 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
             widget.addFloat("Color 4",&vc.control.coloring4,0,1,0.01)
         default : break
         }
-        
+
+        widget.addFloat("Glass",&vc.control.coloringa,0,1,0.01)
+
         widget.addLegend(" ")
         widget.addFloat("Second Surface",&vc.control.secondSurface,0,12,0.02)
         widget.addFloat("Reflect 1",&vc.control.refractAmount, 0,0.25,0.01)

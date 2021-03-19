@@ -97,10 +97,10 @@
 			isa = PBXGroup;
 			children = (
 				1DAF37B521EAA112000DC9E5 /* ViewController.swift */,
+				1D4A5BBA257D9C3B00B63E39 /* ControlPickerViewController.swift */,
 				CFD49CC92115C6DC00B4C5EB /* Shaders.metal */,
 				1DA43D4C259EE55B004954F9 /* WindowHandler.swift */,
 				1D4A5BB8257D8C8C00B63E39 /* ControlViewController.swift */,
-				1D4A5BBA257D9C3B00B63E39 /* ControlPickerViewController.swift */,
 				CFEA3DE8211463D800C7DBD3 /* Products */,
 				1DFFB87B23E2A3900093C78C /* WinLightViewController.swift */,
 				1DA43D4A259ED227004954F9 /* WinColorViewController.swift */,
@@ -369,6 +369,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Harry.OSX-Fractal";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = none;
@@ -392,6 +393,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				MTL_FAST_MATH = YES;
 				MTL_OPTIMIZATION_LEVEL = 3;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Harry.OSX-Fractal";

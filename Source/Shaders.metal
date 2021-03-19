@@ -1300,7 +1300,7 @@ float DE(float3 pos,device Control &control,thread float4 &orbitTrap) {
         pos = (control.InvRadius * control.InvRadius / r2 ) * pos + control.InvCenter;
         
         float an = atan2(pos.y,pos.x) + control.InvAngle;
-        float ra = sqrt(pos.y * pos.y + pos.x * pos.x);
+        float ra = length(pos.xy); // sqrt(pos.y * pos.y + pos.x * pos.x);
         pos.x = cos(an)*ra;
         pos.y = sin(an)*ra;
         float de = DE_Inner(pos,control,orbitTrap);
@@ -1480,24 +1480,41 @@ float3 applyColoring7
  float3 normal,
  device Control &control)
 {
-    vec3 col;
-    float t, dt, c;
-    col = vec3();
-    dt = 0.08;
-    t = 0.;
-    for (int j = 0; j < 64; j ++) {
-        t += dt;
-        c = marbVol(position + t * direction,control);
-        col = 0.95 * col + 0.05 * vec3 (1.7 * c - 0.7 * c * c, c, 0.4 * c * c * c);
+    float IoR = control.coloring1 * 5;
+    float cosi = dot(direction, normal);
+    float etai = 1.0, etat = IoR;
+    if (cosi > 0.0) {
+        float tmp = etai;
+        etai = etat;
+        etat = tmp;
     }
-    
-    col *= 1. -
-    smoothstep (0.1, 0.3, normal.y) *
-    smoothstep ( 0., 0.7, normal.z) *
-    SmoothBump (0.3, 0.5, 0.05, normal.x);
-    
-    return clamp (col, 0., 1.);
+    float sint = etai / etat * sqrt(max(0.0, 1.0 - cosi * cosi));
+    if (sint >= 1.0) return 1.0;
+    float cost = sqrt(max(0.0, 1.0 - sint * sint));
+    cosi = abs(cosi);
+    float sqrtRs = ((etat * cosi) - (etai * cost)) / ((etat * cosi) + (etai * cost));
+    float sqrtRp = ((etai * cosi) - (etat * cost)) / ((etai * cosi) + (etat * cost));
+    return (sqrtRs * sqrtRs + sqrtRp * sqrtRp) / 2.0;
 }
+
+//    vec3 col;
+//    float t, dt, c;
+//    col = vec3();
+//    dt = 0.08;
+//    t = 0.;
+//    for (int j = 0; j < 64; j ++) {
+//        t += dt;
+//        c = marbVol(position + t * direction,control);
+//        col = 0.95 * col + 0.05 * vec3 (1.7 * c - 0.7 * c * c, c, 0.4 * c * c * c);
+//    }
+//
+//    col *= 1. -
+//    smoothstep (0.1, 0.3, normal.y) *
+//    smoothstep ( 0., 0.7, normal.z) *
+//    SmoothBump (0.3, 0.5, 0.05, normal.x);
+//
+//    return clamp (col, 0., 1.);
+//}
 
 //MARK: -
 
@@ -1559,6 +1576,8 @@ float3 applyColoring
             return applyColoring7(position,direction,coloringTexture,distAns,normal,control);
     }
     
+    
+    ans = mix(ans,applyColoring7(position,direction,coloringTexture,distAns,normal,control) * control.coloring3,control.coloringa);
     return ans;
 }
 

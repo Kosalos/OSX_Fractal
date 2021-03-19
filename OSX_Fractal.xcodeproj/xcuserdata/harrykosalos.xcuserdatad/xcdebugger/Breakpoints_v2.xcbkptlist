@@ -14,8 +14,8 @@
             filePath = "Source/Shaders.metal"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1678"
-            endingLineNumber = "1678"
+            startingLineNumber = "1697"
+            endingLineNumber = "1697"
             landmarkName = "rayMarchShader ( texture2d&lt;float, access::write&gt; outTexture [[texture(0)]], texture2d&lt;float, access::read&gt; coloringTexture [[texture(1)]], device Control &amp;c [[ buffer(0) ]], uint2 p [[thread_position_in_grid]] )"
             landmarkType = "9">
          </BreakpointContent>
@@ -30,10 +30,10 @@
             filePath = "Source/Shaders.metal"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1483"
-            endingLineNumber = "1483"
-            landmarkName = "applyColoring7 ( float3 position, float3 direction, texture2d &lt;float, access::read&gt; vcoloringTexture, float3 distAns, float3 normal, device Control &amp;control)"
-            landmarkType = "9">
+            startingLineNumber = "1500"
+            endingLineNumber = "1500"
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

@@ -922,6 +922,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         // this appears to stop beachball delays if I cause key roll-over?
         Thread.sleep(forTimeInterval: timeInterval)
         
+        encodeWidgetDataForAllLights()
         var c = control
         
         func prepareJulia() { c.julia = simd_float3(control.juliaX,control.juliaY,control.juliaZ) }
@@ -930,7 +931,6 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         c.nlight = normalize(c.light)
         
         c.InvCenter = simd_float3(c.InvCx, c.InvCy, c.InvCz)
-        encodeWidgetDataForAllLights()
         
         //-----------------------------------------------
         let colMap = [ colorMap1,colorMap2,colorMap3,colorMap4 ]
