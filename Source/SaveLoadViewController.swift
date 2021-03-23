@@ -82,8 +82,14 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     
     func didTapButton(_ sender: NSButton) {
         let buttonPosition = sender.convert(CGPoint.zero, to:tv)
-        if buttonPosition.x < 400 { overwriteAndDismissDialog(tv.row(at:buttonPosition)) }
-        deleteAndReloadList(tv.row(at:buttonPosition))
+        let index = tv.row(at:buttonPosition)
+        
+        if buttonPosition.x < 400 {
+            overwriteAndDismissDialog(index)
+        }
+        else {
+            deleteAndReloadList(index)
+        }
     }
     
     @IBAction func radioPressed(_ sender: NSButton) {

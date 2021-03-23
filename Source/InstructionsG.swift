@@ -3,7 +3,7 @@ import Cocoa
 class InstructionsG: NSView {
     var parent:Widget! = nil
     let YTOP = 5
-    let YHOP = 18
+    let YHOP = 17 //18
     let YS = 10
 
     func initialize(_ parentPtr:Widget) { parent = parentPtr }

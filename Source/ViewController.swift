@@ -1719,7 +1719,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         if control.txtOnOff {
             widget.addFloat("   X",&control.tCenterX,0.01,1,0.02)
             widget.addFloat("   Y",&control.tCenterY,0.01,1,0.02)
-            widget.addFloat("   Scale",&control.tScale,0.01,1,0.02)
+            widget.addFloat("   Scale",&control.tScale,-4,4,0.02)
         }
         
         widget.addBoolean(" Spherical Inversion",&control.doInversion,99)
