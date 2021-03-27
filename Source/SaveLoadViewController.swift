@@ -237,8 +237,26 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
         }
         
         if slEntry[index].dateString == noFileString { // an 'add' session
-            useRawIndex = false
-            finishSession()
+            
+            // determine first unused index#
+            var i = 0
+            let fileManager = FileManager.default
+            
+            while true {
+                self.determineURL(i,false)
+                if !fileManager.fileExists(atPath: fileURL.path) { break }
+                i += 1
+            }
+                
+            do {
+                vc.control.version = versionNumber
+                let data:NSData = NSData(bytes:&vc.control, length:self.sz)
+                try data.write(to: self.fileURL, options: .atomic)
+            } catch {
+                print(error)
+            }
+            self.dismiss(self)
+            return
         }
         else {
             let alert = NSAlert()

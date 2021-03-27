@@ -746,7 +746,7 @@ float DE_FLOWER(float3 pos,device Control &control,thread float4 &orbitTrap) {
     float3 ot,trap = control.otFixed;
     if(control.orbitStyle == 2) trap -= pos;
     
-    for(int i = 0; i < control.isteps; ++i) { //kaliset fractal with no mirroring offset
+    for(int i = 0; i < control.isteps; ++i) {  //kaliset fractal with no mirroring offset
         q.xyz = abs(q.xyz);
         float r = dot(q.xyz, q.xyz);
         q /= clamp(r, 0.0, control.cx);
