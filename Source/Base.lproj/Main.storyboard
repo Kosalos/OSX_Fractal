@@ -219,7 +219,7 @@
                                                                         <font key="font" metaFont="system"/>
                                                                     </buttonCell>
                                                                     <connections>
-                                                                        <action selector="saveTapped:" target="xEJ-TS-j0i" id="O5i-7s-an9"/>
+                                                                        <action selector="deleteTapped:" target="xEJ-TS-j0i" id="LxB-V2-w1t"/>
                                                                     </connections>
                                                                 </button>
                                                                 <button verticalHuggingPriority="750" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="o7u-4s-0qZ" userLabel="Overwrite Button">
@@ -232,7 +232,7 @@
                                                                         <font key="font" metaFont="system"/>
                                                                     </buttonCell>
                                                                     <connections>
-                                                                        <action selector="saveTapped:" target="xEJ-TS-j0i" id="j2Q-0H-ago"/>
+                                                                        <action selector="overwriteTapped:" target="xEJ-TS-j0i" id="D8Y-Od-nNn"/>
                                                                     </connections>
                                                                 </button>
                                                             </subviews>
@@ -249,7 +249,6 @@
                                                             </constraints>
                                                             <connections>
                                                                 <outlet property="legend" destination="Evv-ZC-PSF" id="dIP-ed-JmM"/>
-                                                                <outlet property="saveButton" destination="o7u-4s-0qZ" id="EYd-Ba-0Hw"/>
                                                             </connections>
                                                         </tableCellView>
                                                     </prototypeCellViews>
@@ -847,7 +846,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </customView>
                             <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QG2-uV-bIS">
-                                <rect key="frame" x="134" y="17" width="25" height="25"/>
+                                <rect key="frame" x="158" y="16" width="25" height="25"/>
                                 <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="eIS-cs-DYO">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -870,8 +869,8 @@
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="rm3-4k-N2w">
-                                <rect key="frame" x="63" y="14" width="69" height="32"/>
-                                <buttonCell key="cell" type="push" title="Reset" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="5hH-mR-XCM">
+                                <rect key="frame" x="6" y="13" width="144" height="32"/>
+                                <buttonCell key="cell" type="push" title="Randomize Colors" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="5hH-mR-XCM">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -881,9 +880,9 @@
                             </button>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="rm3-4k-N2w" firstAttribute="leading" secondItem="Lfe-t3-Nrb" secondAttribute="leading" constant="70" id="EUC-eR-v7X"/>
-                            <constraint firstAttribute="bottom" secondItem="rm3-4k-N2w" secondAttribute="bottom" constant="21" id="HQA-lI-pgZ"/>
-                            <constraint firstItem="QG2-uV-bIS" firstAttribute="leading" secondItem="rm3-4k-N2w" secondAttribute="trailing" constant="12" symbolic="YES" id="mAy-gg-uXk"/>
+                            <constraint firstItem="rm3-4k-N2w" firstAttribute="leading" secondItem="Lfe-t3-Nrb" secondAttribute="leading" constant="13" id="EUC-eR-v7X"/>
+                            <constraint firstAttribute="bottom" secondItem="rm3-4k-N2w" secondAttribute="bottom" constant="20" id="HQA-lI-pgZ"/>
+                            <constraint firstItem="QG2-uV-bIS" firstAttribute="leading" secondItem="rm3-4k-N2w" secondAttribute="trailing" constant="18" id="mAy-gg-uXk"/>
                             <constraint firstItem="rm3-4k-N2w" firstAttribute="top" secondItem="QG2-uV-bIS" secondAttribute="top" id="nbk-Pl-mrf"/>
                         </constraints>
                     </view>
@@ -1288,7 +1287,7 @@
                 </viewController>
                 <customObject id="Vo8-50-8ef" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2231" y="251"/>
+            <point key="canvasLocation" x="-2164" y="262"/>
         </scene>
     </scenes>
 </document>

@@ -4,15 +4,15 @@ struct SLEntry {
     var kind = Int()
     var dateValue = TimeInterval()
     var dateString = String()
-    var rawIndex = Int()
+    var filenameNumber = Int()
     
-    init(_ k:Int, _ str:String, _ value:TimeInterval, _ index:Int) { kind = k; dateString = str; dateValue = value; rawIndex = index }
+    init(_ k:Int, _ str:String, _ value:TimeInterval, _ number:Int) { kind = k; dateString = str; dateValue = value; filenameNumber = number }
     
     mutating func copy(_ other:SLEntry) {
         kind = other.kind
         dateValue = other.dateValue
         dateString = other.dateString
-        rawIndex = other.rawIndex
+        filenameNumber = other.filenameNumber
     }
 }
 
@@ -20,14 +20,15 @@ let populatedCellBackgroundColor = NSColor(red:0.1,  green:0.5,  blue:0.1, alpha
 let noFileString = "** unused **"
 
 protocol SLCellDelegate: class {
-    func didTapButton(_ sender: NSButton)
+    func didTapOverwriteButton(_ sender: NSButton)
+    func didTapDeleteButton(_ sender: NSButton)
 }
 
 class SaveLoadCell: NSTableCellView {
     weak var delegate: SLCellDelegate?
     @IBOutlet var legend: NSTextField!
-    @IBOutlet var saveButton: NSButton!
-    @IBAction func saveTapped(_ sender: NSButton) { delegate?.didTapButton(sender) }
+    @IBAction func overwriteTapped(_ sender: NSButton) { delegate?.didTapOverwriteButton(sender) }
+    @IBAction func deleteTapped(_ sender: NSButton) { delegate?.didTapDeleteButton(sender) }
     var isUnused = Bool()
     var kind = Int()
     
@@ -79,18 +80,14 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     
     func numberOfSections(in tableView: NSTableView) -> Int { return 1 }
     func numberOfRows(in tableView: NSTableView) -> Int { return slEntry.count }
-    
-    func didTapButton(_ sender: NSButton) {
+
+    func rowForButton(_ sender: NSButton) -> Int {
         let buttonPosition = sender.convert(CGPoint.zero, to:tv)
-        let index = tv.row(at:buttonPosition)
-        
-        if buttonPosition.x < 400 {
-            overwriteAndDismissDialog(index)
-        }
-        else {
-            deleteAndReloadList(index)
-        }
+        return tv.row(at:buttonPosition)
     }
+    
+    func didTapOverwriteButton(_ sender: NSButton) { overwriteAndDismissDialog(rowForButton(sender)) }
+    func didTapDeleteButton(_ sender: NSButton) { deleteAndReloadList(rowForButton(sender)) }
     
     @IBAction func radioPressed(_ sender: NSButton) {
         if sender == DateRadio {
@@ -98,9 +95,9 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
             dateSort = true
         }
         else { dateSort = false }
-
+        
         DateRadio.title = dateAscending ? "Date Asc" : "Date Desc"
-
+        
         updateSortButtons()
         sortSLEntries()
         tv.reloadData()
@@ -209,31 +206,30 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     
     let sz = MemoryLayout<Control>.size
     
-    func determineURL(_ index:Int, _ useRawIndex:Bool) {
+    func determineURL(_ index:Int, _ usefilenameNumber:Bool) {
         var index = index
-        if useRawIndex { index = slEntry[index].rawIndex }
+        if usefilenameNumber { index = slEntry[index].filenameNumber }
         
         let name = String(format:"Store%d.dat",index)
         fileURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false).appendingPathComponent(name)
     }
     
-    func overwriteAndDismissDialog(_ index:Int) {
-        var useRawIndex = true
-        
-        func performSave() {
-            do {
-                self.determineURL(index,useRawIndex)
-                vc.control.version = versionNumber
-                let data:NSData = NSData(bytes:&vc.control, length:self.sz)
-                try data.write(to: self.fileURL, options: .atomic)
-            } catch {
-                print(error)
-            }
+    func writeDataToFileURLAndDismiss() {
+        do {
+            vc.control.version = versionNumber
+            let data:NSData = NSData(bytes:&vc.control, length:self.sz)
+            try data.write(to: self.fileURL, options: .atomic)
+        } catch {
+            print(error)
         }
         
+        dismiss(self)
+    }
+    
+    func overwriteAndDismissDialog(_ index:Int) {
         func finishSession() {
-            performSave()
-            self.dismiss(self)
+            determineURL(index,true)
+            writeDataToFileURLAndDismiss()
         }
         
         if slEntry[index].dateString == noFileString { // an 'add' session
@@ -247,16 +243,8 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
                 if !fileManager.fileExists(atPath: fileURL.path) { break }
                 i += 1
             }
-                
-            do {
-                vc.control.version = versionNumber
-                let data:NSData = NSData(bytes:&vc.control, length:self.sz)
-                try data.write(to: self.fileURL, options: .atomic)
-            } catch {
-                print(error)
-            }
-            self.dismiss(self)
-            return
+            
+            writeDataToFileURLAndDismiss()
         }
         else {
             let alert = NSAlert()
@@ -265,7 +253,11 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
             alert.addButton(withTitle: "NO")
             alert.addButton(withTitle: "YES")
             alert.beginSheetModal(for: self.view.window!) {( returnCode: NSApplication.ModalResponse) -> Void in
-                if returnCode.rawValue == 1001 { do { finishSession() }}
+                if returnCode.rawValue == 1001 {
+                    do {
+                        self.determineURL(index,true)
+                        self.writeDataToFileURLAndDismiss()
+                    }}
                 else { self.dismiss(self) }
             }
         }
@@ -291,7 +283,13 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
         alert.addButton(withTitle: "NO")
         alert.addButton(withTitle: "YES")
         alert.beginSheetModal(for: self.view.window!) {( returnCode: NSApplication.ModalResponse) -> Void in
-            if returnCode.rawValue == 1001 { do { self.deleteEntry(index); self.loadSLEntries(); self.tv.reloadData() }}
+            if returnCode.rawValue == 1001 {
+                do {
+                    self.deleteEntry(index)
+                    self.loadSLEntries()
+                    self.tv.reloadData()
+                }
+            }
             else { self.dismiss(self) }
         }
     }

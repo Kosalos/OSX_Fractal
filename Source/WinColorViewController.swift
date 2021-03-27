@@ -11,6 +11,22 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
     @IBOutlet var instructionsG: InstructionsG!
     
     @IBAction func resetButtonPressed(_ sender: NSButton) {
+        vc.control.coloring1 = Float.random(in: 0 ... 1)
+        vc.control.coloring2 = Float.random(in: 0 ... 1)
+        vc.control.coloring3 = Float.random(in: 0 ... 1)
+        vc.control.coloring4 = Float.random(in: 0 ... 1)
+        vc.control.coloring5 = Float.random(in: 0 ... 1)
+        vc.control.coloring6 = Float.random(in: 0 ... 1)
+        vc.control.coloring7 = Float.random(in: 0 ... 1)
+        vc.control.coloring8 = Float.random(in: 0 ... 1)
+        vc.control.coloring9 = Float.random(in: 0 ... 1)
+        vc.control.coloringa = Float.random(in: 0 ... 1)
+        vc.control.secondSurface = Float.random(in: 0 ... 12)
+        vc.control.refractAmount = Float.random(in: 0 ... 0.25)
+        vc.control.transparentAmount = Float.random(in: 0 ... 3)
+        
+        defineWidgets()
+        vc.flagViewToRecalcFractal()
     }
     
     @IBAction func helpPressed(_ sender: NSButton) {
