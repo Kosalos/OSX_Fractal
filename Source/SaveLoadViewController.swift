@@ -31,6 +31,8 @@ class SaveLoadCell: NSTableCellView {
     @IBAction func deleteTapped(_ sender: NSButton) { delegate?.didTapDeleteButton(sender) }
     var isUnused = Bool()
     var kind = Int()
+    @IBOutlet var overwriteButton: NSButton!
+    @IBOutlet var deleteButton: NSButton!
     
     override func draw(_ rect: CGRect) {
         let context = NSGraphicsContext.current?.cgContext
@@ -39,18 +41,27 @@ class SaveLoadCell: NSTableCellView {
             context?.setFillColor(NSColor.darkGray.cgColor)
         }
         else {
-            let cMap:[CGFloat] = [ 0.3, 0.6, 1 ]
+            let cMap:[CGFloat] = [ 0.2, 0.5, 0.8 ]
             var k = kind % 27
             let r = cMap[k % 3]; k /= 3
             let g = cMap[k % 3] + 0.1; k /= 3
             let b = cMap[k % 3]
-            
             context?.setFillColor(NSColor(red:r, green:g, blue:b, alpha:1).cgColor)
         }
         
         context?.fill(rect)
         context?.setStrokeColor(NSColor.black.cgColor)
         context?.stroke(rect)
+        
+        let s = NSShadow()
+        s.shadowOffset = NSSize(width:2,height:2)
+        s.shadowBlurRadius = 1
+        s.shadowColor = .black
+        
+        legend.textColor = .white
+        legend.shadow = s
+        overwriteButton.set(textColor: .white)
+        deleteButton.set(textColor: .yellow)
     }
 }
 
@@ -115,7 +126,7 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
             
             // ------------------------
             kind = 0
-            determineURL(index,false)
+            determineURL(index, usefilenameNumber:false)
             let data = NSData(contentsOf: fileURL)
             if data != nil {
                 data?.getBytes(&cc, length:sz)
@@ -169,7 +180,6 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
         tv.delegate = self
         
         updateSortButtons()
-        
         loadSLEntries()
     }
     
@@ -184,15 +194,8 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
         
         if row >= slEntry.count { return cell }
         
-        if slEntry[row].dateString == noFileString {
-            cell.legend.stringValue = noFileString
-            cell.isUnused = true
-        }
-        else {
-            cell.legend.stringValue = String(format:"%2d %@  %@",row+1,  vc.titleString[slEntry[row].kind],  slEntry[row].dateString)
-            cell.isUnused = false
-        }
-        
+        cell.legend.stringValue = String(format:"%2d %@  %@",row+1,  vc.titleString[slEntry[row].kind],  slEntry[row].dateString)
+        cell.isUnused = false
         cell.delegate = self
         cell.kind = slEntry[row].kind
         return cell
@@ -206,11 +209,11 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     
     let sz = MemoryLayout<Control>.size
     
-    func determineURL(_ index:Int, _ usefilenameNumber:Bool) {
-        var index = index
-        if usefilenameNumber { index = slEntry[index].filenameNumber }
+    func determineURL(_ number:Int, usefilenameNumber:Bool) {
+        var number = number
+        if usefilenameNumber { number = slEntry[number].filenameNumber }
         
-        let name = String(format:"Store%d.dat",index)
+        let name = String(format:"Store%d.dat",number)
         fileURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false).appendingPathComponent(name)
     }
     
@@ -228,18 +231,17 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     
     func overwriteAndDismissDialog(_ index:Int) {
         func finishSession() {
-            determineURL(index,true)
+            determineURL(index, usefilenameNumber:true)
             writeDataToFileURLAndDismiss()
         }
         
         if slEntry[index].dateString == noFileString { // an 'add' session
-            
-            // determine first unused index#
+            // determine first unused filenameNumber
             var i = 0
             let fileManager = FileManager.default
             
             while true {
-                self.determineURL(i,false)
+                self.determineURL(i, usefilenameNumber:false)
                 if !fileManager.fileExists(atPath: fileURL.path) { break }
                 i += 1
             }
@@ -255,7 +257,7 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
             alert.beginSheetModal(for: self.view.window!) {( returnCode: NSApplication.ModalResponse) -> Void in
                 if returnCode.rawValue == 1001 {
                     do {
-                        self.determineURL(index,true)
+                        self.determineURL(index, usefilenameNumber:true)
                         self.writeDataToFileURLAndDismiss()
                     }}
                 else { self.dismiss(self) }
@@ -264,7 +266,7 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     }
     
     func deleteEntry(_ index:Int) {
-        self.determineURL(index,true)
+        self.determineURL(index, usefilenameNumber:true)
         
         do {
             let fileManager = FileManager.default
@@ -301,7 +303,7 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     func determineDateString(_ index:Int) -> String {
         var dStr = noFileString
         
-        determineURL(index,false)
+        determineURL(index, usefilenameNumber:false)
         
         do {
             let key:Set<URLResourceKey> = [.creationDateKey]
@@ -336,7 +338,7 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     @discardableResult func loadData(_ index:Int) -> Bool {
         memorizeControlData()
         
-        determineURL(index,true)
+        determineURL(index, usefilenameNumber:true)
         
         let data = NSData(contentsOf: fileURL)
         if data == nil { return false } // clicked on empty entry
@@ -367,7 +369,7 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
             
             print(loadNextIndex)
             
-            determineURL(loadNextIndex,true)
+            determineURL(loadNextIndex, usefilenameNumber:true)
             let data = NSData(contentsOf: fileURL)
             
             if data != nil {

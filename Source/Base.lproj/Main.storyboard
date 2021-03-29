@@ -104,8 +104,8 @@
                             <textField autoresizesSubviews="NO" wantsLayer="YES" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fCH-5f-ISd">
                                 <rect key="frame" x="99" y="20" width="121" height="88"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <shadow key="shadow" blurRadius="2">
-                                    <size key="offset" width="1" height="-2"/>
+                                <shadow key="shadow" blurRadius="1">
+                                    <size key="offset" width="2" height="2"/>
                                     <color key="color" name="windowFrameTextColor" catalog="System" colorSpace="catalog"/>
                                 </shadow>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="left" id="4JV-dm-QtW">
@@ -248,7 +248,9 @@
                                                                 <constraint firstItem="o7u-4s-0qZ" firstAttribute="firstBaseline" secondItem="Evv-ZC-PSF" secondAttribute="baseline" constant="-3" id="zaU-8H-tCC"/>
                                                             </constraints>
                                                             <connections>
+                                                                <outlet property="deleteButton" destination="12S-gF-Wgd" id="IfI-Ap-mpw"/>
                                                                 <outlet property="legend" destination="Evv-ZC-PSF" id="dIP-ed-JmM"/>
+                                                                <outlet property="overwriteButton" destination="o7u-4s-0qZ" id="2k5-ZQ-U3A"/>
                                                             </connections>
                                                         </tableCellView>
                                                     </prototypeCellViews>
@@ -784,8 +786,8 @@
                             <textField autoresizesSubviews="NO" wantsLayer="YES" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="R40-DA-Wbt">
                                 <rect key="frame" x="11" y="376" width="121" height="88"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <shadow key="shadow" blurRadius="2">
-                                    <size key="offset" width="1" height="-2"/>
+                                <shadow key="shadow" blurRadius="1">
+                                    <size key="offset" width="2" height="2"/>
                                     <color key="color" name="windowFrameTextColor" catalog="System" colorSpace="catalog"/>
                                 </shadow>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="left" id="4Ct-ie-AoE">
@@ -858,8 +860,8 @@
                             <textField autoresizesSubviews="NO" wantsLayer="YES" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xaH-zN-Vxr">
                                 <rect key="frame" x="11" y="529" width="121" height="88"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <shadow key="shadow" blurRadius="2">
-                                    <size key="offset" width="1" height="-2"/>
+                                <shadow key="shadow" blurRadius="1">
+                                    <size key="offset" width="2" height="2"/>
                                     <color key="color" name="windowFrameTextColor" catalog="System" colorSpace="catalog"/>
                                 </shadow>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="left" id="iCp-zj-eCi">

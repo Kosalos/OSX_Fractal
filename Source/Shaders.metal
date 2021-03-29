@@ -1255,6 +1255,38 @@ float DE_MANDELNEST(float3 pos,device Control &control,thread float4 &orbitTrap)
 #endif
 }
 
+//MARK: - 28 Kali Rontgen
+// https://www.shadertoy.com/view/XlXcRj
+
+float DE_KALI_RONTGEN(float3 pos,device Control &control,thread float4 &orbitTrap) {
+#ifdef zzzSINGLE_EQUATION
+    return 0;
+#else
+    float d = 10000.;
+    float4 p = float4(pos, 1.);
+    float3 param = float3(control.cx,control.cy,control.cz);
+    
+    float3 ot,trap = control.otFixed;
+    if(int(control.orbitStyle + 0.5) == 2) trap -= pos;
+    
+    for(int i = 0; i < control.isteps; ++i) {
+        p = abs(p) / dot(p.xyz, p.xyz);
+        
+        d = min(d, (length(p.xy - float2(0,.01))-.03) / p.w);
+        if(d > 4) break;
+        
+        p.xyz -= param;
+        p.xyz = rotatePosition(p.xyz,1,control.angle1);
+        
+        ot = p.xyz;
+        if(control.orbitStyle > 0) ot -= trap;
+        orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
+    }
+    
+    return d;
+#endif
+}
+
 //MARK: - distance estimate
 // ===========================================
 
@@ -1287,6 +1319,7 @@ float DE_Inner(float3 pos,device Control &control,thread float4 &orbitTrap) {
         case EQU_25_SPUDS2018   : return DE_SPUDS2018(pos,control,orbitTrap);
         case EQU_26_KALEIDO     : return DE_KALEIDO(pos,control,orbitTrap);
         case EQU_27_MANDELNEST  : return DE_MANDELNEST(pos,control,orbitTrap);
+        case EQU_28_KALI_RONTGEN: return DE_KALI_RONTGEN(pos,control,orbitTrap);
     }
     
     return 0;

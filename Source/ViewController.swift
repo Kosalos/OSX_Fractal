@@ -178,7 +178,8 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
           "Monster","Kali Tower","Gold","Spider","Knighty's Kleinian",
           "Half Tetrahedron","Knighty Polychora","3Dickulus Quaternion Julia","Spudsville","Flower Hive",
           "Pupukuusikkos Spiralbox", "SurfBox","TwistBox","Vertebrae", "DarkBeam Surfbox",
-          "Klienian Sponge","Donuts","PDOF","MagnetoBulb","Spuds2018","KaleidoScope","Mandel Nest" ]
+          "Klienian Sponge","Donuts","PDOF","MagnetoBulb","Spuds2018",
+          "KaleidoScope","Mandel Nest","Kali Rontgen" ]
     
     func updateWindowTitle() {
         let index = Int(control.equation)
@@ -902,7 +903,22 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
                 control.InvRadius =  0.4299999
                 control.InvAngle =  0.5
             }
+        case EQU_28_KALI_RONTGEN :
+            control.camera = simd_float3(-0.16709971, -0.020002633, -0.9474212)
+            control.cx = 0.88783956
+            control.cy = 1.3439986
+            control.cz = 0.56685466
+            control.isteps = 7
             
+            if control.doInversion {
+                control.camera = simd_float3( 0.4029004 , -0.036918215 , -0.6140825 )
+                updateShaderDirectionVector(simd_float3( 0.0 , 0.09950372 , 0.9950372 ))
+                control.InvCx =  0.23400004
+                control.InvCy =  0.04200006
+                control.InvCz =  0.07000005
+                control.InvRadius =  0.22000004
+                control.InvAngle =  1.4000001
+            }
         default : break
         }
         
@@ -1705,11 +1721,15 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         case EQU_27_MANDELNEST :
             widget.addInt32("Iterations",&control.isteps,3,130,1)
             widget.addFloat("Power",&control.fx,0.5,12,0.02)
-            
             widget.addFloat("CX",&control.cx,-2,10,0.1)
             widget.addBoolean("Switch",&control.bcx)
             juliaGroup(8,0.01)
-            
+        case EQU_28_KALI_RONTGEN :
+            widget.addInt32("Iterations",&control.isteps,1,30,1)
+            widget.addFloat("X",&control.cx, -10,10,0.01)
+            widget.addFloat("Y",&control.cy, -10,10,0.01)
+            widget.addFloat("Z",&control.cz, -10,10,0.01)
+            widget.addFloat("Angle",&control.angle1,-4,4,0.02)
         default : break
         }
         
