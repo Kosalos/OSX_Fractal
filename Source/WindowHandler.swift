@@ -39,6 +39,23 @@ class WindowHandler {
 
         let w3 = windows[2].contentViewController as! WinLightViewController
         widgets.append(w3.widget)
+        
+        func windowGainedFocus(notification: Notification) {
+            // so only widget list on the active window has the red colored highlight
+            for i in 0 ..< windows.count {
+                if windows[i].isMainWindow {
+                    focusIndex = i
+                    break
+                }
+            }
+            
+            updateWindowWidgetFocus()
+         }
+
+         _ = NotificationCenter.default.addObserver(
+            forName: NSWindow.didBecomeMainNotification,
+             object: nil, queue: nil,
+             using: windowGainedFocus)
     }
 
     func widgetCountInWindow(_ index:Int) -> Int { return widgets[index].data.count }
@@ -55,7 +72,18 @@ class WindowHandler {
         let w3 = windows[2].contentViewController as! WinLightViewController
         w3.displayWidgets()
     }
-
+    
+    func updateWindowWidgetFocus() { // so only widget list on the active window has the red colored highlight
+        if focusIndex != NO_FOCUS {
+            widgets[focusIndex].gainFocus()
+            for i in 0 ..< windows.count {
+                if i != focusIndex {
+                    widgets[i].loseFocus()
+                }
+            }
+        }
+    }
+    
     func cycleWindowFocus() {  // with kludge to put Control window in the List
         focusIndex = (focusIndex + 1) % (windows.count+1)
         
@@ -66,6 +94,16 @@ class WindowHandler {
         }
 
         windows[focusIndex].makeKeyAndOrderFront(nil)
+        updateWindowWidgetFocus()
+        
+        let w1 = windows[0].contentViewController as! ViewController
+        w1.displayWidgets()
+
+        let w2 = windows[1].contentViewController as! WinColorViewController
+        w2.displayWidgets()
+
+        let w3 = windows[2].contentViewController as! WinLightViewController
+        w3.displayWidgets()
     }
 
     func setWindowFocus(_ index:Int) {

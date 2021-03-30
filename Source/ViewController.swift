@@ -179,7 +179,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
           "Half Tetrahedron","Knighty Polychora","3Dickulus Quaternion Julia","Spudsville","Flower Hive",
           "Pupukuusikkos Spiralbox", "SurfBox","TwistBox","Vertebrae", "DarkBeam Surfbox",
           "Klienian Sponge","Donuts","PDOF","MagnetoBulb","Spuds2018",
-          "KaleidoScope","Mandel Nest","Kali Rontgen" ]
+          "KaleidoScope","Mandel Nest","Kali Rontgen","Fractal Engine" ]
     
     func updateWindowTitle() {
         let index = Int(control.equation)
@@ -919,6 +919,9 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
                 control.InvRadius =  0.22000004
                 control.InvAngle =  1.4000001
             }
+        case EQU_29_ENGINE :
+            control.angle1 = 1.7849922
+            control.angle2 = -1.2375059
         default : break
         }
         
@@ -1730,6 +1733,19 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addFloat("Y",&control.cy, -10,10,0.01)
             widget.addFloat("Z",&control.cz, -10,10,0.01)
             widget.addFloat("Angle",&control.angle1,-4,4,0.02)
+        case EQU_29_ENGINE :
+            widget.addInt32("Iterations",&control.isteps,1,130,1)
+            widget.addFloat("X",&control.cx, -10,10,0.01)
+            widget.addFloat("Y",&control.cy, -10,10,0.01)
+            widget.addFloat("Z",&control.cz, -10,10,0.01)
+            widget.addFloat("W",&control.cw, -10,10,0.01)
+            widget.addFloat("Scl",&control.dx, -10,10,0.01)
+            widget.addFloat("Scl2",&control.dy, -10,10,0.01)
+            widget.addFloat("dz",&control.dz, -3,3,0.002)
+            widget.addFloat("offset",&control.dw, -3,3,0.002)
+            widget.addFloat("Angle1",&control.angle1,-4,4,0.05)
+            widget.addFloat("Angle2",&control.angle2,-4,4,0.05)
+            widget.addFloat("Angle3",&control.ex, -4,4,0.05)
         default : break
         }
         

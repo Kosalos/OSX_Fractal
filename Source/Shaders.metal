@@ -3,7 +3,7 @@
 
 // Define this to speed up compilation times
 // in the DE() function you are editing: change "#ifdef SINGLE_EQUATION" to "#ifdef xSINGLE_EQUATION" so that the function body is executed
-//#define SINGLE_EQUATION 1
+#define SINGLE_EQUATION 1
 
 using namespace metal;
 
@@ -42,6 +42,17 @@ float3 rotatePosition(float3 pos, int axis, float angle) {
             pos.z =    qt * ss + pos.z * cc;
             break;
     }
+    return pos;
+}
+
+float2 rotatePosition2(float2 pos, float angle) {
+    float ss = sin(angle);
+    float cc = cos(angle);
+    float qt = pos.x;
+
+    pos.x = pos.x * cc - pos.y * ss;
+    pos.y =    qt * ss + pos.y * cc;
+
     return pos;
 }
 
@@ -1287,6 +1298,78 @@ float DE_KALI_RONTGEN(float3 pos,device Control &control,thread float4 &orbitTra
 #endif
 }
 
+//MARK: - 29 Engine
+// https://www.shadertoy.com/view/ttSBRm
+
+//float DE_ENGINE(float3 pos,device Control &control,thread float4 &orbitTrap) {
+//#ifdef zzzSINGLE_EQUATION
+//    return 0;
+//#else
+////    #define hash(n) fract(sin(n * 234.567+123.34))
+//#define hash(n) fract(sin(n * control.cx + control.cy))
+//    float seed = dot(floor((pos+3.5)/7.)+3.,vec3(123.12,234.56,678.22));
+//    float scale=-5.;
+//    float mr2=.38;
+//    float off=1.2;
+//    float s=3.;
+//
+//    pos -= clamp(pos,-control.cz,control.cz) * 2.;
+//    pos.xy *= rotatePosition2(pos.xy,control.angle1);
+//    pos.yz *= rotatePosition2(pos.yz,control.angle2);
+//    pos = abs(pos);
+//    float3 p0 = pos;
+//    float g; // ,loopEnd = 4.+ hash(seed)*6.;
+//
+//    for(int i = 0; i < control.isteps; ++i) {
+//        pos = 1. - abs(pos -1.);
+//        g = clamp(mr2*max(1.2/dot(pos,pos),1.),0.,1.);
+//        pos = pos * scale * g + p0 * off;
+//        s = s * abs(scale) * g + off;
+//    }
+//
+//    return length(cross(pos,normalize(float3(1))))/s-.005;
+//#endif
+//}
+
+
+float DE_ENGINE(float3 pos,device Control &control,thread float4 &orbitTrap) {
+#ifdef zzzSINGLE_EQUATION
+    return 0;
+#else
+//    #define hash(n) fract(sin(n * 234.567+123.34))
+#define hash(n) fract(sin(n * control.cx + control.cy))
+    float scale = control.dy;
+    float mr2 =  control.dz;
+    float s=3.;
+
+    pos -= clamp(pos,-control.cz,control.cz) * 2;
+    pos.xy *= rotatePosition2(pos.xy,control.angle1);
+    pos.yz *= rotatePosition2(pos.yz,control.angle2);
+//    pos.xz *= rotatePosition2(pos.xz,control.ex);
+    
+    
+    float3 p0 = pos;
+//    pos *= rotatePosition(p0,0,control.ex);
+//    pos *= rotatePosition(p0,1,control.angle1);
+//    pos *= rotatePosition(p0,2,control.angle2);
+
+   // pos = abs(pos);
+     pos = abs(pos + pos * control.dw);
+    p0 = pos;
+    
+    float g; // ,loopEnd = 4.+ hash(seed)*6.;
+    
+    for(int i = 0; i < control.isteps; ++i) {
+        pos = control.cw - abs(pos -control.cw);
+        g = clamp(mr2*max(1.2/dot(pos,pos),1.),0.,1.);
+        pos = pos * scale * g + p0 * control.dx;
+        s = s * abs(scale) * g + control.dx;
+    }
+
+    return length(cross(pos,normalize(float3(1))))/s-.005;
+#endif
+}
+
 //MARK: - distance estimate
 // ===========================================
 
@@ -1320,6 +1403,7 @@ float DE_Inner(float3 pos,device Control &control,thread float4 &orbitTrap) {
         case EQU_26_KALEIDO     : return DE_KALEIDO(pos,control,orbitTrap);
         case EQU_27_MANDELNEST  : return DE_MANDELNEST(pos,control,orbitTrap);
         case EQU_28_KALI_RONTGEN: return DE_KALI_RONTGEN(pos,control,orbitTrap);
+        case EQU_29_ENGINE      : return DE_ENGINE(pos,control,orbitTrap);
     }
     
     return 0;

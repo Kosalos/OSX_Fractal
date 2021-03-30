@@ -54,7 +54,7 @@ class SaveLoadCell: NSTableCellView {
         context?.stroke(rect)
         
         let s = NSShadow()
-        s.shadowOffset = NSSize(width:2,height:2)
+        s.shadowOffset = NSSize(width:1,height:1)
         s.shadowBlurRadius = 1
         s.shadowColor = .black
         

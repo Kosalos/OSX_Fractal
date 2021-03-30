@@ -161,6 +161,7 @@ class Widget {
     
     func gainFocus() {
         focus = previousFocus
+        if focus == NO_FOCUS { focus = 0 }
         focusChanged()
     }
     

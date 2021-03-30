@@ -152,7 +152,7 @@ class BaseNSView3: NSView {
     override var acceptsFirstResponder: Bool { return true }
     
     override func draw(_ rect: NSRect) {
-        let c = CGFloat(0.3)
+        let c = CGFloat(94.0 / 256.0)
         NSColor(red:c, green:c, blue:c, alpha:1).set()
         NSBezierPath(rect:bounds).fill()
     }
