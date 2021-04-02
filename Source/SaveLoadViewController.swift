@@ -71,7 +71,7 @@ let versionNumber:Int32 = 0x55ac
 var loadNextIndex:Int = -1   // first use will bump this to zero
 var slEntry:[SLEntry] = []
 var dateSort:Bool = true
-var dateAscending:Bool = true
+var dateAscending:Bool = false
 
 class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableViewDelegate,SLCellDelegate {
     @IBOutlet var legend: NSTextField!
@@ -94,7 +94,7 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
 
     func rowForButton(_ sender: NSButton) -> Int {
         let buttonPosition = sender.convert(CGPoint.zero, to:tv)
-        return tv.row(at:buttonPosition)
+        return 1 + tv.row(at:buttonPosition)
     }
     
     func didTapOverwriteButton(_ sender: NSButton) { overwriteAndDismissDialog(rowForButton(sender)) }

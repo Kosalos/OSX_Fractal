@@ -159,7 +159,7 @@ void TransA(thread float3 &z, thread float &DF, float a, float b) {
 //widget.addBoolean("B: ShowBalls",&control.bcx)
 //widget.addBoolean("F: FourGen",&control.bcz)
 
-float DE_JosKleinian(float3 z,device Control &control,thread float4 &orbitTrap) {
+float DE_JOSKLEINIAN(float3 z,device Control &control,thread float4 &orbitTrap) {
 #ifdef SINGLE_EQUATION
     return 0;
 #else
@@ -1301,37 +1301,6 @@ float DE_KALI_RONTGEN(float3 pos,device Control &control,thread float4 &orbitTra
 //MARK: - 29 Engine
 // https://www.shadertoy.com/view/ttSBRm
 
-//float DE_ENGINE(float3 pos,device Control &control,thread float4 &orbitTrap) {
-//#ifdef zzzSINGLE_EQUATION
-//    return 0;
-//#else
-////    #define hash(n) fract(sin(n * 234.567+123.34))
-//#define hash(n) fract(sin(n * control.cx + control.cy))
-//    float seed = dot(floor((pos+3.5)/7.)+3.,vec3(123.12,234.56,678.22));
-//    float scale=-5.;
-//    float mr2=.38;
-//    float off=1.2;
-//    float s=3.;
-//
-//    pos -= clamp(pos,-control.cz,control.cz) * 2.;
-//    pos.xy *= rotatePosition2(pos.xy,control.angle1);
-//    pos.yz *= rotatePosition2(pos.yz,control.angle2);
-//    pos = abs(pos);
-//    float3 p0 = pos;
-//    float g; // ,loopEnd = 4.+ hash(seed)*6.;
-//
-//    for(int i = 0; i < control.isteps; ++i) {
-//        pos = 1. - abs(pos -1.);
-//        g = clamp(mr2*max(1.2/dot(pos,pos),1.),0.,1.);
-//        pos = pos * scale * g + p0 * off;
-//        s = s * abs(scale) * g + off;
-//    }
-//
-//    return length(cross(pos,normalize(float3(1))))/s-.005;
-//#endif
-//}
-
-
 float DE_ENGINE(float3 pos,device Control &control,thread float4 &orbitTrap) {
 #ifdef zzzSINGLE_EQUATION
     return 0;
@@ -1370,6 +1339,31 @@ float DE_ENGINE(float3 pos,device Control &control,thread float4 &orbitTrap) {
 #endif
 }
 
+//MARK: - 30 FRACTAL_CAGE
+//https://www.shadertoy.com/view/3l2yDd
+
+float DE_FRACTAL_CAGE(float3 p,device Control &control,thread float4 &orbitTrap) {
+#ifdef zzzSINGLE_EQUATION
+    return 0;
+#else
+    float lp,r2,s = 1;
+    float icy = 1.0 / control.cy;
+    float3 p2,cy3 = float3(control.cy);
+
+    for (int i=0; i<control.isteps; i++) {
+        p -= control.cx * round(p / control.cx);
+    
+        p2 = pow(abs(p),cy3);
+        lp = pow(p2.x + p2.y + p2.z, icy);
+        
+        r2 = control.dx / max( pow(lp,control.cz), control.cw);
+        p *= r2;
+        s *= r2;
+    }
+    return length(p)/s-.001;
+#endif
+}
+
 //MARK: - distance estimate
 // ===========================================
 
@@ -1377,7 +1371,7 @@ float DE_Inner(float3 pos,device Control &control,thread float4 &orbitTrap) {
     switch(control.equation) {
         case EQU_01_MANDELBULB  : return DE_MANDELBULB(pos,control,orbitTrap);
         case EQU_02_APOLLONIAN2 : return DE_APOLLONIAN2(pos,control,orbitTrap);
-        case EQU_03_KLEINIAN    : return DE_JosKleinian(pos,control,orbitTrap);
+        case EQU_03_KLEINIAN    : return DE_JOSKLEINIAN(pos,control,orbitTrap);
         case EQU_04_MANDELBOX   : return DE_MANDELBOX(pos,control,orbitTrap);
         case EQU_05_QUATJULIA   : return DE_QUATJULIA(pos,control,orbitTrap);
         case EQU_06_MONSTER     : return DE_MONSTER(pos,control,orbitTrap);
@@ -1404,6 +1398,7 @@ float DE_Inner(float3 pos,device Control &control,thread float4 &orbitTrap) {
         case EQU_27_MANDELNEST  : return DE_MANDELNEST(pos,control,orbitTrap);
         case EQU_28_KALI_RONTGEN: return DE_KALI_RONTGEN(pos,control,orbitTrap);
         case EQU_29_ENGINE      : return DE_ENGINE(pos,control,orbitTrap);
+        case EQU_30_FRACTAL_CAGE: return DE_FRACTAL_CAGE(pos,control,orbitTrap);
     }
     
     return 0;

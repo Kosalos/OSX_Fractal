@@ -179,11 +179,23 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
           "Half Tetrahedron","Knighty Polychora","3Dickulus Quaternion Julia","Spudsville","Flower Hive",
           "Pupukuusikkos Spiralbox", "SurfBox","TwistBox","Vertebrae", "DarkBeam Surfbox",
           "Klienian Sponge","Donuts","PDOF","MagnetoBulb","Spuds2018",
-          "KaleidoScope","Mandel Nest","Kali Rontgen","Fractal Engine" ]
+          "KaleidoScope","Mandel Nest","Kali Rontgen","Fractal Engine","Fractal Cage" ]
     
     func updateWindowTitle() {
         let index = Int(control.equation)
-        view.window?.title = Int(index + 1).description + ": " + titleString[index] + " : " + widget.focusString()
+        var str = Int(index + 1).description + ": " + titleString[index] + " : " + widget.focusString()
+        
+        // add float value annotation
+        let i = widget.focus
+        if i >= 0 && widget.data[i].kind == .float {
+            let s = String(format: "  (%6.3f -[ %@ ]- %6.3f)",
+                           widget.data[i].range.min(),
+                           widget.data[i].valueString(),
+                           widget.data[i].range.max())
+            str += s
+        }
+        
+        view.window?.title = str
     }
     
     /// reset widget focus index, update window title, recalc fractal.  Called after Load and LoadNext
@@ -922,6 +934,27 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         case EQU_29_ENGINE :
             control.angle1 = 1.7849922
             control.angle2 = -1.2375059
+        case EQU_30_FRACTAL_CAGE :
+            control.camera = SIMD3<Float>(1.3618234, -2.553464, -1.9804218)
+            updateShaderDirectionVector( SIMD3<Float>(0.16831262, 0.100065425, 0.9806415) )
+            control.cx = 1.9970013
+            control.cy = 3.3000035
+            control.cz = 1.4100022
+            control.cw = -0.6599999
+            control.dx = 1.3
+            control.isteps = 12
+            control.bright = 0.9000002
+            control.contrast = 0.55999994
+            
+            if control.doInversion {
+                control.camera = simd_float3( -1.4546375 , -1.1914842 , -4.899163 )
+                updateShaderDirectionVector(simd_float3( 0.16831262 , 0.100065425 , 0.9806415 ))
+                control.InvCx =  0.09000002
+                control.InvCy =  0.030000014
+                control.InvCz =  0.09400001
+                control.InvRadius =  0.33999997
+                control.InvAngle =  -0.049999982
+            }
         default : break
         }
         
@@ -1164,6 +1197,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         
         if widget.keyPress(event) {
             setShaderToFastRender()
+            updateWindowTitle()
             return
         }
         
@@ -1746,6 +1780,13 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addFloat("Angle1",&control.angle1,-4,4,0.05)
             widget.addFloat("Angle2",&control.angle2,-4,4,0.05)
             widget.addFloat("Angle3",&control.ex, -4,4,0.05)
+        case EQU_30_FRACTAL_CAGE :
+            widget.addInt32("Iterations",&control.isteps,1,60,1)
+            widget.addFloat("X",&control.cx, 0,2.5,0.1)
+            widget.addFloat("Y",&control.cy, 0,7,0.1)
+            widget.addFloat("Z",&control.cz, 0,3,0.1)
+            widget.addFloat("W",&control.cw, -1,1.5,0.02)
+            widget.addFloat("D",&control.dx, 0.1,2,0.1)
         default : break
         }
         
@@ -1760,9 +1801,9 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         
         widget.addBoolean(" Spherical Inversion",&control.doInversion,99)
         if control.doInversion {
-            widget.addFloat("   X",&control.InvCx,-5,5,0.01)
+            widget.addFloat("   X",&control.InvCx,-5,5,0.002)
             widget.addFloat("   Y",&control.InvCy,-5,5,0.01)
-            widget.addFloat("   Z",&control.InvCz,-5,5,0.01)
+            widget.addFloat("   Z",&control.InvCz,-5,5,0.002)
             widget.addFloat("   Radius",&control.InvRadius,0.01,10,0.01)
             widget.addFloat("   Angle",&control.InvAngle,-10,10,0.01)
         }

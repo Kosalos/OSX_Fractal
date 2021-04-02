@@ -95,8 +95,8 @@ struct WidgetData {
             return value.description
         case .float :
             let value:Float = valuePtr.load(as:Float.self)
-            return value.debugDescription
-            default : break
+            return String(format: "%6.3f", value)
+        default : break
         }
         
         return ""

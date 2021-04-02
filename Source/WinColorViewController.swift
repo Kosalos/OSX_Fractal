@@ -122,7 +122,7 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
         widget.addFloat("Reflect 2",&vc.control.transparentAmount, 0,3,0.01)
         
         widget.addLegend(" ")
-        widget.addFloat("C Normal",&vc.control.normalOffset, 0.00001,1,0.0001)
+        widget.addFloat("C Normal",&vc.control.normalOffset, 0.00001,1,0.01)
         
         widget.addLegend(" ")
         widget.addLegend("Blur")
