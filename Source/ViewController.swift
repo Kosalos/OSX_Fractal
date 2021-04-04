@@ -179,7 +179,8 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
           "Half Tetrahedron","Knighty Polychora","3Dickulus Quaternion Julia","Spudsville","Flower Hive",
           "Pupukuusikkos Spiralbox", "SurfBox","TwistBox","Vertebrae", "DarkBeam Surfbox",
           "Klienian Sponge","Donuts","PDOF","MagnetoBulb","Spuds2018",
-          "KaleidoScope","Mandel Nest","Kali Rontgen","Fractal Engine","Fractal Cage" ]
+          "KaleidoScope","Mandel Nest","Kali Rontgen","Fractal Engine","Fractal Cage",
+          "Gaz 42" ]
     
     func updateWindowTitle() {
         let index = Int(control.equation)
@@ -955,6 +956,30 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
                 control.InvRadius =  0.33999997
                 control.InvAngle =  -0.049999982
             }
+        case EQU_31_GAZ_42 :
+            control.camera = SIMD3<Float>(5.3399773, 5.3027763, -6.626047)
+            updateShaderDirectionVector( SIMD3<Float>(0.16831262, 0.100065425, 0.9806415) )
+            control.isteps = 12
+            control.cx = 2.659
+            control.cy = 2.437
+            control.cz = -1.627
+            control.cw = 2.815
+            control.bright = 1.640
+            control.contrast = 0.560
+            control.specular = 0.000
+             
+            if control.doInversion {
+                control.camera = simd_float3( -4.2237005 , -0.3830219 , -23.89161 )
+                updateShaderDirectionVector(simd_float3( 0.16831262 , 0.100065425 , 0.9806415 ))
+                control.InvCenter = simd_float3(0.064, 0.090, 0.192)
+                control.InvRadius = 0.550
+                control.InvAngle = 0.230
+                control.isteps = 8
+                control.cx = 1.180
+                control.cy = -2.899
+                control.cz = -4.437
+                control.cw = 3.428
+            }
         default : break
         }
         
@@ -1385,48 +1410,56 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     
     /// press 'V' to display control parameter values in console window
     func displayControlParametersInConsoleWindow() {
+        
+        func floatDisplay(_ legend:String, _ value:Float, _ margin:String = "") {
+            let str = String(format: "%@control.%@ = %.3f", margin,legend,value)
+            print(str)
+        }
+                        
         print("control.camera =",control.camera.debugDescription)
         print("updateShaderDirectionVector(",control.viewVector.debugDescription,")")
-        print("control.cx =",control.cx)
-        print("control.cy =",control.cy)
-        print("control.cz =",control.cz)
-        print("control.cw =",control.cw)
-        print("control.dx =",control.dx)
-        print("control.dy =",control.dy)
-        print("control.dz =",control.dz)
-        print("control.dw =",control.dw)
-        print("control.ex =",control.ex)
-        print("control.ey =",control.ey)
-        print("control.ez =",control.ez)
-        print("control.ew =",control.ew)
-        print("control.fx =",control.fx)
-        print("control.fy =",control.fy)
-        print("control.fz =",control.fz)
-        print("control.fw =",control.fw)
-        
         print("control.isteps =",control.isteps)
-        print("control.bright =",control.bright)
-        print("control.contrast =",control.contrast)
-        print("control.specular =",control.specular)
-        
-        print("control.angle1 =",control.angle1)
-        print("control.angle2 =",control.angle2)
-        
+
+        floatDisplay("cx",control.cx)
+        floatDisplay("cy",control.cy)
+        floatDisplay("cz",control.cz)
+        floatDisplay("cw",control.cw)
+        floatDisplay("dx",control.dx)
+        floatDisplay("dy",control.dy)
+        floatDisplay("dz",control.dz)
+        floatDisplay("dw",control.dw)
+        floatDisplay("ex",control.ex)
+        floatDisplay("ey",control.ey)
+        floatDisplay("ez",control.ez)
+        floatDisplay("ew",control.ew)
+        floatDisplay("fx",control.fx)
+        floatDisplay("fy",control.fy)
+        floatDisplay("fz",control.fz)
+        floatDisplay("fw",control.fw)
+
+        floatDisplay("angle1",control.angle1)
+        floatDisplay("angle2",control.angle2)
+
         print("control.juliaboxMode =",control.juliaboxMode)
-        print("control.juliaX = ",control.juliaX)
-        print("control.juliaY = ",control.juliaY)
-        print("control.juliaZ = ",control.juliaZ)
+        floatDisplay("juliaX",control.juliaX)
+        floatDisplay("juliaY",control.juliaY)
+        floatDisplay("juliaZ",control.juliaZ)
         
+        print(String(format:"control.julia = float3(%.3f, %.3f, %.3f)",control.juliaX,control.juliaY,control.juliaZ))
+
+        floatDisplay("bright",control.bright)
+        floatDisplay("contrast",control.contrast)
+        floatDisplay("specular",control.specular)
+
         //----------------------------------
         print(" ")
         print("if control.doInversion {")
         print("    control.camera = simd_float3(",control.camera.x,",",control.camera.y,",",control.camera.z,")")
         print("    updateShaderDirectionVector(simd_float3(",control.viewVector.x,",",control.viewVector.y,",",control.viewVector.z,"))")
-        print("    control.InvCx = ",control.InvCx)
-        print("    control.InvCy = ",control.InvCy)
-        print("    control.InvCz = ",control.InvCz)
-        print("    control.InvRadius = ",control.InvRadius)
-        print("    control.InvAngle = ",control.InvAngle)
+        let indent = "    "
+v        print(String(format:"    control.InvCenter = simd_float3(%.3f, %.3f, %.3f)",control.InvCx,control.InvCy,control.InvCz))
+        floatDisplay("InvRadius",control.InvRadius,indent)
+        floatDisplay("InvAngle",control.InvAngle,indent)
         print("}")
     }
     
@@ -1787,6 +1820,12 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addFloat("Z",&control.cz, 0,3,0.1)
             widget.addFloat("W",&control.cw, -1,1.5,0.02)
             widget.addFloat("D",&control.dx, 0.1,2,0.1)
+        case EQU_31_GAZ_42 :
+            widget.addInt32("Iterations",&control.isteps,1,60,1)
+            widget.addFloat("X",&control.cx, -10,10,0.01)
+            widget.addFloat("Y",&control.cy, -10,10,0.01)
+            widget.addFloat("Z",&control.cz, -10,10,0.01)
+            widget.addFloat("W",&control.cw, -10,10,0.01)
         default : break
         }
         

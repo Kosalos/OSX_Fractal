@@ -1342,6 +1342,8 @@ float DE_ENGINE(float3 pos,device Control &control,thread float4 &orbitTrap) {
 //MARK: - 30 FRACTAL_CAGE
 //https://www.shadertoy.com/view/3l2yDd
 
+#define R(p,a,r) mix(a*dot(p,a),p,cos(r))+sin(r)*cross(p,a)
+
 float DE_FRACTAL_CAGE(float3 p,device Control &control,thread float4 &orbitTrap) {
 #ifdef zzzSINGLE_EQUATION
     return 0;
@@ -1352,10 +1354,10 @@ float DE_FRACTAL_CAGE(float3 p,device Control &control,thread float4 &orbitTrap)
 
     for (int i=0; i<control.isteps; i++) {
         p -= control.cx * round(p / control.cx);
-    
+
         p2 = pow(abs(p),cy3);
         lp = pow(p2.x + p2.y + p2.z, icy);
-        
+
         r2 = control.dx / max( pow(lp,control.cz), control.cw);
         p *= r2;
         s *= r2;
@@ -1363,6 +1365,77 @@ float DE_FRACTAL_CAGE(float3 p,device Control &control,thread float4 &orbitTrap)
     return length(p)/s-.001;
 #endif
 }
+
+//MARK: - 31 GAZ_42
+// https://www.shadertoy.com/view/Nss3WB
+
+float DE_GAZ_42(float3 p,device Control &control,thread float4 &orbitTrap) {
+#ifdef zzzSINGLE_EQUATION
+    return 0;
+#else
+    float e,s = 1.5;
+    float3 q = p;
+    
+    for (int i=0; i<control.isteps; i++) {
+        p=sign(p)*(control.cx - abs(p - control.cx));
+        e = control.cy/clamp(dot(p,p),control.cz,control.cz+control.cw);
+        p = p * e + q;
+        s *= e;
+        
+        orbitTrap = min(orbitTrap, float4(abs(p), dot(p,p)));
+    }
+    return length(p)/ s - 0.001;
+#endif
+}
+
+//// gaz 19
+//float DE_FRACTAL_CAGE(float3 p,device Control &control,thread float4 &orbitTrap) {
+//#ifdef zzzSINGLE_EQUATION
+//    return 0;
+//#else
+//    float e,s = 2;
+//    p = control.cx - abs(p);
+//
+//    p.x<p.z?p=p.zyx:p;
+//    p.y<p.z?p=p.xzy:p;
+//    p.x<p.y?p=p.yxz:p;
+//
+//    for (int i=0; i<control.isteps; i++) {
+//        p = control.cy - abs(p - control.cz);
+//        e=dot(p,p);
+//        e = control.cw * 3. /min(e,control.cw *2.) + control.cw *2./min(e,control.cw * .5);
+//        s *= e;
+//        p = abs(p)*e-vec3(2,7,1);
+//
+//        orbitTrap = min(orbitTrap, float4(abs(p), dot(p,p)));
+//    }
+//    return length(p)/ s - 0.001;
+//#endif
+//}
+
+//// gaz 31
+//float DE_FRACTAL_CAGE(float3 p,device Control &control,thread float4 &orbitTrap) {
+//#ifdef zzzSINGLE_EQUATION
+//    return 0;
+//#else
+//    float e,s = 1;
+//    e = control.cz/min(dot(p,p),control.cw);
+//    s *= e;
+//
+//    for (int i=0; i<control.isteps; i++) {
+//        p.x =1.-abs(p.x-5.2);
+//        p.y =3.6-abs(p.y-4.3);
+//        p.z =1.8-abs(p.z-2.5);
+//        e = control.cx / min(dot(p,p),control.cx + 1); // 9.);
+//        s *= e;
+//
+//        p = abs(p) * e;
+//
+//        orbitTrap = min(orbitTrap, float4(abs(p), dot(p,p)));
+//    }
+//    return length(p)/ s - 0.001;
+//#endif
+//}
 
 //MARK: - distance estimate
 // ===========================================
@@ -1399,6 +1472,7 @@ float DE_Inner(float3 pos,device Control &control,thread float4 &orbitTrap) {
         case EQU_28_KALI_RONTGEN: return DE_KALI_RONTGEN(pos,control,orbitTrap);
         case EQU_29_ENGINE      : return DE_ENGINE(pos,control,orbitTrap);
         case EQU_30_FRACTAL_CAGE: return DE_FRACTAL_CAGE(pos,control,orbitTrap);
+        case EQU_31_GAZ_42      : return DE_GAZ_42(pos,control,orbitTrap);
     }
     
     return 0;
