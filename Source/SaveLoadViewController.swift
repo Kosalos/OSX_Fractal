@@ -18,6 +18,7 @@ struct SLEntry {
 
 let populatedCellBackgroundColor = NSColor(red:0.1,  green:0.5,  blue:0.1, alpha: 1)
 let noFileString = "** unused **"
+private var focus:Int = 0
 
 protocol SLCellDelegate: class {
     func didTapOverwriteButton(_ sender: NSButton)
@@ -29,29 +30,36 @@ class SaveLoadCell: NSTableCellView {
     @IBOutlet var legend: NSTextField!
     @IBAction func overwriteTapped(_ sender: NSButton) { delegate?.didTapOverwriteButton(sender) }
     @IBAction func deleteTapped(_ sender: NSButton) { delegate?.didTapDeleteButton(sender) }
-    var isUnused = Bool()
     var kind = Int()
+    var row = Int()
     @IBOutlet var overwriteButton: NSButton!
     @IBOutlet var deleteButton: NSButton!
     
     override func draw(_ rect: CGRect) {
         let context = NSGraphicsContext.current?.cgContext
         
-        if isUnused {
-            context?.setFillColor(NSColor.darkGray.cgColor)
+        let cMap:[CGFloat] = [ 0.2, 0.5, 0.8 ]
+        var k = kind % 27
+        let r = cMap[k % 3]; k /= 3
+        let g = cMap[k % 3] + 0.1; k /= 3
+        let b = cMap[k % 3]
+        context?.setFillColor(NSColor(red:r, green:g, blue:b, alpha:1).cgColor)
+        context?.fill(rect)
+        
+        
+        if row == focus {
+            context?.setStrokeColor(NSColor.white.cgColor)
+            context?.setLineWidth(5)
+            context?.stroke(rect)
+
+            context?.setStrokeColor(NSColor.black.cgColor)
+            context?.setLineWidth(1)
+            context?.stroke(rect.insetBy(dx: 4, dy: 4))
         }
         else {
-            let cMap:[CGFloat] = [ 0.2, 0.5, 0.8 ]
-            var k = kind % 27
-            let r = cMap[k % 3]; k /= 3
-            let g = cMap[k % 3] + 0.1; k /= 3
-            let b = cMap[k % 3]
-            context?.setFillColor(NSColor(red:r, green:g, blue:b, alpha:1).cgColor)
+            context?.setStrokeColor(NSColor.black.cgColor)
+            context?.stroke(rect)
         }
-        
-        context?.fill(rect)
-        context?.setStrokeColor(NSColor.black.cgColor)
-        context?.stroke(rect)
         
         let s = NSShadow()
         s.shadowOffset = NSSize(width:1,height:1)
@@ -79,6 +87,7 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     @IBOutlet var DateRadio: NSButton!
     @IBOutlet var KindRadio: NSButton!
     @IBOutlet var saveNewButton: NSButton!
+    @IBOutlet var loadNewestButton: NSButton!
     var tv:NSTableView! = nil
     var dateString:String = ""
     var fileURL:URL! = nil
@@ -87,6 +96,13 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
         let index = slEntry.count
         slEntry.append(SLEntry(99,noFileString,0,0))
         overwriteAndDismissDialog(index)
+    }
+    
+    @IBAction func loadNewestPressed(_ sender: NSButton) {
+        dateSort = true
+        dateAscending = false
+        sortSLEntries()
+        loadAndDismissDialog(0)        
     }
     
     func numberOfSections(in tableView: NSTableView) -> Int { return 1 }
@@ -178,15 +194,36 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
         tv = scrollView.documentView as? NSTableView
         tv.dataSource = self
         tv.delegate = self
+        focus = 0
         
         updateSortButtons()
         loadSLEntries()
+    }
+    
+    override func keyDown(with event: NSEvent) {
+        func changeFocus(_ amt:Int) {
+            focus += amt
+            focus = min(slEntry.count-1,focus)
+            focus = max(focus,0)
+            tv.reloadData()
+            tv.scrollRowToVisible(focus)
+        }
+        
+        switch Int32(event.keyCode) {
+        case 53 : dismiss(self)  // Esc
+        case 37 : loadNewestPressed(loadNewestButton) // L
+        case UP_ARROW   : changeFocus(-1)
+        case DOWN_ARROW : changeFocus(+1)
+        case 36 : loadAndDismissDialog(focus) // <return>
+        default : break
+        }
     }
     
     func updateSortButtons() {
         DateRadio.set(textColor: dateSort ? .red : .white)
         KindRadio.set(textColor: !dateSort ? .red : .white)
         saveNewButton.set(textColor: .white)
+        loadNewestButton.set(textColor: .white)
     }
     
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
@@ -195,9 +232,9 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
         if row >= slEntry.count { return cell }
         
         cell.legend.stringValue = String(format:"%2d %@  %@",row+1,  vc.titleString[slEntry[row].kind],  slEntry[row].dateString)
-        cell.isUnused = false
         cell.delegate = self
         cell.kind = slEntry[row].kind
+        cell.row = row
         return cell
     }
     

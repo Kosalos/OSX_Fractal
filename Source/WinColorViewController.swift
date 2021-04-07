@@ -117,17 +117,17 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
         widget.addFloat("Glass",&vc.control.coloringa,0,1,0.01)
 
         widget.addLegend(" ")
-        widget.addFloat("Second Surface",&vc.control.secondSurface,0,12,0.02)
-        widget.addFloat("Reflect 1",&vc.control.refractAmount, 0,0.25,0.01)
-        widget.addFloat("Reflect 2",&vc.control.transparentAmount, 0,3,0.01)
+        widget.addFloat("Second Surface",&vc.control.secondSurface,0,12,0.1)
+        widget.addFloat("Reflect 1",&vc.control.refractAmount, 0,0.25,0.02)
+        widget.addFloat("Reflect 2",&vc.control.transparentAmount, 0,3,0.03)
         
         widget.addLegend(" ")
         widget.addFloat("C Normal",&vc.control.normalOffset, 0.00001,1,0.01)
         
         widget.addLegend(" ")
         widget.addLegend("Blur")
-        widget.addFloat("Strength (0 = Off)", &vc.control.blurStrength, 0,500,5)
-        widget.addFloat("Distance", &vc.control.blurFocalDistance, 0.001,4,0.01)
+        widget.addFloat("Strength (0 = Off)", &vc.control.blurStrength, 0,500,15)
+        widget.addFloat("Distance", &vc.control.blurFocalDistance, 0.001,4,0.02)
         
         widget.addLegend(" ")
         widget.addFloat("Radial Symmetry",&vc.control.radialAngle,0,Float.pi,0.03)

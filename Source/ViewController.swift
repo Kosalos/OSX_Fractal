@@ -180,7 +180,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
           "Pupukuusikkos Spiralbox", "SurfBox","TwistBox","Vertebrae", "DarkBeam Surfbox",
           "Klienian Sponge","Donuts","PDOF","MagnetoBulb","Spuds2018",
           "KaleidoScope","Mandel Nest","Kali Rontgen","Fractal Engine","Fractal Cage",
-          "Gaz 42" ]
+          "Gaz 42","Boney Tunnel" ]
     
     func updateWindowTitle() {
         let index = Int(control.equation)
@@ -980,6 +980,35 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
                 control.cz = -4.437
                 control.cw = 3.428
             }
+        case EQU_32_BONEYTUNNEL :
+            control.camera = SIMD3<Float>(5.6837554, 5.6239524, -6.4170876)
+            updateShaderDirectionVector( SIMD3<Float>(0.06502428, 0.060750265, 0.9960327) )
+            control.isteps = 12
+            control.cx = 2.459
+            control.cy = 3.437
+            control.cz = 0.000
+            control.cw = 5.115
+            control.dx = -19.200
+            control.dy = 6.100
+            control.dz = 2.600
+            control.bright = 1.180
+            control.contrast = 0.380
+            control.specular = 0.000
+   
+            if control.doInversion {
+                control.camera = simd_float3( -6.520481 , -1.809379 , -23.238674 )
+                updateShaderDirectionVector(simd_float3( 0.06502428 , 0.060750265 , 0.9960327 ))
+                control.InvCenter = simd_float3(-2.318, -0.850, 1.800)
+                control.InvRadius = 4.500
+                control.InvAngle = 2.800
+                control.cx = -2.000
+                control.cy = 0.337
+                control.cz = 0.000
+                control.cw = 4.615
+                control.dx = 5.000
+                control.dy = 8.500
+                control.dz = 3.000
+            }
         default : break
         }
         
@@ -1457,7 +1486,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         print("    control.camera = simd_float3(",control.camera.x,",",control.camera.y,",",control.camera.z,")")
         print("    updateShaderDirectionVector(simd_float3(",control.viewVector.x,",",control.viewVector.y,",",control.viewVector.z,"))")
         let indent = "    "
-v        print(String(format:"    control.InvCenter = simd_float3(%.3f, %.3f, %.3f)",control.InvCx,control.InvCy,control.InvCz))
+        print(String(format:"    control.InvCenter = simd_float3(%.3f, %.3f, %.3f)",control.InvCx,control.InvCy,control.InvCz))
         floatDisplay("InvRadius",control.InvRadius,indent)
         floatDisplay("InvAngle",control.InvAngle,indent)
         print("}")
@@ -1506,6 +1535,8 @@ v        print(String(format:"    control.InvCenter = simd_float3(%.3f, %.3f, %.
             control.fz = fRandom3()
             control.fw = fRandom3()
         }
+        
+        updateWindowTitle()
     }
     
     //MARK: -
@@ -1756,21 +1787,6 @@ v        print(String(format:"    control.InvCenter = simd_float3(%.3f, %.3f, %.
             widget.addFloat("m2",&control.cw, 0.1,8,0.01)
             widget.addFloat("dr",&control.dx,0.1,3,0.1)
             widget.addFloat("grow",&control.dy,0.1,1,0.01)
-            //            widget.addFloat("M1 X",&control.dx,-8,8,0.001)
-            //            widget.addFloat("M1 Y",&control.dy,-8,8,0.001)
-            //            widget.addFloat("M1 Z",&control.dz,-8,8,0.001)
-            //            widget.addFloat("M2 X",&control.ex,-8,8,0.001)
-            //            widget.addFloat("M2 Y",&control.ey,-8,8,0.001)
-            //            widget.addFloat("M2 Z",&control.ez,-8,8,0.001)
-            //            widget.addFloat("Bias",&control.fx,0,2,0.001)
-            //            widget.addFloat("Bailout",&control.fy,0,30,1)
-            //            widget.addFloat("Angle X",&control.angle1,-4,4,0.05)
-            //            widget.addFloat("Angle Y",&control.angle2,-4,4,0.05)
-            //            widget.addBoolean("Abs X",&control.bdx)
-            //            widget.addBoolean("Abs Y",&control.bdy)
-            //            widget.addBoolean("Abs Z",&control.bdz)
-            //            widget.addBoolean("Style",&control.bdw)
-        //            juliaGroup(8,0.01)
         case EQU_25_SPUDS2018 :
             widget.addInt32("Iterations",&control.isteps,2,30,1)
             widget.addFloat("X",&control.cx,-3,3,0.01)
@@ -1826,6 +1842,16 @@ v        print(String(format:"    control.InvCenter = simd_float3(%.3f, %.3f, %.
             widget.addFloat("Y",&control.cy, -10,10,0.01)
             widget.addFloat("Z",&control.cz, -10,10,0.01)
             widget.addFloat("W",&control.cw, -10,10,0.01)
+        case EQU_32_BONEYTUNNEL :
+            widget.addInt32("Iterations",&control.isteps,1,60,1)
+            widget.addInt32("Transit",&control.icx,1,20,1)
+            widget.addFloat("cx",&control.cx, -20,20,0.01)
+            widget.addFloat("cy",&control.cy, -20,20,0.1)
+            widget.addFloat("cz",&control.cz, 0,30,0.1)
+            widget.addFloat("cw",&control.cw, 0,30,0.1)
+            widget.addFloat("dx",&control.dx, -20,20,0.1)
+            widget.addFloat("dy",&control.dy, -20,30,0.1)
+            widget.addFloat("dz",&control.dz, 0,20,0.1)
         default : break
         }
         
