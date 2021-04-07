@@ -46,8 +46,8 @@
             filePath = "Source/ViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1832"
-            endingLineNumber = "1832"
+            startingLineNumber = "1861"
+            endingLineNumber = "1861"
             landmarkName = "defineWidgetsForCurrentEquation()"
             landmarkType = "7">
          </BreakpointContent>

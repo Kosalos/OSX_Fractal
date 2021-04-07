@@ -1401,14 +1401,14 @@ float DE_BONEYTUNNEL(float3 z,device Control &control,thread float4 &orbitTrap) 
     float fl = control.cx;
     float fr = control.cy;
     float r,r2,scale = control.cw;
-    
+
     for (int i=0; i<control.isteps; i++) {
         // box_fold
         z = clamp(z, -fl, fl) * 2.0 - z;
-        
+
         // sphere_fold
         r2 = dot(z,z);
-        
+
         if(r2 < control.cz) {
             float temp = (fr / control.cz);
             z *= temp;
@@ -1419,10 +1419,10 @@ float DE_BONEYTUNNEL(float3 z,device Control &control,thread float4 &orbitTrap) 
                 z *= temp;
                 dr *= temp;
             }
-        
+
         z = scale * z + offset;
         dr = dr * abs(scale) + 1.0;
-        
+
         if(i < control.icx) { // torus
             vec2 q = vec2(length(z.xz) - control.dy ,z.y);
             r = length(q) - control.dz;
@@ -1430,12 +1430,39 @@ float DE_BONEYTUNNEL(float3 z,device Control &control,thread float4 &orbitTrap) 
         else { // sphere
             r = length(z) - control.dx;
         }
-        
+
         float dd = r / abs(dr);
         if (i < 3 || dd < fd) fd = dd;
     }
-    
+
     return fd;
+#endif
+}
+
+//MARK: - 33 GAZ_19
+// 19 https://www.shadertoy.com/view/WttfWM
+
+float DE_GAZ_19(float3 p,device Control &control,thread float4 &orbitTrap) {
+#ifdef zzzSINGLE_EQUATION
+    return 0;
+#else
+    float e,s = 2;
+    p = control.cx - abs(p);
+
+    p.x < p.z ? p = p.zyx:p;
+    p.y < p.z ? p = p.xzy:p;
+    p.x < p.y ? p = p.yxz:p;
+
+    for (int i=0; i<control.isteps; i++) {
+        p = control.cy - abs(p - control.cz);
+        e = dot(p,p);
+        e = control.cw * 3 / min(e,control.cw * 2) + control.cw * 2 / min(e,control.cw * 0.5);
+        s *= e;
+        p = abs(p) * e - float3(control.dx,control.dy,control.dz);
+
+        orbitTrap = min(orbitTrap, float4(abs(p), dot(p,p)));
+    }
+    return length(p)/ s - 0.001;
 #endif
 }
 
@@ -1502,36 +1529,9 @@ float DE_BONEYTUNNEL(float3 z,device Control &control,thread float4 &orbitTrap) 
 //#endif
 //}
 
-//// gaz 19
-//float DE_GAZ_42(float3 p,device Control &control,thread float4 &orbitTrap) {
-//#ifdef zzzSINGLE_EQUATION
-//    return 0;
-//#else
-//    float e,s = 2;
-//    p = control.cx - abs(p);
-//
-//    p.x<p.z?p=p.zyx:p;
-//    p.y<p.z?p=p.xzy:p;
-//    p.x<p.y?p=p.yxz:p;
-//
-//    for (int i=0; i<control.isteps; i++) {
-//        p = control.cy - abs(p - control.cz);
-//        e=dot(p,p);
-//        e = control.cw * 3. /min(e,control.cw *2.) + control.cw *2./min(e,control.cw * .5);
-//        s *= e;
-//        p = abs(p)*e-vec3(2,7,1);
-//
-//        p = rotatePosition(p,0,control.dx * s);
-//        p = rotatePosition(p,2,control.dy * s);
-//
-//        orbitTrap = min(orbitTrap, float4(abs(p), dot(p,p)));
-//    }
-//    return length(p)/ s - 0.001;
-//#endif
-//}
 
-//// gaz 31
-//float DE_FRACTAL_CAGE(float3 p,device Control &control,thread float4 &orbitTrap) {
+////// gaz 31   not interesting
+//float DE_BONEYTUNNEL(float3 p,device Control &control,thread float4 &orbitTrap) {
 //#ifdef zzzSINGLE_EQUATION
 //    return 0;
 //#else
@@ -1540,12 +1540,12 @@ float DE_BONEYTUNNEL(float3 z,device Control &control,thread float4 &orbitTrap) 
 //    s *= e;
 //
 //    for (int i=0; i<control.isteps; i++) {
-//        p.x =1.-abs(p.x-5.2);
-//        p.y =3.6-abs(p.y-4.3);
-//        p.z =1.8-abs(p.z-2.5);
-//        e = control.cx / min(dot(p,p),control.cx + 1); // 9.);
-//        s *= e;
+//        p.x = control.dx - abs(p.x - control.dy);
+//        p.y = control.dz - abs(p.y - control.dw);
+//        p.z = control.ex - abs(p.z - control.ey);
 //
+//        e = control.cx / min(dot(p,p),control.cy);
+//        s *= e;
 //        p = abs(p) * e;
 //
 //        orbitTrap = min(orbitTrap, float4(abs(p), dot(p,p)));
@@ -1591,6 +1591,7 @@ float DE_Inner(float3 pos,device Control &control,thread float4 &orbitTrap) {
         case EQU_30_FRACTAL_CAGE: return DE_FRACTAL_CAGE(pos,control,orbitTrap);
         case EQU_31_GAZ_42      : return DE_GAZ_42(pos,control,orbitTrap);
         case EQU_32_BONEYTUNNEL : return DE_BONEYTUNNEL(pos,control,orbitTrap);
+        case EQU_33_GAZ_19      : return DE_GAZ_19(pos,control,orbitTrap);
     }
     
     return 0;

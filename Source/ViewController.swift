@@ -180,7 +180,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
           "Pupukuusikkos Spiralbox", "SurfBox","TwistBox","Vertebrae", "DarkBeam Surfbox",
           "Klienian Sponge","Donuts","PDOF","MagnetoBulb","Spuds2018",
           "KaleidoScope","Mandel Nest","Kali Rontgen","Fractal Engine","Fractal Cage",
-          "Gaz 42","Boney Tunnel" ]
+          "Gaz 42","Boney Tunnel","Gaz 19" ]
     
     func updateWindowTitle() {
         let index = Int(control.equation)
@@ -1008,6 +1008,35 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
                 control.dx = 5.000
                 control.dy = 8.500
                 control.dz = 3.000
+            }
+        case EQU_33_GAZ_19 :
+            control.camera = SIMD3<Float>(-0.01336822, 4.770886, -0.29477775)
+            updateShaderDirectionVector( SIMD3<Float>(0.0027407147, -0.99560505, 0.09361113) )
+            control.isteps = 6
+            control.cx = -4.451
+            control.cy = 10.347
+            control.cz = 6.600
+            control.cw = 19.000
+            control.dx = -1.120
+            control.dy = 16.460
+            control.dz = 19.500
+            control.bright = 2.140
+            control.contrast = 0.140
+            control.specular = 0.000
+            
+            if control.doInversion {
+                control.camera = simd_float3( 0.017274715 , 0.904729 , -0.051788263 )
+                updateShaderDirectionVector(simd_float3( 0.0027407147 , -0.99560505 , 0.09361113 ))
+                control.InvCenter = simd_float3(0.028, 0.660, -0.044)
+                control.InvRadius = 0.350
+                control.InvAngle = -1.530
+                control.cx = -5.201
+                control.cy = 10.557
+                control.cz = 6.400
+                control.cw = 10.500
+                control.dx = -2.560
+                control.dy = 16.080
+                control.dz = 19.770
             }
         default : break
         }
@@ -1843,15 +1872,36 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addFloat("Z",&control.cz, -10,10,0.01)
             widget.addFloat("W",&control.cw, -10,10,0.01)
         case EQU_32_BONEYTUNNEL :
-            widget.addInt32("Iterations",&control.isteps,1,60,1)
-            widget.addInt32("Transit",&control.icx,1,20,1)
+            widget.addInt32("Iterations",&control.isteps,1,30,1)
             widget.addFloat("cx",&control.cx, -20,20,0.01)
-            widget.addFloat("cy",&control.cy, -20,20,0.1)
-            widget.addFloat("cz",&control.cz, 0,30,0.1)
-            widget.addFloat("cw",&control.cw, 0,30,0.1)
-            widget.addFloat("dx",&control.dx, -20,20,0.1)
-            widget.addFloat("dy",&control.dy, -20,30,0.1)
-            widget.addFloat("dz",&control.dz, 0,20,0.1)
+            widget.addFloat("cy",&control.cy, -20,20,0.01)
+            widget.addFloat("cz",&control.cz, -20,20,0.1)
+            widget.addFloat("cw",&control.cw, -20,20,0.1)
+            widget.addFloat("X1",&control.dx, -20,20,0.01)
+            widget.addFloat("X2",&control.dy, -20,20,0.01)
+            widget.addFloat("Y1",&control.dz, -20,20,0.01)
+            widget.addFloat("Y2",&control.dw, -20,20,0.01)
+            widget.addFloat("Z1",&control.ex, -20,20,0.01)
+            widget.addFloat("Z2",&control.ey, -20,20,0.01)
+
+//            widget.addInt32("Iterations",&control.isteps,1,60,1)
+//            widget.addInt32("Transit",&control.icx,1,20,1)
+//            widget.addFloat("cx",&control.cx, -20,20,0.01)
+//            widget.addFloat("cy",&control.cy, -20,20,0.1)
+//            widget.addFloat("cz",&control.cz, 0,30,0.1)
+//            widget.addFloat("cw",&control.cw, 0,30,0.1)
+//            widget.addFloat("dx",&control.dx, -20,20,0.1)
+//            widget.addFloat("dy",&control.dy, -20,30,0.1)
+//            widget.addFloat("dz",&control.dz, 0,20,0.1)
+        case EQU_33_GAZ_19 :
+            widget.addInt32("Iterations",&control.isteps,3,10,1)
+            widget.addFloat("cx",&control.cx, -20,20,0.01)
+            widget.addFloat("cy",&control.cy, -20,20,0.01)
+            widget.addFloat("cz",&control.cz, -20,20,0.1)
+            widget.addFloat("cw",&control.cw, -20,20,0.1)
+            widget.addFloat("OffsetX",&control.dx, -30,30,0.01)
+            widget.addFloat("OffsetY",&control.dy, -30,30,0.01)
+            widget.addFloat("OffsetZ",&control.dz, -30,30,0.01)
         default : break
         }
         
