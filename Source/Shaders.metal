@@ -2,8 +2,8 @@
 #include "Shader.h"
 
 // Define this to speed up compilation times
-// in the DE() function you are editing: change "#ifdef SINGLE_EQUATION" to "#ifdef xSINGLE_EQUATION" so that the function body is executed
-#define SINGLE_EQUATION 1
+// in the DE() function you are editing: change "#ifdef SINGLE_EQUATION" to something else so that the function body is executed
+//#define SINGLE_EQUATION 1
 
 using namespace metal;
 
@@ -98,7 +98,7 @@ float DE_MANDELBULB(float3 pos,device Control &control,thread float4 &orbitTrap)
 // apollonian2: https://www.shadertoy.com/view/llKXzh
 
 float DE_APOLLONIAN2(float3 pos,device Control &control,thread float4 &orbitTrap) {
-#ifdef SINGLE_EQUATION
+#ifdef zzzSINGLE_EQUATION
     return 0;
 #else
     float t = control.cz + 0.25 * cos(control.cw * PI * control.cx * (pos.z - pos.x));
@@ -1119,7 +1119,10 @@ float DE_PDOF(float3 pos,device Control &control,thread float4 &orbitTrap) {
 #else
     float DEfactor = 1;
     float3 ap;
-    
+
+    float3 ot,trap = control.otFixed;
+    if(control.orbitStyle == 2) trap -= pos;
+
     for(int i=0; i < control.isteps; ++i) {
         ap = pos;
         pos = control.dx * clamp(pos, -control.cx, control.cx) - pos;
@@ -1134,7 +1137,9 @@ float DE_PDOF(float3 pos,device Control &control,thread float4 &orbitTrap) {
         if(control.juliaboxMode)
             pos += control.julia;
         
-        orbitTrap = min(orbitTrap, abs(float4(pos,dot(pos,pos))));
+        ot = pos * 0.1;
+        if(control.orbitStyle > 0) ot -= trap;
+        orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
     }
     
     return abs(0.5 * abs(pos.z - control.cz)/DEfactor - control.cw);
@@ -1402,6 +1407,9 @@ float DE_BONEYTUNNEL(float3 z,device Control &control,thread float4 &orbitTrap) 
     float fr = control.cy;
     float r,r2,scale = control.cw;
 
+    float3 ot,trap = control.otFixed;
+    if(int(control.orbitStyle + 0.5) == 2) trap -= z;
+
     for (int i=0; i<control.isteps; i++) {
         // box_fold
         z = clamp(z, -fl, fl) * 2.0 - z;
@@ -1433,6 +1441,10 @@ float DE_BONEYTUNNEL(float3 z,device Control &control,thread float4 &orbitTrap) 
 
         float dd = r / abs(dr);
         if (i < 3 || dd < fd) fd = dd;
+        
+        ot = z;
+        if(control.orbitStyle > 0) ot -= trap;
+        orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
     }
 
     return fd;
@@ -1440,31 +1452,117 @@ float DE_BONEYTUNNEL(float3 z,device Control &control,thread float4 &orbitTrap) 
 }
 
 //MARK: - 33 GAZ_19
-// 19 https://www.shadertoy.com/view/WttfWM
+// https://www.shadertoy.com/view/WttfWM
+
+// 13
+//https://www.shadertoy.com/view/3ttBWn
 
 float DE_GAZ_19(float3 p,device Control &control,thread float4 &orbitTrap) {
 #ifdef zzzSINGLE_EQUATION
     return 0;
 #else
-    float e,s = 2;
-    p = control.cx - abs(p);
-
-    p.x < p.z ? p = p.zyx:p;
-    p.y < p.z ? p = p.xzy:p;
-    p.x < p.y ? p = p.yxz:p;
-
-    for (int i=0; i<control.isteps; i++) {
-        p = control.cy - abs(p - control.cz);
-        e = dot(p,p);
-        e = control.cw * 3 / min(e,control.cw * 2) + control.cw * 2 / min(e,control.cw * 0.5);
-        s *= e;
-        p = abs(p) * e - float3(control.dx,control.dy,control.dz);
+    float s=2.;
+    for(int j=0;j < control.isteps;++j) {
+        p = abs(p - control.cx) - control.cy;
+        p.z > p.x ? p = p.zyx:p;
+        p.y > p.z ? p = p.xzy:p;
+        p.z = abs(p.z)- control.cz * sin(p.z) / s;
+        p.y += control.cw * sin(p.y) / s;
+        p.x -= p.y * control.dx * sin(p.x) / s;
+        
+//        p = 3 * p - vec3(9,2,3);
+        p = control.dy * p - vec3(control.ex,control.ey,control.ez);
+        s *= 3; // control.dz;
 
         orbitTrap = min(orbitTrap, float4(abs(p), dot(p,p)));
     }
+
     return length(p)/ s - 0.001;
 #endif
 }
+
+//float DE_GAZ_19(float3 p,device Control &control,thread float4 &orbitTrap) {
+//#ifdef zzzSINGLE_EQUATION
+//    return 0;
+//#else
+//    float e,s = 2;
+//    p = control.cx - abs(p);
+//
+//    p.x < p.z ? p = p.zyx:p;
+//    p.y < p.z ? p = p.xzy:p;
+//    p.x < p.y ? p = p.yxz:p;
+//
+//    for (int i=0; i<control.isteps; i++) {
+//        p = control.cy - abs(p - control.cz);
+//        e = dot(p,p);
+//        e = control.cw * 3 / min(e,control.cw * 2) + control.cw * 2 / min(e,control.cw * 0.5);
+//        s *= e;
+//        p = abs(p) * e - float3(control.dx,control.dy,control.dz);
+//
+//        orbitTrap = min(orbitTrap, float4(abs(p), dot(p,p)));
+//    }
+//    return length(p)/ s - 0.001;
+//#endif
+//}
+
+
+//MARK: - 34 GAZ_18
+// https://www.shadertoy.com/view/wl3fDM
+
+//#define R(p,a,r)mix(a*dot(p,a),p,cos(r))+sin(r)*cross(p,a)
+//void mainImage(out vec4 O, vec2 C)
+//{
+//    O=vec4(0);
+//    vec3 r=iResolution,p;
+//    for(float i=0.,g=0.,e,l,s;
+//        ++i<99.;
+//        e<.003?O.xyz+=mix(
+//                r/r,
+//                cos(vec3(8,3,12)+g*3.)*.5+.5,
+//                .6
+//            )*.9/i:p
+//    )
+//    {
+//        p=vec3(g*(C-.5*r.xy)/r.y,g-2.);
+//        p=R(p,normalize(vec3(1,2,3)),iTime*.2);
+//        p=.7-abs(abs(p-1.+sin(p*.1))-1.);
+//        for(int k=0;k++<2;)
+//            p=abs(p),
+//            p=p.x<p.y?p.zxy:p.zyx;
+//        s=4.;
+//        for(int j=0;j++<4;)
+//            s*=l=2./min(dot(p,p),2.),
+//            p=abs(p)*l-vec3(2,1,3);
+//        g+=e=length(p.yz)/s;
+//    }
+//    O=pow(O,vec4(.8,.6,1.3,1));
+//}
+
+//float DE_GAZ_19(float3 p,device Control &control,thread float4 &orbitTrap) {
+//#ifdef zzzSINGLE_EQUATION
+//    return 0;
+//#else
+//    float l,s = 4;
+//
+////    p = .7 - abs(abs(p-1.+sin(p*.1))-1.);
+//    p = control.cx - abs( abs(p - control.cy + sin(p * control.cz)) - control.cw);
+//
+//    for(int k=0;k < control.isteps;++k) {
+//        p = abs(p);
+//        p = p.x < p.y ? p.zxy :p.zyx;
+//    }
+//
+//    for(int j=0;j < control.isteps*2;++j) {
+//        l = control.dx / min(dot(p,p),control.dy);
+//        s *= l;
+//        p = abs(p) * l - vec3(2,1,3);
+//
+//        orbitTrap = min(orbitTrap, float4(abs(p), dot(p,p)));
+//    }
+//
+//    return length(p)/ s - 0.001;
+//#endif
+//}
 
 //// gaz 21
 //float DE_GAZ_42(float3 p,device Control &control,thread float4 &orbitTrap) {
@@ -1894,7 +1992,7 @@ float3 cycle(float3 c, float s, device Control &control) {
 }
 
 float3 getOrbitColor(device Control &control,float4 orbitTrap) {
-    orbitTrap.w = sqrt(orbitTrap.w);
+ //zorro   orbitTrap.w = sqrt(orbitTrap.w);
     
     float3 orbitColor;
     
@@ -2057,7 +2155,8 @@ kernel void rayMarchShader
         // ======================================================
         if(c.OrbitStrength > 0) {
             float3 oColor = getOrbitColor(c,orbitTrap);
-            color = mix(color, 3.0 * oColor, c.OrbitStrength);
+//            color = mix(color, 3.0 * oColor, c.OrbitStrength);
+            color = mix(color, oColor, c.OrbitStrength);
         }
         
         // ======================================================

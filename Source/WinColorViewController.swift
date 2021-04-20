@@ -11,6 +11,11 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
     @IBOutlet var instructionsG: InstructionsG!
     
     @IBAction func resetButtonPressed(_ sender: NSButton) {
+        randomizeColorSettings()
+        vc.repeatCount = 50
+    }
+
+    func randomizeColorSettings() {
         vc.control.coloring1 = Float.random(in: 0 ... 1)
         vc.control.coloring2 = Float.random(in: 0 ... 1)
         vc.control.coloring3 = Float.random(in: 0 ... 1)
@@ -21,12 +26,7 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
         vc.control.coloring8 = Float.random(in: 0 ... 1)
         vc.control.coloring9 = Float.random(in: 0 ... 1)
         vc.control.coloringa = Float.random(in: 0 ... 1)
-        vc.control.secondSurface = Float.random(in: 0 ... 12)
-        vc.control.refractAmount = Float.random(in: 0 ... 0.25)
-        vc.control.transparentAmount = Float.random(in: 0 ... 3)
-        
         defineWidgets()
-        vc.flagViewToRecalcFractal()
     }
     
     @IBAction func helpPressed(_ sender: NSButton) {

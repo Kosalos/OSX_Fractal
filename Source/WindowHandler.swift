@@ -26,10 +26,12 @@ class WindowHandler {
             windows.append(wc!.window!)
         }
         
-        windows.append(vc.view.window!) // main window
-        addWindowToList("Color")
-        addWindowToList("Lights")
-        
+        windows.append(vc.view.window!) // 1 main window
+        addWindowToList("Color")   // 2
+        addWindowToList("Lights")  // 3
+        addWindowToList("Control") // 4 no widgets
+        addWindowToList("Memory")  // 5 no widgets
+
         // widget instances do not exist until their parent window is launched
         let w1 = windows[0].contentViewController as! ViewController
         widgets.append(w1.widget)
@@ -42,7 +44,7 @@ class WindowHandler {
         
         func windowGainedFocus(notification: Notification) {
             // so only widget list on the active window has the red colored highlight
-            for i in 0 ..< windows.count {
+            for i in 0 ..< windows.count-2 {
                 if windows[i].isMainWindow {
                     focusIndex = i
                     break
@@ -74,9 +76,11 @@ class WindowHandler {
     }
     
     func updateWindowWidgetFocus() { // so only widget list on the active window has the red colored highlight
-        if focusIndex != NO_FOCUS {
+        if focusIndex == windows.count-1 { return } // no widgets on memory window
+        
+        if focusIndex != NO_FOCUS && focusIndex < windows.count-2 {
             widgets[focusIndex].gainFocus()
-            for i in 0 ..< windows.count {
+            for i in 0 ..< windows.count-2 {
                 if i != focusIndex {
                     widgets[i].loseFocus()
                 }

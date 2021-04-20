@@ -72,7 +72,9 @@ class ControlViewController: NSViewController {
         vc.keyDown(with: event)
     }
     
-    override func keyUp(with event: NSEvent) { vc.keyUp(with: event) }
+    override func keyUp(with event: NSEvent) {
+        vc.keyUp(with: event)
+    }
     
     //MARK: -
     
@@ -161,7 +163,30 @@ class ControlPanelView: NSView {
         setNeedsDisplay(self.bounds)
     }
     
+    override func keyDown(with event: NSEvent) {
+        switch event.charactersIgnoringModifiers!.uppercased() {
+        case " " : spaceKeyDown  = true
+        default  : vc.keyDown(with: event)
+        }
+    }
+    
+    override func keyUp(with event: NSEvent) {
+        spaceKeyDown = false
+        vc.keyUp(with: event)
+    }
+    
     var isMouseDown:Bool = false
+    var spaceKeyDown:Bool = false
+    var xCoord = Float()
+    var oldXCoord = Float()
+    var yCoord = Float()
+    var oldYCoord = Float()
+
+    func clamp(_ value:Float, _ min:Float, _ max:Float) -> Float {
+        if value < min { return min }
+        if value > max { return max }
+        return value
+    }
     
     override func mouseDown(with event: NSEvent) {
         let pt:NSPoint = event.locationInWindow
@@ -182,15 +207,19 @@ class ControlPanelView: NSView {
             let p = panelRect[panelIndex]
             
             decodeSelectionIndex(getPanelWidgetIndex(panelIndex,0))
-            var x = Float(pt.x - p.minX)
-            if x < 0 { x = 0 } else if x > pSize { x = pSize }
-            winHandler.widgetPointer(selectedWindow).data[selectedRow].setRatio(x / pSize)
-            
+            oldXCoord = xCoord
+            xCoord = Float(pt.x - p.minX)
+            if spaceKeyDown { xCoord = oldXCoord + (xCoord - oldXCoord) * 0.01 }
+            xCoord = clamp(xCoord,0,pSize)
+            winHandler.widgetPointer(selectedWindow).data[selectedRow].setRatio(xCoord / pSize)
+
             decodeSelectionIndex(getPanelWidgetIndex(panelIndex,1))
-            var y = Float(p.minY - pt.y)
-            if y < 0 { y = 0 } else if y > pSize { y = pSize }
-            winHandler.widgetPointer(selectedWindow).data[selectedRow].setRatio(y / pSize)
-            
+            oldYCoord = yCoord
+            yCoord = Float(p.minY - pt.y)
+            if spaceKeyDown { yCoord = oldYCoord + (yCoord - oldYCoord) * 0.01 }
+            yCoord = clamp(yCoord,0,pSize)
+            winHandler.widgetPointer(selectedWindow).data[selectedRow].setRatio(yCoord / pSize)
+
             winHandler.refreshWidgetsAndImage()
             refresh()
         }

@@ -21,6 +21,8 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     var lightAngle:Float = 0
     var palletteIndex:Int = 0
     var texture:MTLTexture! = nil
+    var repeatCount = Int()
+    var scrollWheelClickedCount = Int()
     
     @IBOutlet var instructions: NSTextField!
     @IBOutlet var instructionsG: InstructionsG!
@@ -149,6 +151,12 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.skip += 1
         }
         
+        if repeatCount > 0 && !metalView.viewIsDirty {
+            repeatCount -= 1
+            vcColor.randomizeColorSettings()
+            isDirty = true
+        }
+        
         if isDirty {
             flagViewToRecalcFractal()
         }
@@ -201,6 +209,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     
     /// reset widget focus index, update window title, recalc fractal.  Called after Load and LoadNext
     func controlJustLoaded() {
+        undoReset()
         defineWidgetsForCurrentEquation()
         widget.focus = 0
         updateWindowTitle()
@@ -1010,33 +1019,61 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
                 control.dz = 3.000
             }
         case EQU_33_GAZ_19 :
-            control.camera = SIMD3<Float>(-0.01336822, 4.770886, -0.29477775)
-            updateShaderDirectionVector( SIMD3<Float>(0.0027407147, -0.99560505, 0.09361113) )
-            control.isteps = 6
-            control.cx = -4.451
-            control.cy = 10.347
-            control.cz = 6.600
-            control.cw = 19.000
-            control.dx = -1.120
-            control.dy = 16.460
-            control.dz = 19.500
-            control.bright = 2.140
-            control.contrast = 0.140
+//            control.camera = SIMD3<Float>(-0.01336822, 4.770886, -0.29477775)
+//            updateShaderDirectionVector( SIMD3<Float>(0.0027407147, -0.99560505, 0.09361113) )
+//            control.isteps = 6
+//            control.cx = -4.451
+//            control.cy = 10.347
+//            control.cz = 6.600
+//            control.cw = 19.000
+//            control.dx = -1.120
+//            control.dy = 16.460
+//            control.dz = 19.500
+//            control.bright = 2.140
+//            control.contrast = 0.140
+//            control.specular = 0.000
+//
+//            if control.doInversion {
+//                control.camera = simd_float3( 0.017274715 , 0.904729 , -0.051788263 )
+//                updateShaderDirectionVector(simd_float3( 0.0027407147 , -0.99560505 , 0.09361113 ))
+//                control.InvCenter = simd_float3(0.028, 0.660, -0.044)
+//                control.InvRadius = 0.350
+//                control.InvAngle = -1.530
+//                control.cx = -5.201
+//                control.cy = 10.557
+//                control.cz = 6.400
+//                control.cw = 10.500
+//                control.dx = -2.560
+//                control.dy = 16.080
+//                control.dz = 19.770
+//            }
+        
+            control.camera = SIMD3<Float>(1.5076702, 4.643819, -1.0596257)
+            updateShaderDirectionVector( SIMD3<Float>(0.001503774, -0.998679, 0.0513625) )
+            control.isteps = 9
+            control.cx = -3.703
+            control.cy = 0.379
+            control.cz = 2.332
+            control.cw = 1.916
+            control.dx = 4.253
+            control.dy = 4.069
+            control.bright = 1.010
+            control.contrast = 0.260
             control.specular = 0.000
             
             if control.doInversion {
-                control.camera = simd_float3( 0.017274715 , 0.904729 , -0.051788263 )
-                updateShaderDirectionVector(simd_float3( 0.0027407147 , -0.99560505 , 0.09361113 ))
-                control.InvCenter = simd_float3(0.028, 0.660, -0.044)
-                control.InvRadius = 0.350
-                control.InvAngle = -1.530
-                control.cx = -5.201
-                control.cy = 10.557
-                control.cz = 6.400
-                control.cw = 10.500
-                control.dx = -2.560
-                control.dy = 16.080
-                control.dz = 19.770
+                control.camera = simd_float3( -0.007168062 , 1.2144068 , 0.05787508 )
+                updateShaderDirectionVector(simd_float3( 0.0015037737 , -0.9986788 , 0.051362492 ))
+                control.InvCenter = simd_float3(0.100, 0.100, 0.100)
+                control.InvRadius = 0.300
+                control.InvAngle = 0.100
+                control.isteps = 8
+                control.cx = -3.473
+                control.cy = 0.409
+                control.cz = 2.832
+                control.cw = 2.116
+                control.dx = 4.273
+                control.dy = 4.019
             }
         default : break
         }
@@ -1178,6 +1215,8 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             }
         }
         
+        if let v = vcMemory { v.addImage(metalView.currentDrawable!.texture) }
+        
         if control.skip > 1 {   // 'fast' renders will have ~50% utilization
             timeInterval = NSDate().timeIntervalSince(start as Date)
         }
@@ -1234,6 +1273,13 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         mouseDrag2DImage(true)
     }
     
+    //MARK: -
+    
+    override func scrollWheel(with event: NSEvent) {
+        jogCameraAndFocusPosition(0,0,Int(event.deltaY * 5))
+        scrollWheelClickedCount = 2
+    }
+    
     var control2 = Control()
     
     override func mouseUp(with event: NSEvent) { jogRelease(1,1,1) }
@@ -1251,6 +1297,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     var optionKeyDown:Bool = false
     var cmdKeyDown:Bool = false
     var speed1000:Bool = false
+    var performingUndo:Bool = false
     
     func updateModifierKeyFlags(_ ev:NSEvent) {
         let rv = ev.modifierFlags.intersection(.deviceIndependentFlagsMask).rawValue
@@ -1273,12 +1320,12 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             flagViewToRecalcFractal()
         }
         
-        isKeyDown = true
-        
+        performingUndo = false
         updateModifierKeyFlags(event)
         widget.updateAlterationSpeed(event)
         
         if widget.keyPress(event) {
+            undoPush()
             setShaderToFastRender()
             updateWindowTitle()
             return
@@ -1308,6 +1355,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             case "2" : winHandler.setWindowFocus(1)
             case "3" : winHandler.setWindowFocus(2)
             case "4" : winHandler.setWindowFocus(3)
+            case "5" : winHandler.setWindowFocus(4)
             default : break
             }
             return
@@ -1342,9 +1390,6 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             if(palletteIndex > 3) { palletteIndex = 0 }
             flagViewToRecalcFractal()
             
-        case "B" : control.bcx = !control.bcx; toggle2()
-        case "F" : control.bcz = !control.bcz; toggle2()
-        case "K" : control.bcx = !control.bcx; toggle2()
         case "P" :
             if control.txtOnOff {
                 control.txtOnOff = false
@@ -1360,32 +1405,8 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             instructionsG.isHidden = !instructionsG.isHidden
         case "H" : setControlParametersToRandomValues(); flagViewToRecalcFractal()
         case "V" : displayControlParametersInConsoleWindow()
-        case "Q" :
-            speed1000 = true
-        case "W" :
-            control.doInversion = !control.doInversion
-            control.bdx = !control.bdx
-            toggle2()
-        case "E" :
-            control.bcz = !control.bcz
-            control.bdy = !control.bdy
-            toggle2()
-        case "R" :
-            control.bcw = !control.bcw
-            control.bdz = !control.bdz
-            toggle2()
-        case "T" :
-            control.bdx = !control.bdx
-            control.bdw = !control.bdw
-            toggle2()
-        case "Y" :
-            control.bdy = !control.bdy
-            control.bex = !control.bex
-            toggle2()
-        case "U" :
-            control.bdz = !control.bdz
-            control.bey = !control.bey
-            toggle2()
+        case "Q" : speed1000 = true
+        case "U" : performingUndo = true; undoPop()
         case "G" :
             control.colorScheme += 1
             if control.colorScheme > 7 { control.colorScheme = 0 }
@@ -1405,10 +1426,13 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     }
     
     override func keyUp(with event: NSEvent) {
-        
-        isKeyDown = false
-        
         super.keyUp(with: event)
+        
+        if performingUndo {
+            performingUndo = false
+            control.skip = 1
+            flagViewToRecalcFractal()
+        }
         
         switch event.charactersIgnoringModifiers!.uppercased() {
         case "4","$","5","%" : jogRelease(1,0,0)
@@ -1425,7 +1449,6 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     /// update 2D fractal camera position
     
     var jogAmount:simd_float3 = simd_float3()
-    var isKeyDown:Bool = false
     
     func jogCameraAndFocusPosition(_ dx:Int, _ dy:Int, _ dz:Int) {
         if dx != 0 { jogAmount.x = Float(dx) * alterationSpeed * 0.01 }
@@ -1440,6 +1463,11 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     }
     
     func performJog() -> Bool {
+        if scrollWheelClickedCount > 0 {
+            scrollWheelClickedCount -= 1
+            if scrollWheelClickedCount == 0 { jogAmount.z = 0 }
+        }
+        
         if jogAmount.x == 0 && jogAmount.y == 0 && jogAmount.z == 0 { return false}
         
         if ctrlKeyDown {
@@ -1565,6 +1593,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.fw = fRandom3()
         }
         
+        undoPush()
         updateWindowTitle()
     }
     
@@ -1894,7 +1923,16 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
 //            widget.addFloat("dy",&control.dy, -20,30,0.1)
 //            widget.addFloat("dz",&control.dz, 0,20,0.1)
         case EQU_33_GAZ_19 :
-            widget.addInt32("Iterations",&control.isteps,3,10,1)
+//            widget.addInt32("Iterations",&control.isteps,3,10,1)
+//            widget.addFloat("cx",&control.cx, -20,20,0.01)
+//            widget.addFloat("cy",&control.cy, -20,20,0.01)
+//            widget.addFloat("cz",&control.cz, -20,20,0.1)
+//            widget.addFloat("cw",&control.cw, -20,20,0.1)
+//            widget.addFloat("OffsetX",&control.dx, -30,30,0.01)
+//            widget.addFloat("OffsetY",&control.dy, -30,30,0.01)
+//            widget.addFloat("OffsetZ",&control.dz, -30,30,0.01)
+
+            widget.addInt32("Iterations",&control.isteps,1,30,1)
             widget.addFloat("cx",&control.cx, -20,20,0.01)
             widget.addFloat("cy",&control.cy, -20,20,0.01)
             widget.addFloat("cz",&control.cz, -20,20,0.1)
@@ -1902,6 +1940,9 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addFloat("OffsetX",&control.dx, -30,30,0.01)
             widget.addFloat("OffsetY",&control.dy, -30,30,0.01)
             widget.addFloat("OffsetZ",&control.dz, -30,30,0.01)
+            widget.addFloat("ex",&control.ex, -20,20,0.01)
+            widget.addFloat("ey",&control.ey, -20,20,0.01)
+            widget.addFloat("ez",&control.ez, -20,20,0.01)
         default : break
         }
         
@@ -2131,6 +2172,31 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             }
         }
     }
+    
+    
+    //MARK: -
+    //MARK: - Undo
+    
+    let MAXUNDO:Int = 500
+    
+    var undo:[Control] = []
+    
+    func undoReset() {
+        undo.removeAll()
+    }
+    
+    func undoPush() {
+        undo.append(control)
+        if undo.count == MAXUNDO { undo.removeFirst() }
+    }
+    
+    func undoPop() {
+        if undo.count > 0 {
+            control = undo.last!
+            undo.removeLast()
+            flagViewToRecalcFractal()
+        }
+    }
 }
 
 //MARK: -
@@ -2160,5 +2226,48 @@ extension NSMutableAttributedString {
         let normal = NSAttributedString(string: text + "\n")
         append(normal)
         return self
+    }
+}
+
+// https://stackoverflow.com/questions/33844130/take-a-snapshot-of-current-screen-with-metal-in-swift
+extension MTLTexture {
+    func bytes() -> UnsafeMutableRawPointer {
+        let width = self.width
+        let height   = self.height
+        let rowBytes = self.width * 4
+        let p = malloc(width * height * 4)
+        
+        self.getBytes(p!, bytesPerRow: rowBytes, from: MTLRegionMake2D(0, 0, width, height), mipmapLevel: 0)
+        
+        return p!
+    }
+    
+    func toImage() -> CGImage? {
+        let p = bytes()
+        
+        let pColorSpace = CGColorSpaceCreateDeviceRGB()
+        
+        let rawBitmapInfo = CGImageAlphaInfo.noneSkipFirst.rawValue | CGBitmapInfo.byteOrder32Little.rawValue
+        let bitmapInfo:CGBitmapInfo = CGBitmapInfo(rawValue: rawBitmapInfo)
+        
+        let selftureSize = self.width * self.height * 4
+        let rowBytes = self.width * 4
+        let releaseMaskImagePixelData: CGDataProviderReleaseDataCallback = { (info: UnsafeMutableRawPointer?, data: UnsafeRawPointer, size: Int) -> () in
+            return
+        }
+        let provider = CGDataProvider(dataInfo: nil, data: p, size: selftureSize, releaseData: releaseMaskImagePixelData)
+        let cgImageRef = CGImage(width: self.width, height: self.height, bitsPerComponent: 8, bitsPerPixel: 32, bytesPerRow: rowBytes, space: pColorSpace, bitmapInfo: bitmapInfo, provider: provider!, decode: nil, shouldInterpolate: true, intent: CGColorRenderingIntent.defaultIntent)!
+        
+        return cgImageRef
+    }
+    
+    func toNSImage(_ sz:NSSize) -> NSImage? {
+        return NSImage(cgImage:toImage()!, size:sz)
+    }
+}
+
+extension NSImageView {
+    func imageFromTexture(_ tt:MTLTexture) {
+        image = tt.toNSImage(frame.size)!
     }
 }
