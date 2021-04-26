@@ -143,7 +143,7 @@
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="91" id="vPx-gh-eMQ"/>
                                 </constraints>
-                                <buttonCell key="cell" type="push" title="Date Asc" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="8FP-CA-pqV">
+                                <buttonCell key="cell" type="push" title="&lt;D&gt;ate Asc" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="8FP-CA-pqV">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -152,11 +152,11 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mbq-kQ-qgX">
-                                <rect key="frame" x="434" y="9" width="94" height="32"/>
+                                <rect key="frame" x="418" y="9" width="110" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="70" id="2iq-5r-euL"/>
                                 </constraints>
-                                <buttonCell key="cell" type="push" title="Save New" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="x98-6w-hYN">
+                                <buttonCell key="cell" type="push" title="&lt;S&gt;ave New" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="x98-6w-hYN">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -269,7 +269,7 @@
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="66" id="lEE-vj-FBp"/>
                                 </constraints>
-                                <buttonCell key="cell" type="push" title="Kind" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="qKh-ig-Kj0">
+                                <buttonCell key="cell" type="push" title="&lt;K&gt;ind" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="qKh-ig-Kj0">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -286,11 +286,11 @@
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Kgi-Vd-iAK">
-                                <rect key="frame" x="284" y="9" width="134" height="32"/>
+                                <rect key="frame" x="272" y="9" width="130" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="107" id="9bH-rB-JX1"/>
                                 </constraints>
-                                <buttonCell key="cell" type="push" title="(L) Load Newest" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="CgK-wo-VkO">
+                                <buttonCell key="cell" type="push" title="&lt;L&gt;oad Newest" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="CgK-wo-VkO">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -904,7 +904,8 @@
                         <constraints>
                             <constraint firstItem="rm3-4k-N2w" firstAttribute="leading" secondItem="Lfe-t3-Nrb" secondAttribute="leading" constant="13" id="EUC-eR-v7X"/>
                             <constraint firstAttribute="bottom" secondItem="rm3-4k-N2w" secondAttribute="bottom" constant="20" id="HQA-lI-pgZ"/>
-                            <constraint firstItem="QG2-uV-bIS" firstAttribute="leading" secondItem="rm3-4k-N2w" secondAttribute="trailing" constant="18" id="mAy-gg-uXk"/>
+                            <constraint firstAttribute="trailing" secondItem="QG2-uV-bIS" secondAttribute="trailing" constant="20" id="bh3-kK-zle"/>
+                            <constraint firstItem="QG2-uV-bIS" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="rm3-4k-N2w" secondAttribute="trailing" symbolic="YES" id="mAy-gg-uXk"/>
                             <constraint firstItem="rm3-4k-N2w" firstAttribute="top" secondItem="QG2-uV-bIS" secondAttribute="top" id="nbk-Pl-mrf"/>
                         </constraints>
                     </view>

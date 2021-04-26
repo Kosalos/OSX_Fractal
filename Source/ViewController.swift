@@ -1019,61 +1019,29 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
                 control.dz = 3.000
             }
         case EQU_33_GAZ_19 :
-//            control.camera = SIMD3<Float>(-0.01336822, 4.770886, -0.29477775)
-//            updateShaderDirectionVector( SIMD3<Float>(0.0027407147, -0.99560505, 0.09361113) )
-//            control.isteps = 6
-//            control.cx = -4.451
-//            control.cy = 10.347
-//            control.cz = 6.600
-//            control.cw = 19.000
-//            control.dx = -1.120
-//            control.dy = 16.460
-//            control.dz = 19.500
-//            control.bright = 2.140
-//            control.contrast = 0.140
-//            control.specular = 0.000
-//
-//            if control.doInversion {
-//                control.camera = simd_float3( 0.017274715 , 0.904729 , -0.051788263 )
-//                updateShaderDirectionVector(simd_float3( 0.0027407147 , -0.99560505 , 0.09361113 ))
-//                control.InvCenter = simd_float3(0.028, 0.660, -0.044)
-//                control.InvRadius = 0.350
-//                control.InvAngle = -1.530
-//                control.cx = -5.201
-//                control.cy = 10.557
-//                control.cz = 6.400
-//                control.cw = 10.500
-//                control.dx = -2.560
-//                control.dy = 16.080
-//                control.dz = 19.770
-//            }
-        
-            control.camera = SIMD3<Float>(1.5076702, 4.643819, -1.0596257)
-            updateShaderDirectionVector( SIMD3<Float>(0.001503774, -0.998679, 0.0513625) )
-            control.isteps = 9
-            control.cx = -3.703
-            control.cy = 0.379
-            control.cz = 2.332
-            control.cw = 1.916
-            control.dx = 4.253
-            control.dy = 4.069
-            control.bright = 1.010
-            control.contrast = 0.260
+            control.camera = SIMD3<Float>(-0.65199566, 6.4152403, -0.4299477)
+            updateShaderDirectionVector( SIMD3<Float>(0.001503774, -0.9986789, 0.0513625) )
+            control.isteps = 10
+            control.cx = 5.467
+            control.cy = 4.919
+            control.cz = 12.300
+            control.cw = -12.400
+            control.dx = -6.127
+            control.dy = -2.421
+            control.dz = 5.880
+            control.ex = -12.980
+            control.ey = -10.810
+            control.ez = -6.340
+            control.bright = 1.410
+            control.contrast = 0.300
             control.specular = 0.000
-            
+             
             if control.doInversion {
-                control.camera = simd_float3( -0.007168062 , 1.2144068 , 0.05787508 )
-                updateShaderDirectionVector(simd_float3( 0.0015037737 , -0.9986788 , 0.051362492 ))
-                control.InvCenter = simd_float3(0.100, 0.100, 0.100)
-                control.InvRadius = 0.300
-                control.InvAngle = 0.100
-                control.isteps = 8
-                control.cx = -3.473
-                control.cy = 0.409
-                control.cz = 2.832
-                control.cw = 2.116
-                control.dx = 4.273
-                control.dy = 4.019
+                control.camera = simd_float3( -0.65199566 , 6.4152403 , -0.4299477 )
+                updateShaderDirectionVector(simd_float3( 0.001503774 , -0.9986789 , 0.0513625 ))
+                control.InvCenter = simd_float3(-2.180, 0.120, 0.316)
+                control.InvRadius = 3.280
+                control.InvAngle = 0.080
             }
         default : break
         }
@@ -1923,15 +1891,6 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
 //            widget.addFloat("dy",&control.dy, -20,30,0.1)
 //            widget.addFloat("dz",&control.dz, 0,20,0.1)
         case EQU_33_GAZ_19 :
-//            widget.addInt32("Iterations",&control.isteps,3,10,1)
-//            widget.addFloat("cx",&control.cx, -20,20,0.01)
-//            widget.addFloat("cy",&control.cy, -20,20,0.01)
-//            widget.addFloat("cz",&control.cz, -20,20,0.1)
-//            widget.addFloat("cw",&control.cw, -20,20,0.1)
-//            widget.addFloat("OffsetX",&control.dx, -30,30,0.01)
-//            widget.addFloat("OffsetY",&control.dy, -30,30,0.01)
-//            widget.addFloat("OffsetZ",&control.dz, -30,30,0.01)
-
             widget.addInt32("Iterations",&control.isteps,1,30,1)
             widget.addFloat("cx",&control.cx, -20,20,0.01)
             widget.addFloat("cy",&control.cy, -20,20,0.01)

@@ -128,7 +128,8 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
         widget.addLegend("Blur")
         widget.addFloat("Strength (0 = Off)", &vc.control.blurStrength, 0,500,15)
         widget.addFloat("Distance", &vc.control.blurFocalDistance, 0.001,4,0.02)
-        
+        widget.addFloat("Dimming", &vc.control.blurBright, 0,10,0.1)
+
         widget.addLegend(" ")
         widget.addFloat("Radial Symmetry",&vc.control.radialAngle,0,Float.pi,0.03)
         

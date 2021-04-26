@@ -116,7 +116,7 @@ typedef struct {
     float coloring1,coloring2,coloring3,coloring4,coloring5;
     float coloring6,coloring7,coloring8,coloring9,coloringa;
     
-    float blurFocalDistance,blurStrength;
+    float blurFocalDistance,blurStrength,blurBright;
 
 } Control;
 

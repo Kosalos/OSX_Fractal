@@ -123,7 +123,7 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
         }
         else { dateSort = false }
         
-        DateRadio.title = dateAscending ? "Date Asc" : "Date Desc"
+        DateRadio.title = dateAscending ? "<D>ate Asc" : "<D>ate Desc"
         
         updateSortButtons()
         sortSLEntries()
@@ -210,11 +210,14 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
         }
         
         switch Int32(event.keyCode) {
-        case 53 : dismiss(self)  // Esc
-        case 37 : loadNewestPressed(loadNewestButton) // L
         case UP_ARROW   : changeFocus(-1)
         case DOWN_ARROW : changeFocus(+1)
-        case 36 : loadAndDismissDialog(focus) // <return>
+        case  1 : saveNewPressed(DateRadio)         // S
+        case  2 : radioPressed(DateRadio)           // D
+        case 36 : loadAndDismissDialog(focus)       // <return>
+        case 37 : loadNewestPressed(loadNewestButton) // L
+        case 40 : radioPressed(KindRadio)           // K
+        case 53 : dismiss(self)  // Esc
         default : break
         }
     }
@@ -376,7 +379,9 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
         memorizeControlData()
         
         determineURL(index, usefilenameNumber:true)
-        
+
+        vc.control.blurBright = 0
+
         let data = NSData(contentsOf: fileURL)
         if data == nil { return false } // clicked on empty entry
         

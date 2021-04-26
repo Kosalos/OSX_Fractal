@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		1D09268C223C1248005BC5FC /* EquationPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D09268B223C1248005BC5FC /* EquationPickerViewController.swift */; };
-		1D0DDCDF222F181C00D916F6 /* ArcBall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D0DDCDE222F181B00D916F6 /* ArcBall.swift */; };
 		1D3FB471225519240027DFDF /* VideoRecorderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3FB46F225519240027DFDF /* VideoRecorderViewController.swift */; };
 		1D3FB4742256C78A0027DFDF /* help3.txt in Resources */ = {isa = PBXBuildFile; fileRef = 1D3FB4732256C7890027DFDF /* help3.txt */; };
 		1D40CB4D21F1015F009C73A3 /* Widget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D40CB4C21F1015F009C73A3 /* Widget.swift */; };
@@ -37,7 +36,6 @@
 
 /* Begin PBXFileReference section */
 		1D09268B223C1248005BC5FC /* EquationPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EquationPickerViewController.swift; sourceTree = "<group>"; };
-		1D0DDCDE222F181B00D916F6 /* ArcBall.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArcBall.swift; sourceTree = "<group>"; };
 		1D3FB46F225519240027DFDF /* VideoRecorderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoRecorderViewController.swift; sourceTree = "<group>"; };
 		1D3FB4732256C7890027DFDF /* help3.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = help3.txt; sourceTree = "<group>"; };
 		1D40CB4C21F1015F009C73A3 /* Widget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widget.swift; sourceTree = "<group>"; };
@@ -79,6 +77,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1D52F119263711400093B328 /* Help Files */ = {
+			isa = PBXGroup;
+			children = (
+				1D4650092221B0BB00D14A94 /* HelpViewController.swift */,
+				1D46500B2221B0C400D14A94 /* help.txt */,
+				1D3FB4732256C7890027DFDF /* help3.txt */,
+				1DFFB87F23E501DC0093C78C /* help4.txt */,
+				1D4A5BBC257FEA2100B63E39 /* help5.txt */,
+				1DA43D4E25A103F2004954F9 /* help6.txt */,
+			);
+			path = "Help Files";
+			sourceTree = "<group>";
+		};
 		CFEA3DDE211463D800C7DBD3 = {
 			isa = PBXGroup;
 			children = (
@@ -111,21 +122,15 @@
 				1D95FCFB2308613F00C99D8D /* InstructionsG.swift */,
 				1DAF37B921EAD662000DC9E5 /* Shader.h */,
 				1DFFB87D23E39A380093C78C /* Shader.m */,
-				CFD49CC52115B92300B4C5EB /* MetalView.swift */,
 				1D465007221E88DA00D14A94 /* SaveLoadViewController.swift */,
-				1D4650092221B0BB00D14A94 /* HelpViewController.swift */,
 				1D09268B223C1248005BC5FC /* EquationPickerViewController.swift */,
+				CFD49CC52115B92300B4C5EB /* MetalView.swift */,
 				CFEA3DEA211463D800C7DBD3 /* AppDelegate.swift */,
-				1D0DDCDE222F181B00D916F6 /* ArcBall.swift */,
 				CFEA3DEE211463D900C7DBD3 /* Assets.xcassets */,
+				1D52F119263711400093B328 /* Help Files */,
 				CFEA3DE8211463D800C7DBD3 /* Products */,
 				CFEA3DF0211463D900C7DBD3 /* Main.storyboard */,
 				1D88BAAF233135D300362BA9 /* ColorMap.swift */,
-				1D46500B2221B0C400D14A94 /* help.txt */,
-				1D3FB4732256C7890027DFDF /* help3.txt */,
-				1DFFB87F23E501DC0093C78C /* help4.txt */,
-				1D4A5BBC257FEA2100B63E39 /* help5.txt */,
-				1DA43D4E25A103F2004954F9 /* help6.txt */,
 				CFEA3DF3211463D900C7DBD3 /* Info.plist */,
 				CFEA3DF4211463D900C7DBD3 /* Entitlements.entitlements */,
 			);
@@ -212,7 +217,6 @@
 				1D4A5BBB257D9C3B00B63E39 /* ControlPickerViewController.swift in Sources */,
 				1DA43D4D259EE55B004954F9 /* WindowHandler.swift in Sources */,
 				1D95FCFC2308613F00C99D8D /* InstructionsG.swift in Sources */,
-				1D0DDCDF222F181C00D916F6 /* ArcBall.swift in Sources */,
 				1D88BAB0233135D300362BA9 /* ColorMap.swift in Sources */,
 				1D4A5BB9257D8C8C00B63E39 /* ControlViewController.swift in Sources */,
 				1D3FB471225519240027DFDF /* VideoRecorderViewController.swift in Sources */,

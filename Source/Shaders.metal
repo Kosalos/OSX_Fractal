@@ -912,7 +912,7 @@ float DE_TWISTBOX(float3 pos,device Control &control,thread float4 &orbitTrap) {
 #define slopesinz  control.fw
 
 float DE_VERTEBRAE(float3 pos,device Control &control,thread float4 &orbitTrap) {
-#ifdef SINGLE_EQUATION
+#ifdef zzSINGLE_EQUATION
     return 0;
 #else
     float4 c = 0.5 * float4(control.cx, control.cy, control.cz, control.cw);
@@ -2253,6 +2253,10 @@ kernel void effectsShader
     }
     
     total /= float(bCount);
+    
+    if(control.blurBright > 0) 
+        total *= (1.0 - control.blurBright/10);
+    
     outTexture.write(total,p);
 }
 
