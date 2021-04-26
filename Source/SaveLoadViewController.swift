@@ -380,12 +380,16 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
         
         determineURL(index, usefilenameNumber:true)
 
-        vc.control.blurBright = 0
-
         let data = NSData(contentsOf: fileURL)
         if data == nil { return false } // clicked on empty entry
         
+        let allZeros = Control()
+        vc.control = allZeros
+
         data?.getBytes(&vc.control, length:sz)
+        
+        if vc.control.blurDim != vc.control.blurDim { vc.control.blurDim = 0 }
+        
         updateControlData()
         
         loadNextIndex = index // "load next" will continue after current selection

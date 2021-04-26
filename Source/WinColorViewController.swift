@@ -105,14 +105,21 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
             widget.addFloat("Color 7",&vc.control.coloring7,-1,1,0.01)
             widget.addFloat("Color 8",&vc.control.coloring8,-1,1,0.01)
             widget.addFloat("Color 9",&vc.control.coloring9,-1,1,0.01)
-           // widget.addFloat("Color a",&vc.control.coloringa,-1,1,0.01)
         case 7 :
             widget.addFloat("Color 1",&vc.control.coloring1,0,1,0.01)
             widget.addFloat("Color 2",&vc.control.coloring2,0,1,0.01)
             widget.addFloat("Color 3",&vc.control.coloring3,0,1,0.01)
             widget.addFloat("Color 4",&vc.control.coloring4,0,1,0.01)
+            widget.addFloat("Color 5",&vc.control.coloring5,-1,1,0.01)
+            widget.addFloat("Color 6",&vc.control.coloring6,-1,1,0.01)
+            widget.addFloat("Color 7",&vc.control.coloring7,-1,1,0.01)
+            widget.addInt32("Iterations",&vc.control.icz,1,40,1)
         default : break
         }
+
+        widget.addFloat("Mix X",&vc.control.coloringM1,0,1,0.1)
+        widget.addFloat("Mix Y",&vc.control.coloringM2,0,1,0.1)
+        widget.addFloat("Mix Z",&vc.control.coloringM3,0,1,0.1)
 
         widget.addFloat("Glass",&vc.control.coloringa,0,1,0.01)
 
@@ -128,7 +135,7 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
         widget.addLegend("Blur")
         widget.addFloat("Strength (0 = Off)", &vc.control.blurStrength, 0,500,15)
         widget.addFloat("Distance", &vc.control.blurFocalDistance, 0.001,4,0.02)
-        widget.addFloat("Dimming", &vc.control.blurBright, 0,10,0.1)
+        widget.addFloat("Dimming", &vc.control.blurDim, 0,10,0.1)
 
         widget.addLegend(" ")
         widget.addFloat("Radial Symmetry",&vc.control.radialAngle,0,Float.pi,0.03)

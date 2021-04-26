@@ -1789,10 +1789,10 @@ float3 HSVtoRGB(float3 hsv) {
     return float3(0.);
 }
 
+//MARK: -
 
-float3 palette(float t, float3 a, float3 b, float3 c, float3 d)
-{
-    return a + b*cos( 6.28318*(c*t+d) );
+float3 palette(float t, float3 a, float3 b, float3 c, float3 d) {
+    return a + b * cos(6.28318 * (c*t+d));
 }
 
 float3 doPalette(float val, matrix_float4x4 pType ) {
@@ -1803,7 +1803,6 @@ float3 applyColoring6
 (
  float3 position,
  float3 direction,
- texture2d <float, access::read> vcoloringTexture,
  float3 distAns,
  float3 normal,
  device Control &control)
@@ -1825,99 +1824,41 @@ float3 applyColoring6
     paletteVal[3].x = control.coloring9;
     paletteVal[3].y = control.coloringa;
     
-    float3 refr = refract( direction , normal ,  1. / 1.1 );
-    //    float3 refl = reflect( float3( 0. , 3. , 0. ) , normal );
     float3 refl = reflect( float3( 0. , control.coloring2 , 0. ) , normal );
     refl = normalize( refl );
     
-    ushort2 t1; // ,t2;
-    t1.x = ushort(refr.x);
-    t1.y = ushort(refr.y);
-    // t2.x = ushort(refl.x);
-    //t2.y = ushort(refl.y);
-    
-    float3 refrCol = float3(0.5,0.5,0.5 );  // coloringTexture.read(t1).xyz;
-    //float3 reflCol = float3(0.9,0.6,0.1); // texture( iChannel0, refl ).xyz;
-    
     float reflectVal = pow( max( 0. , dot( refl , direction ) ), control.coloring1 * 50);
-    
-    
-    //float face = pow( (1. -  max(0. , dot( normal , direction ))) , 4. );
-    
     float3 palCol = doPalette( distAns.x / 8, paletteVal );
     float3 refCol = doPalette( reflectVal , paletteVal ) * reflectVal;
     
-    return refCol +  (palCol  * refrCol);
+    return refCol + palCol;
 }
 
 //MARK: -
-// https://www.shadertoy.com/view/MtlyRf
-
-float marbVol(vec3 p,device Control &control)
-{
-    vec3 q = p;
-    float f = 0;
-    int count = int(control.coloring4 * 20);
-    
-    for (int j = 0; j < count; j ++) {
-        q = 0.7 * (abs (q) / dot (q, q) - 1.);
-        q.yz = vec2 (q.y * q.y - q.z * q.z, 2. * q.y * q.z);
-        q = q.zxy;
-        f += exp (-15. * abs (dot (p, q)));
-    }
-    
-    return f;
-}
-
-float SmoothBump (float lo, float hi, float w, float x)
-{
-    return (1. - smoothstep (hi - w, hi + w, x)) * smoothstep (lo - w, lo + w, x);
-}
 
 float3 applyColoring7
 (
- float3 position,
+ float3 p,
  float3 direction,
- texture2d <float, access::read> vcoloringTexture,
  float3 distAns,
  float3 normal,
  device Control &control)
 {
-    float IoR = control.coloring1 * 5;
-    float cosi = dot(direction, normal);
-    float etai = 1.0, etat = IoR;
-    if (cosi > 0.0) {
-        float tmp = etai;
-        etai = etat;
-        etat = tmp;
+    float k,r2,col = 0;
+    float kMax = control.coloring4 / 10;
+    float3 p1,CSize = float3(control.coloring1,control.coloring2,control.coloring3);
+    
+    for( int i=0; i < control.icz;i++ ) {
+        p1 = 2.0 * clamp(p, -CSize, CSize) - p;
+        col += abs(p.z - p1.z);
+        p = p1;
+        r2 = dot(p,p);
+        k = max( 1.1/r2, kMax);
+        p *= k;
     }
-    float sint = etai / etat * sqrt(max(0.0, 1.0 - cosi * cosi));
-    if (sint >= 1.0) return 1.0;
-    float cost = sqrt(max(0.0, 1.0 - sint * sint));
-    cosi = abs(cosi);
-    float sqrtRs = ((etat * cosi) - (etai * cost)) / ((etat * cosi) + (etai * cost));
-    float sqrtRp = ((etai * cosi) - (etat * cost)) / ((etai * cosi) + (etat * cost));
-    return (sqrtRs * sqrtRs + sqrtRp * sqrtRp) / 2.0;
+    
+    return (0.5 + 0.5 * sin(col * vec3(control.coloring5,control.coloring6,control.coloring7)));
 }
-
-//    vec3 col;
-//    float t, dt, c;
-//    col = vec3();
-//    dt = 0.08;
-//    t = 0.;
-//    for (int j = 0; j < 64; j ++) {
-//        t += dt;
-//        c = marbVol(position + t * direction,control);
-//        col = 0.95 * col + 0.05 * vec3 (1.7 * c - 0.7 * c * c, c, 0.4 * c * c * c);
-//    }
-//
-//    col *= 1. -
-//    smoothstep (0.1, 0.3, normal.y) *
-//    smoothstep ( 0., 0.7, normal.z) *
-//    SmoothBump (0.3, 0.5, 0.05, normal.x);
-//
-//    return clamp (col, 0., 1.);
-//}
 
 //MARK: -
 
@@ -1925,25 +1866,24 @@ float3 applyColoring
 (
  float3 position,
  float3 direction,
- texture2d <float, access::read> coloringTexture,
  float3 distAns,
  float3 normal,
  device Control &control)
 {
-    float3 cc,nn,ans = float3();
-    float f1,f2,f3,f4,f5,iterationCount = distAns.y;
+    float3 cc,nn,a2,ans;
+    float f1,f2,f3,f4,f5;
     
     switch(control.colorScheme) {
         case 0 :
             f1 = 1 + control.coloring1 * 100;
             f2 = 1 + control.coloring2 * 10;
-            ans = float3(1 - (normal / f2 + sqrt(iterationCount / f1)));
+            ans = float3(1 - (normal / f2 + sqrt(distAns.y / f1)));
             break;
         case 1 :
             f1 = 5 + control.coloring1 * 10;
             f2 = 5 + control.coloring2 * 20;
             f3 = 0.01 + control.coloring3 * 5;
-            ans = float3(abs(1 - (normal * f3 + sqrt(iterationCount / f1)))) / f2;
+            ans = float3(abs(1 - (normal * f3 + sqrt(distAns.y / f1)))) / f2;
             break;
         case 2 :
             f1 = 5 + control.coloring1 * 10;
@@ -1951,7 +1891,7 @@ float3 applyColoring
             f3 = 0.01 + control.coloring3 * 5;
             f4 = 0.01 + control.coloring4 * 6;
             f5 = control.coloring5 * 2;
-            ans = float3((1 - (normal * f3 + sqrt(iterationCount / f1)))) / f2;
+            ans = float3((1 - (normal * f3 + sqrt(distAns.y / f1)))) / f2;
             cc = 0.5 + 0.5 * cos(f4 * position.z + float3(0.0,1.0,f5) );
             ans = mix(ans,cc,0.5);
             break;
@@ -1959,10 +1899,10 @@ float3 applyColoring
             f1 = 0.01 + control.coloring1 * 0.05;
             f2 = 0.01 + control.coloring2 * 0.1;
             ans = abs(normal) * f1;
-            ans += HSVtoRGB(ans * iterationCount * f2);
+            ans += HSVtoRGB(ans * distAns.y * f2);
             break;
         case 4 :
-            ans = float3(1 - (normal / 10 + sqrt(iterationCount / 80)));
+            ans = float3(1 - (normal / 10 + sqrt(distAns.y / 80)));
             ans.x = (ans.x + ans.y + ans.z)/3;
             ans.y = ans.x;
             ans.z = ans.y;
@@ -1974,13 +1914,18 @@ float3 applyColoring
             ans = hsv2rgb(normalize(0.5 - nn));
             break;
         case 6 :
-            return applyColoring6(position,direction,coloringTexture,distAns,normal,control);
+            ans = applyColoring6(position,direction,distAns,normal,control);
+            break;
         case 7 :
-            return applyColoring7(position,direction,coloringTexture,distAns,normal,control);
+            ans = applyColoring7(position,direction,distAns,normal,control);
+            break;
     }
-    
-    
-    ans = mix(ans,applyColoring7(position,direction,coloringTexture,distAns,normal,control) * control.coloring3,control.coloringa);
+
+    a2 = ans;
+    ans.x = mix(a2.x,a2.y,control.coloringM1);
+    ans.y = mix(a2.y,a2.z,control.coloringM2);
+    ans.z = mix(a2.z,a2.x,control.coloringM3);
+
     return ans;
 }
 
@@ -1992,9 +1937,9 @@ float3 cycle(float3 c, float s, device Control &control) {
 }
 
 float3 getOrbitColor(device Control &control,float4 orbitTrap) {
- //zorro   orbitTrap.w = sqrt(orbitTrap.w);
-    
     float3 orbitColor;
+
+    orbitTrap.w = sqrt(orbitTrap.w);
     
     if (control.Cycles > 0.0) {
         orbitColor =
@@ -2012,26 +1957,6 @@ float3 getOrbitColor(device Control &control,float4 orbitTrap) {
     
     return orbitColor;
 }
-
-
-//        if(c.refractAmount > 0) { // refraction enabled
-//            orbitTrap = float4(10000.0);
-//            direction =  refract(direction, normal,c.refractAmount - 0.5);
-//
-//            distAns2 = shortest_dist(position + direction,direction,c,orbitTrap);
-//
-//            position = camera + distAns2.x * direction;
-//            normal = calcNormal(position,c);
-//        }
-//
-////        // second surface
-////        if(c.secondSurface > 0) {
-////            float3 position = camera + distAns.x * direction;
-////            float3 distAns2 = shortest_dist(position + direction * c.secondSurface,direction,c,orbitTrap);
-////
-////            distAns = mix(distAns,distAns2,c.transparentAmount);
-////        }
-//
 
 //MARK: -
 
@@ -2115,7 +2040,7 @@ kernel void rayMarchShader
             color = coloringTexture.read(pt).xyz;
         }
         
-        color += applyColoring(position,direction,coloringTexture,distAns,normal,c);
+        color += applyColoring(position,direction,distAns,normal,c);
         
         // second surface
         if(c.secondSurface > 0) {
@@ -2128,7 +2053,7 @@ kernel void rayMarchShader
             position = camera + distAns.x * direction;
             normal = calcNormal(position,c);
             
-            float3 color2 = applyColoring(position,direction,coloringTexture,distAns,normal,c);
+            float3 color2 = applyColoring(position,direction,distAns,normal,c);
             color = saturate(color + color2 * c.transparentAmount);
         }
         
@@ -2254,8 +2179,8 @@ kernel void effectsShader
     
     total /= float(bCount);
     
-    if(control.blurBright > 0) 
-        total *= (1.0 - control.blurBright/10);
+    if(control.blurDim > 0) 
+        total *= (1.0 - control.blurDim/10);
     
     outTexture.write(total,p);
 }

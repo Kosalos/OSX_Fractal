@@ -14,8 +14,8 @@
             filePath = "Source/Shaders.metal"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2228"
-            endingLineNumber = "2228"
+            startingLineNumber = "2153"
+            endingLineNumber = "2153"
             landmarkName = "effectsShader ( texture2d&lt;float, access::read&gt; inTexture [[texture(0)]], texture2d&lt;float, access::write&gt; outTexture [[texture(1)]], device Control &amp;control [[buffer(0)]], uint2 p [[thread_position_in_grid]] )"
             landmarkType = "9">
          </BreakpointContent>
@@ -30,9 +30,41 @@
             filePath = "Source/Shaders.metal"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1994"
-            endingLineNumber = "1994"
-            landmarkName = "getOrbitColor(device Control &amp;control,float4 orbitTrap)"
+            startingLineNumber = "1939"
+            endingLineNumber = "1939"
+            landmarkName = "unknown"
+            landmarkType = "0">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "1C61CCE3-BB3E-44A4-8591-E3F4B2110CF0"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Source/Shaders.metal"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1920"
+            endingLineNumber = "1920"
+            landmarkName = "applyColoring ( float3 position, float3 direction, float3 distAns, float3 normal, device Control &amp;control)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "4E2C96F8-4B96-4008-BF96-6D67B5EAB7E4"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Source/Shaders.metal"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1807"
+            endingLineNumber = "1807"
+            landmarkName = "applyColoring6 ( float3 position, float3 direction, float3 distAns, float3 normal, device Control &amp;control)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

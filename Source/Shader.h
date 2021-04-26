@@ -92,7 +92,6 @@ typedef struct {
     float secondSurface;
     float angle1,angle2;
     
-
     // orbit Trap -----------
     float Cycles;
     float OrbitStrength;
@@ -115,9 +114,9 @@ typedef struct {
     float normalOffset;
     float coloring1,coloring2,coloring3,coloring4,coloring5;
     float coloring6,coloring7,coloring8,coloring9,coloringa;
-    
-    float blurFocalDistance,blurStrength,blurBright;
 
+    float blurFocalDistance,blurStrength,blurDim;
+    float coloringM1,coloringM2,coloringM3;
 } Control;
 
 // 3D window ---------------------------------
