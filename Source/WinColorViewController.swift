@@ -12,7 +12,8 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
     
     @IBAction func resetButtonPressed(_ sender: NSButton) {
         randomizeColorSettings()
-        vc.repeatCount = 50
+        vc.repeatCount = 20
+        vc.repeatStyle = 1
     }
 
     func randomizeColorSettings() {
@@ -69,10 +70,10 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
     func defineWidgets() {
         widget.reset(true)
         widget.addFloat("Bright",&vc.control.bright,0.01,10,0.02)
-        widget.addFloat("Enhance",&vc.control.enhance,0,30,0.03)
+        widget.addFloat("Enhance",&vc.control.enhance,0,10,0.03)
         widget.addFloat("Contrast",&vc.control.contrast,0.1,0.7,0.02)
         widget.addFloat("Specular",&vc.control.specular,0,2,0.1)
-        widget.addFloat("Light Position",&vc.lightAngle,-3,3,0.3)
+        widget.addFloat("Light Position",&vc.lightAngle,-4,4,0.3)
         
         widget.addLegend(" ")
         widget.addInt32("Style#",&vc.control.colorScheme,0,7,1,true,98)

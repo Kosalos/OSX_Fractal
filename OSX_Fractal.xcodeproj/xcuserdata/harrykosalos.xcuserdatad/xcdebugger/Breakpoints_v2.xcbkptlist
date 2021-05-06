@@ -14,8 +14,8 @@
             filePath = "Source/Shaders.metal"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2153"
-            endingLineNumber = "2153"
+            startingLineNumber = "1971"
+            endingLineNumber = "1971"
             landmarkName = "effectsShader ( texture2d&lt;float, access::read&gt; inTexture [[texture(0)]], texture2d&lt;float, access::write&gt; outTexture [[texture(1)]], device Control &amp;control [[buffer(0)]], uint2 p [[thread_position_in_grid]] )"
             landmarkType = "9">
          </BreakpointContent>
@@ -30,10 +30,10 @@
             filePath = "Source/Shaders.metal"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1939"
-            endingLineNumber = "1939"
-            landmarkName = "unknown"
-            landmarkType = "0">
+            startingLineNumber = "1757"
+            endingLineNumber = "1757"
+            landmarkName = "getOrbitColor(device Control &amp;control,float4 orbitTrap)"
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -46,8 +46,8 @@
             filePath = "Source/Shaders.metal"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1920"
-            endingLineNumber = "1920"
+            startingLineNumber = "1738"
+            endingLineNumber = "1738"
             landmarkName = "applyColoring ( float3 position, float3 direction, float3 distAns, float3 normal, device Control &amp;control)"
             landmarkType = "9">
          </BreakpointContent>
@@ -62,8 +62,8 @@
             filePath = "Source/Shaders.metal"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1807"
-            endingLineNumber = "1807"
+            startingLineNumber = "1625"
+            endingLineNumber = "1625"
             landmarkName = "applyColoring6 ( float3 position, float3 direction, float3 distAns, float3 normal, device Control &amp;control)"
             landmarkType = "9">
          </BreakpointContent>

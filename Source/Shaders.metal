@@ -148,17 +148,6 @@ void TransA(thread float3 &z, thread float &DF, float a, float b) {
     DF *= iR;
 }
 
-//widget.addInt32("Final Iterations",&control.icx, 1,69,1)
-//widget.addInt32("Box Iterations",&control.icy,1,40,1)
-//widget.addFloat("Box Size X",&control.cz, 0.01,2,0.006)
-//widget.addFloat("Box Size Z",&control.cw, 0.01,2,0.006)
-//widget.addFloat("Klein R",&control.dx, 0.001,2.5,0.005)
-//widget.addFloat("Klein I",&control.dy, 0.001,2.5,0.005)
-//widget.addFloat("Clamp Y",&control.dz, 0.001,2,0.01)
-//widget.addFloat("Clamp DF",&control.dw, 0.001,2,0.03)
-//widget.addBoolean("B: ShowBalls",&control.bcx)
-//widget.addBoolean("F: FourGen",&control.bcz)
-
 float DE_JOSKLEINIAN(float3 z,device Control &control,thread float4 &orbitTrap) {
 #ifdef SINGLE_EQUATION
     return 0;
@@ -673,71 +662,72 @@ float DE_QUATJULIA2(float3 pos,device Control &control,thread float4 &orbitTrap)
 //MARK: - 14 Spudsville
 // spudsville : https://github.com/3Dickulus/FragM/blob/master/Fragmentarium-Source/Examples/Experimental/Spudsville2.frag
 
-void spudsSphereFold(thread float3 &z, thread float &dz,device Control &control) {
-    float r2 = dot(z,z);
-    if (r2< control.cx) {
-        float temp = (control.cy / control.cx);
-        z *= temp;
-        dz *= temp;
-    } else if (r2 < control.cy) {
-        float temp = control.cy /r2;
-        z *= temp;
-        dz *= temp;
-    }
-}
+#define Q1 control.cx
+#define Q2 control.cy
+#define Q3 control.cz
+#define Q4 control.cw
+#define Q5 control.fx
+#define Q6 control.dx
+#define Q7 control.dy
+#define Q8 control.dz
+#define Q9 control.dw
 
-void spudsBoxFold(thread float3 &z, thread float &dz,device Control &control) {
-    z = clamp(z, -control.cz, control.cz) * 2.0 - z;
-}
-
-void spudsBoxFold3(thread float3 &z, thread float &dz,device Control &control) {
-    z = clamp(z, -control.cw,control.cw) * 2.0 - z;
-}
-
-float3 triPow(float power, float3 a);
-
-void spudsPowN2(thread float3 &z, float zr0, thread float &dr,device Control &control) {
-    float zo0 = asin( z.z/zr0 );
-    float zi0 = atan2( z.y,z.x );
-    float zr = pow( zr0, control.fx-1.0 );
-    float zo = zo0 * control.fx;
-    float zi = zi0 * control.fx;
-    dr = zr*dr * control.fx * abs(length(float3(1.0,1.0,control.dx)/sqrt(3.0))) + 1.0;
-    zr *= zr0;
-    z = zr*float3( cos(zo)*cos(zi), cos(zo)*sin(zi), control.dx * sin(zo) );
+float3 spudsBoxFold(float3 pos, float fold, float mult) {
+    return clamp(pos, -fold, fold) * mult - pos;
 }
 
 float DE_SPUDS(float3 pos,device Control &control,thread float4 &orbitTrap) {
-#ifdef SINGLE_EQUATION
+#ifdef zSINGLE_EQUATION
     return 0;
 #else
-    int i = 0;
+    int n = 0;
     float dz = 1.0;
-    float r = 1;
+    float temp,r2,r = length(pos);
     
     float3 ot,trap = control.otFixed;
     if(control.orbitStyle == 2) trap -= pos;
     
-    while(r < 10 && i < control.isteps) {
-        if (i <=  control.isteps/2) {
-            spudsBoxFold(pos,dz,control);
-            spudsSphereFold(pos,dz,control);
-            pos = control.dz * pos;
-            dz *= abs(control.dz);
-            r = length(pos);
+    while(n < control.isteps) {
+        if (n <= control.isteps/2) {
+            pos = spudsBoxFold(pos,Q3,Q9);
+            
+            r2 = dot(pos,pos);
+            if (r2 < Q1) {
+                temp = (Q2 / Q1);
+                pos *= temp;
+                dz *= temp;
+            } else if (r2 < Q2) {
+                temp = Q2 /r2;
+                pos *= temp;
+                dz *= temp;
+            }
+
+            pos *= Q7;
+            dz *= abs(Q7);
         } else {
-            spudsBoxFold3(pos,dz,control);
+            pos = spudsBoxFold(pos,Q4,Q9);
             r = length(pos);
-            spudsPowN2(pos,r,dz,control);
-            pos = control.dw * pos;
-            dz *= abs(control.dw);
+            
+            float zo0 = asin(pos.z / r);
+            float zi0 = atan2(pos.y, pos.x);
+            float zr = pow(r, Q5 - 1.0);
+            float zo = zo0 * Q5;
+            float zi = zi0 * Q5;
+            dz = zr * dz * Q5 * abs(length(float3(1.0,1.0,Q6)/sqrt(3.0))) + 1.0;
+            zr *= r;
+            pos = zr * float3(cos(zo)*cos(zi), cos(zo)*sin(zi), Q6 * sin(zo));
+
+            pos = Q8 * pos;
+            dz *= abs(Q8);
         }
         
+        r = length(pos);
+
         ot = pos;
         if(control.orbitStyle > 0) ot -= trap;
         orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
         
-        i++;
+        n++;
     }
     
     return r * log(r) / dz;
@@ -1183,7 +1173,7 @@ float spuds2018_apollonian(float3 p,device Control &control)
     return 0.25*abs(p.y)/scale;
 }
 
-float spuds2018_box(float3 p, float3 b,device Control &control)
+float boundingBox(float3 p, float3 b)
 {
     float3 d = abs(p) - b;
     return min(max(d.x,max(d.y,d.z)),0.0) + length(max(d,0.0));
@@ -1194,10 +1184,10 @@ float DE_SPUDS2018(float3 p,device Control &control,thread float4 &orbitTrap) {
     return 0;
 #else
     p = rotatePosition(p,1,control.cx);
-    float3 q = p;
     float d0 = spuds2018_apollonian(p * 0.5,control) * control.dz;
     float d1=abs(p.y + 0.2);
-    float d3 = spuds2018_box(q + float3(0.,control.cy,0.), control.cz * float3(control.cw,control.dx,control.dy),control);
+    float d3 = boundingBox(p + float3(0.,control.cy,0.),
+                           control.cz * float3(control.cw,control.dx,control.dy));
     float d = max(d0, d3);
     return min(d,d1);
 #endif
@@ -1246,23 +1236,32 @@ float DE_MANDELNEST(float3 pos,device Control &control,thread float4 &orbitTrap)
     return 0;
 #else
     float r,dr = 1;
-    float2 shift = float2(control.cx * PI);
+    float fx = control.fx;
+    float shift = control.cx;
+    float3 julia = control.julia;
+    float3 deltaJulia = float3(control.dx,control.dy,control.dz);
     
     for(int i=0; i < control.isteps; ++i) {
         r = length(pos);
-        if(r > 200) break;
+        if(r > 3) break;
         
         if(control.bcx && !(i & 2)) {
-            pos = sin(shift.x + control.fx * asin(pos/r));
+            pos = sin(shift + fx * asin(pos/r));
         } else {
-            pos = cos(shift.y + control.fx * acos(pos/r));
+            pos = cos(shift + fx * acos(pos/r));
         }
         
-        pos *= pow(r,control.fx);
-        pos += control.juliaboxMode ? control.julia : pos;
+        pos *= pow(r,fx);
+        pos += control.juliaboxMode ? julia : pos;
         
-        dr = (pow(r, control.fx - 1.0) * control.fx * dr ) + 1.0;
+        dr = pow(r, fx - 1.0) * fx * dr + 1.0;
         
+        shift += control.angle1;
+        fx += control.angle2;
+        
+        if(control.juliaboxMode)
+            julia += deltaJulia;
+
         float4 hk = float4(pos,r);
         orbitTrap = min(orbitTrap, dot(hk,hk));
     }
@@ -1319,16 +1318,10 @@ float DE_ENGINE(float3 pos,device Control &control,thread float4 &orbitTrap) {
     pos -= clamp(pos,-control.cz,control.cz) * 2;
     pos.xy *= rotatePosition2(pos.xy,control.angle1);
     pos.yz *= rotatePosition2(pos.yz,control.angle2);
-//    pos.xz *= rotatePosition2(pos.xz,control.ex);
     
     
     float3 p0 = pos;
-//    pos *= rotatePosition(p0,0,control.ex);
-//    pos *= rotatePosition(p0,1,control.angle1);
-//    pos *= rotatePosition(p0,2,control.angle2);
-
-   // pos = abs(pos);
-     pos = abs(pos + pos * control.dw);
+    pos = abs(pos + pos * control.dw);
     p0 = pos;
     
     float g; // ,loopEnd = 4.+ hash(seed)*6.;
@@ -1481,177 +1474,6 @@ float DE_GAZ_19(float3 p,device Control &control,thread float4 &orbitTrap) {
 #endif
 }
 
-//float DE_GAZ_19(float3 p,device Control &control,thread float4 &orbitTrap) {
-//#ifdef zzzSINGLE_EQUATION
-//    return 0;
-//#else
-//    float e,s = 2;
-//    p = control.cx - abs(p);
-//
-//    p.x < p.z ? p = p.zyx:p;
-//    p.y < p.z ? p = p.xzy:p;
-//    p.x < p.y ? p = p.yxz:p;
-//
-//    for (int i=0; i<control.isteps; i++) {
-//        p = control.cy - abs(p - control.cz);
-//        e = dot(p,p);
-//        e = control.cw * 3 / min(e,control.cw * 2) + control.cw * 2 / min(e,control.cw * 0.5);
-//        s *= e;
-//        p = abs(p) * e - float3(control.dx,control.dy,control.dz);
-//
-//        orbitTrap = min(orbitTrap, float4(abs(p), dot(p,p)));
-//    }
-//    return length(p)/ s - 0.001;
-//#endif
-//}
-
-
-//MARK: - 34 GAZ_18
-// https://www.shadertoy.com/view/wl3fDM
-
-//#define R(p,a,r)mix(a*dot(p,a),p,cos(r))+sin(r)*cross(p,a)
-//void mainImage(out vec4 O, vec2 C)
-//{
-//    O=vec4(0);
-//    vec3 r=iResolution,p;
-//    for(float i=0.,g=0.,e,l,s;
-//        ++i<99.;
-//        e<.003?O.xyz+=mix(
-//                r/r,
-//                cos(vec3(8,3,12)+g*3.)*.5+.5,
-//                .6
-//            )*.9/i:p
-//    )
-//    {
-//        p=vec3(g*(C-.5*r.xy)/r.y,g-2.);
-//        p=R(p,normalize(vec3(1,2,3)),iTime*.2);
-//        p=.7-abs(abs(p-1.+sin(p*.1))-1.);
-//        for(int k=0;k++<2;)
-//            p=abs(p),
-//            p=p.x<p.y?p.zxy:p.zyx;
-//        s=4.;
-//        for(int j=0;j++<4;)
-//            s*=l=2./min(dot(p,p),2.),
-//            p=abs(p)*l-vec3(2,1,3);
-//        g+=e=length(p.yz)/s;
-//    }
-//    O=pow(O,vec4(.8,.6,1.3,1));
-//}
-
-//float DE_GAZ_19(float3 p,device Control &control,thread float4 &orbitTrap) {
-//#ifdef zzzSINGLE_EQUATION
-//    return 0;
-//#else
-//    float l,s = 4;
-//
-////    p = .7 - abs(abs(p-1.+sin(p*.1))-1.);
-//    p = control.cx - abs( abs(p - control.cy + sin(p * control.cz)) - control.cw);
-//
-//    for(int k=0;k < control.isteps;++k) {
-//        p = abs(p);
-//        p = p.x < p.y ? p.zxy :p.zyx;
-//    }
-//
-//    for(int j=0;j < control.isteps*2;++j) {
-//        l = control.dx / min(dot(p,p),control.dy);
-//        s *= l;
-//        p = abs(p) * l - vec3(2,1,3);
-//
-//        orbitTrap = min(orbitTrap, float4(abs(p), dot(p,p)));
-//    }
-//
-//    return length(p)/ s - 0.001;
-//#endif
-//}
-
-//// gaz 21
-//float DE_GAZ_42(float3 p,device Control &control,thread float4 &orbitTrap) {
-//#ifdef zzzSINGLE_EQUATION
-//    return 0;
-//#else
-//    float e,s=2.;
-//    p.y=abs(p.y);
-//
-//    for (int i=0; i<control.isteps; i++) {
-//        p.xz=abs(p.xz) - control.cx;
-//        p.z>p.x?p=p.zyx:p;
-//        p.z = control.cy - abs(p.z -control.cz + sin(p.z) * control.cw);
-//        p.y>p.x?p=p.yxz:p;
-//
-////        p.x =3.-abs(p.x-5.+sin(p.x*3.)*.2);
-//        p.x = control.dx - abs(p.x - control.dy + sin(p.x * control.dz) * control.dw);
-//
-//        p.y>p.x?p=p.yxz:p;
-//
-////        p.y = .9-abs(p.y-.4);
-//        p.y = control.ex - abs(p.y - control.ey);
-//
-//
-//        e=12.*clamp(.3/min(dot(p,p),1.),.0,1.)+ 2.*clamp(.1/min(dot(p,p),1.),.0,1.);
-//        p=e*p-vec3(7,1,1);
-//        s*=e;
-//    }
-//
-//    return length(p)/ s - 0.001;
-//#endif
-//}
-
-// 9
-//float DE_GAZ_42(float3 p,device Control &control,thread float4 &orbitTrap) {
-//#ifdef zzzSINGLE_EQUATION
-//    return 0;
-//#else
-//    vec3 k = vec3(5,2,1);
-//    float r,dr = 1;
-//
-//    for (int i=0; i<control.isteps; i++) {
-//        p.xz=abs(p.xz);
-//        p.xz=p.z>p.x?p.zx:p.xz;
-//        p.z = control.cy - abs(p.z - control.cy);
-//        p.xy=p.y>p.x?p.yx:p.xy;
-//        p.x -= control.cz;
-//        p.xy=p.y>p.x?p.yx:p.xy;
-//        p.y += control.cw;
-//
-//        p =k+(p-k) * control.dx;
-//
-//        r = length(p);
-//        if(r > 200) break;
-//
-//        dr = (pow(r, control.cx - 1.0) * control.cx * dr ) + 1.0;
-//
-//        orbitTrap = min(orbitTrap, float4(abs(p), dot(p,p)));
-//    }
-//
-//    return 0.25 * log(r) * r/dr;
-//#endif
-//}
-
-
-////// gaz 31   not interesting
-//float DE_BONEYTUNNEL(float3 p,device Control &control,thread float4 &orbitTrap) {
-//#ifdef zzzSINGLE_EQUATION
-//    return 0;
-//#else
-//    float e,s = 1;
-//    e = control.cz/min(dot(p,p),control.cw);
-//    s *= e;
-//
-//    for (int i=0; i<control.isteps; i++) {
-//        p.x = control.dx - abs(p.x - control.dy);
-//        p.y = control.dz - abs(p.y - control.dw);
-//        p.z = control.ex - abs(p.z - control.ey);
-//
-//        e = control.cx / min(dot(p,p),control.cy);
-//        s *= e;
-//        p = abs(p) * e;
-//
-//        orbitTrap = min(orbitTrap, float4(abs(p), dot(p,p)));
-//    }
-//    return length(p)/ s - 0.001;
-//#endif
-//}
-
 //MARK: - distance estimate
 // ===========================================
 
@@ -1726,10 +1548,6 @@ float3 shortest_dist(float3 eye, float3 marchingDirection,device Control &contro
     for(; i < MAX_MARCHING_STEPS; ++i) {
         dist = DE(eye + ans.x * marchingDirection,control,orbitTrap);
         if(dist < MIN_DIST) break;
-        //            if(secondSurface == 0.0) break;     // secondSurface is disabled (equals 0), or has already been used
-        //            ans.x += secondSurface;             // move along ray, and start looking for 2nd surface
-        //            secondSurface = 0;                  // set to zero as 'already been used' marker
-        //        }
         
         ans.x += dist;
         if(ans.x >= MAX_DIST) break;

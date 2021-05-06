@@ -273,6 +273,7 @@ class Widget {
         
         switch Int32(event.keyCode) {
         case LEFT_ARROW :
+            if focus < 0 { break }
             lastKeypressWasArrowKey = true
             if data[focus].alterValue(-1) {
                 vc.flagViewToRecalcFractal()
@@ -281,6 +282,7 @@ class Widget {
                 changeMade = true
             }
         case RIGHT_ARROW :
+            if focus < 0 { break }
             lastKeypressWasArrowKey = true
             if data[focus].alterValue(+1) {
                 vc.flagViewToRecalcFractal()

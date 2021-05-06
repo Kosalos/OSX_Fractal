@@ -22,6 +22,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     var palletteIndex:Int = 0
     var texture:MTLTexture! = nil
     var repeatCount = Int()
+    var repeatStyle = Int()
     var scrollWheelClickedCount = Int()
     
     @IBOutlet var instructions: NSTextField!
@@ -153,7 +154,8 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         
         if repeatCount > 0 && !metalView.viewIsDirty {
             repeatCount -= 1
-            vcColor.randomizeColorSettings()
+            if repeatStyle == 1 { vcColor.randomizeColorSettings() }
+            if repeatStyle == 2 { setControlParametersToRandomValues() }
             isDirty = true
         }
         
@@ -529,8 +531,8 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             control.cz = 2.0900004
             control.cw = 2.1300004
             control.dx = 2.2099998
-            control.dz = 0.61
-            control.dw = 4.049999
+            control.dy = 0.61
+            control.dz = 4.049999
             control.fx = 1.2000002
             control.isteps = 9
             control.bright = 2.3600001
@@ -544,8 +546,8 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
                 control.cz = 1.2500002
                 control.cw = 2.1300004
                 control.dx = 2.51
-                control.dz = 0.61
-                control.dw = 4.049999
+                control.dy = 0.61
+                control.dz = 4.049999
                 control.fx = 1.2000002
                 control.InvCx =  0.40399995
                 control.InvCy =  -0.398
@@ -1371,7 +1373,9 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         case " " :
             instructions.isHidden = !instructions.isHidden
             instructionsG.isHidden = !instructionsG.isHidden
-        case "H" : setControlParametersToRandomValues(); flagViewToRecalcFractal()
+        case "H" :
+            repeatCount = 20
+            repeatStyle = 2
         case "V" : displayControlParametersInConsoleWindow()
         case "Q" : speed1000 = true
         case "U" : performingUndo = true; undoPop()
@@ -1389,6 +1393,11 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         case ".",">" : adjustWindowSize(+1)
         case "[" : launchVideoRecorder()
         case "]" : if let vr = vr { vr.addKeyFrame() }
+            
+        case "S" :
+            if let s = saveLoadViewController {
+                s.saveNewPressed(s.saveNewButton)
+            }
         default : break
         }
     }
@@ -1706,25 +1715,17 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addFloat("Offset X",&control.juliaX,-15,15,0.1)
             widget.addFloat("Offset Y",&control.juliaY,-15,15,0.1)
             widget.addFloat("Offset Z",&control.juliaZ,-15,15,0.1)
-            //        case EQU_14_SPUDS :
-            //            widget.addInt32("Iterations",&control.isteps,2,30,1)
-            //            widget.addFloat("Power",&control.fx,0.5,20,0.1)
-            //            widget.addFloat("MinRad",&control.cx,0.01,8,0.1)
-            //            widget.addFloat("FixedRad",&control.cy,0.01,8,0.02)
-            //            widget.addFloat("Fold Limit",&control.cz,0.01,8,0.02)
-            //            widget.addFloat("Fold Limit2",&control.cw,0.01,8,0.02)
-            //            widget.addFloat("ZMUL",&control.dx,0.01,8,0.1)
-            //            widget.addFloat("Scale",&control.dz,0.01,8,0.1)
-        //            widget.addFloat("Scale2",&control.dw,0.01,8,0.1)
         case EQU_14_SPUDS :
-            widget.addInt32("Iterations",&control.isteps,2,60,1)
-            widget.addFloat("X",&control.cx,-3,3,0.01)
-            widget.addFloat("Y",&control.cy,0.01,10,0.01)
-            widget.addFloat("Z",&control.cz,0.01,10,0.01)
-            widget.addFloat("W",&control.cw,0.01,10,0.01)
-            widget.addFloat("X",&control.dx,0.01,10,0.01)
-            widget.addFloat("Y",&control.dy,0.01,10,0.01)
-            widget.addFloat("Z",&control.dz,0.01,10,0.01)
+            widget.addInt32("Iterations",&control.isteps,2,20,1)
+            widget.addFloat("Q1",&control.cx,-6,6,0.02)
+            widget.addFloat("Q2",&control.cy,0.01,16,0.02)
+            widget.addFloat("Q3",&control.cz,-6,6,0.02)
+            widget.addFloat("Q4",&control.cw,-6,6,0.02)
+            widget.addFloat("Q5",&control.fx,-6,6,0.02)
+            widget.addFloat("Q6",&control.dx,0.01,16,0.02)
+            widget.addFloat("Q7",&control.dy,-6,6,0.02)
+            widget.addFloat("Q8",&control.dz,-6,6,0.02)
+            widget.addFloat("Q9",&control.dw,-6,6,0.02)
         case EQU_15_FLOWER :
             widget.addInt32("Iterations",&control.isteps,2,30,1)
             widget.addFloat("Scale",&control.cx,0.5,3,0.01)
@@ -1817,12 +1818,11 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addInt32("Iterations",&control.isteps,2,30,1)
             widget.addFloat("X",&control.cx,-3,3,0.01)
             widget.addFloat("Z",&control.dz,0.01,10,0.01)
-            
-            widget.addFloat("Box1",&control.cy,0.01,3,0.01)
-            widget.addFloat("Box2",&control.cz,0.01,3,0.01)
-            widget.addFloat("Box3",&control.cw,0.01,3,0.01)
-            widget.addFloat("Box4",&control.dx,0.01,3,0.01)
-            widget.addFloat("Box5",&control.dy,0.01,3,0.01)
+            widget.addFloat("Box1",&control.cy,0.01,10,0.01)
+            widget.addFloat("Box2",&control.cz,0.01,10,0.01)
+            widget.addFloat("Box3",&control.cw,0.01,10,0.01)
+            widget.addFloat("Box4",&control.dx,0.01,10,0.01)
+            widget.addFloat("Box5",&control.dy,0.01,10,0.01)
         case EQU_26_KALEIDO :
             widget.addInt32("Iterations",&control.isteps,10,200,1)
             widget.addFloat("Scale",&control.cx,0.5,2,0.0005)
@@ -1836,6 +1836,12 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addFloat("CX",&control.cx,-2,10,0.1)
             widget.addBoolean("Switch",&control.bcx)
             juliaGroup(8,0.01)
+            widget.addFloat("Angle1",&control.angle1,-4,4,0.05)
+            widget.addFloat("Angle2",&control.angle2,-4,4,0.05)
+            widget.addFloat("J1",&control.dx,-1,1,0.01)
+            widget.addFloat("J2",&control.dy,-1,1,0.01)
+            widget.addFloat("J3",&control.dz,-1,1,0.01)
+
         case EQU_28_KALI_RONTGEN :
             widget.addInt32("Iterations",&control.isteps,1,30,1)
             widget.addFloat("X",&control.cx, -10,10,0.01)
@@ -1880,16 +1886,6 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addFloat("Y2",&control.dw, -20,20,0.01)
             widget.addFloat("Z1",&control.ex, -20,20,0.01)
             widget.addFloat("Z2",&control.ey, -20,20,0.01)
-
-//            widget.addInt32("Iterations",&control.isteps,1,60,1)
-//            widget.addInt32("Transit",&control.icx,1,20,1)
-//            widget.addFloat("cx",&control.cx, -20,20,0.01)
-//            widget.addFloat("cy",&control.cy, -20,20,0.1)
-//            widget.addFloat("cz",&control.cz, 0,30,0.1)
-//            widget.addFloat("cw",&control.cw, 0,30,0.1)
-//            widget.addFloat("dx",&control.dx, -20,20,0.1)
-//            widget.addFloat("dy",&control.dy, -20,30,0.1)
-//            widget.addFloat("dz",&control.dz, 0,20,0.1)
         case EQU_33_GAZ_19 :
             widget.addInt32("Iterations",&control.isteps,1,30,1)
             widget.addFloat("cx",&control.cx, -20,20,0.01)

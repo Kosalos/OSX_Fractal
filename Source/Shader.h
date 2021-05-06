@@ -20,6 +20,7 @@ enum {
 
 #define NUM_LIGHT   3
 
+#define ESC_KEY      53
 #define HOME_KEY    115
 #define END_KEY     119
 #define PAGE_UP     116

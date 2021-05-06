@@ -9,20 +9,6 @@ let MXS = Int(10)
 let MYS = Int(10)
 let MTOTAL = MXS * MYS
 
-//class MemoryView : NSImageView {
-//    init() {
-//        super.init(frame: frame:CGRect(x:xp, y:yp, width:MSZ, height:MSZ)))
-//    }
-//
-//    required init(coder: NSCoder) {
-//        super.init(coder: coder)!
-//    }
-//
-//    override func keyDown(with event: NSEvent) {
-//        print(self.frame.debugDescription)
-//    }
-//}
-
 struct MemoryData {
     var image = NSImageView()
     var control = Control()
@@ -46,7 +32,7 @@ class MemoryViewController: NSViewController, NSWindowDelegate {
                 let xp = MXB + CGFloat(x) * (MMARGIN + MSZ)
                 
                 var d = MemoryData()
-                d.image = NSImageView.init(frame:CGRect(x:xp, y:yp, width:MSZ, height:MSZ)) // as! MemoryView
+                d.image = NSImageView.init(frame:CGRect(x:xp, y:yp, width:MSZ, height:MSZ))
                 d.control = vc.control
                 
                 data.append(d)
@@ -83,7 +69,16 @@ class MemoryViewController: NSViewController, NSWindowDelegate {
         }
     }
     
-    override func keyDown(with event: NSEvent) { vc.keyDown(with:event) }
+    override func keyDown(with event: NSEvent) {
+        switch Int32(event.keyCode) {
+        case ESC_KEY :
+            vc.repeatCount = 0
+        default : break
+        }
+
+        vc.keyDown(with:event)
+    }
+
     override func keyUp(with event: NSEvent) { vc.keyUp(with:event) }
 }
 

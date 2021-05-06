@@ -20,7 +20,7 @@ let populatedCellBackgroundColor = NSColor(red:0.1,  green:0.5,  blue:0.1, alpha
 let noFileString = "** unused **"
 private var focus:Int = 0
 
-protocol SLCellDelegate: class {
+protocol SLCellDelegate: AnyObject {
     func didTapOverwriteButton(_ sender: NSButton)
     func didTapDeleteButton(_ sender: NSButton)
 }
@@ -80,6 +80,7 @@ var loadNextIndex:Int = -1   // first use will bump this to zero
 var slEntry:[SLEntry] = []
 var dateSort:Bool = true
 var dateAscending:Bool = false
+var saveLoadViewController:SaveLoadViewController! = nil
 
 class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableViewDelegate,SLCellDelegate {
     @IBOutlet var legend: NSTextField!
@@ -191,6 +192,8 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        saveLoadViewController = self
+        
         tv = scrollView.documentView as? NSTableView
         tv.dataSource = self
         tv.delegate = self
@@ -386,10 +389,9 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
         let allZeros = Control()
         vc.control = allZeros
 
-        data?.getBytes(&vc.control, length:sz)
-        
+        data?.getBytes(&vc.control, length:data!.length)
         if vc.control.blurDim != vc.control.blurDim { vc.control.blurDim = 0 }
-        
+
         updateControlData()
         
         loadNextIndex = index // "load next" will continue after current selection
