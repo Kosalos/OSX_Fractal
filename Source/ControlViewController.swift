@@ -17,14 +17,21 @@ class ControlViewController: NSViewController {
     @IBOutlet var panel2: ControlPanelView!
     @IBOutlet var panel3: ControlPanelView!
     @IBOutlet var panel4: ControlPanelView!
-    @IBAction func x1(_ sender: NSButton) { panelIndex = 0; selectIndex = 0;    presentPopover("ControlPickerVC") }
-    @IBAction func y1(_ sender: NSButton) { panelIndex = 0; selectIndex = 1;    presentPopover("ControlPickerVC") }
-    @IBAction func x2(_ sender: NSButton) { panelIndex = 1; selectIndex = 0;    presentPopover("ControlPickerVC") }
-    @IBAction func y2(_ sender: NSButton) { panelIndex = 1; selectIndex = 1;    presentPopover("ControlPickerVC") }
-    @IBAction func x3(_ sender: NSButton) { panelIndex = 2; selectIndex = 0;    presentPopover("ControlPickerVC") }
-    @IBAction func y3(_ sender: NSButton) { panelIndex = 2; selectIndex = 1;    presentPopover("ControlPickerVC") }
-    @IBAction func x4(_ sender: NSButton) { panelIndex = 3; selectIndex = 0;    presentPopover("ControlPickerVC") }
-    @IBAction func y4(_ sender: NSButton) { panelIndex = 3; selectIndex = 1;    presentPopover("ControlPickerVC") }
+    
+    func launchPopOver(_ pIndex:Int, _ sIndex:Int) {
+        panelIndex = pIndex
+        selectIndex = sIndex
+        presentPopover("ControlPickerVC")
+    }
+    
+    @IBAction func x1(_ sender: NSButton) { launchPopOver(0,0) }
+    @IBAction func y1(_ sender: NSButton) { launchPopOver(0,1) }
+    @IBAction func x2(_ sender: NSButton) { launchPopOver(1,0) }
+    @IBAction func y2(_ sender: NSButton) { launchPopOver(1,1) }
+    @IBAction func x3(_ sender: NSButton) { launchPopOver(2,0) }
+    @IBAction func y3(_ sender: NSButton) { launchPopOver(2,1) }
+    @IBAction func x4(_ sender: NSButton) { launchPopOver(3,0) }
+    @IBAction func y4(_ sender: NSButton) { launchPopOver(3,1) }
     
     @IBAction func helpPressed(_ sender: NSButton) {
         if !isHelpVisible {

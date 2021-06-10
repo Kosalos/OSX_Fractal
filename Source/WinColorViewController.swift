@@ -74,6 +74,9 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
         widget.addFloat("Contrast",&vc.control.contrast,0.1,0.7,0.02)
         widget.addFloat("Specular",&vc.control.specular,0,2,0.1)
         widget.addFloat("Light Position",&vc.lightAngle,-4,4,0.3)
+        widget.addFloat("SPower",&vc.control.fz, 0.001,15,0.01)
+        widget.addFloat("SMix",&vc.control.fy, 0.0,1,0.01)
+
         
         widget.addLegend(" ")
         widget.addInt32("Style#",&vc.control.colorScheme,0,7,1,true,98)

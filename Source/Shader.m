@@ -22,6 +22,27 @@ void resetAllLights(void) {
     }
 }
 
+//static const vector_float3 bbC[] = {
+//    { 1,0,0 },
+//    { 0,1,0 },
+//    { 1,1,0 },
+//    { 0,0,1 },
+//    { 1,0,1 },
+//    { 0,1,1 },
+//    { 1,1,1 },
+//    { 1,0,0.5 },
+//    { 1,0.5,0.5 },
+//    { 1,0.5,1 }};
+
+void resetShaderArrayData() {
+    resetAllLights();
+    
+    for(int i=0;i<NUM_BILLBOARD;++i) {
+        c->billboard[i].active = false;
+  //      c->billboard[i].color = bbC[i];
+    }
+}
+
 float max(float v1,float v2) { if(v1 > v2) return v1;  return v2; }
 
 simd_float3 normalize(simd_float3 v) {
@@ -30,7 +51,7 @@ simd_float3 normalize(simd_float3 v) {
     return v / len;
 }
 
-void encodeWidgetDataForAllLights(void) {
+void encodeShaderArrayData(void) {
     for(int i=0;i<NUM_LIGHT;++i) {
         c->flight[i].bright = max(c->flight[i].bright,0);
         c->flight[i].fx = max(c->flight[i].fx,0.1);
@@ -64,3 +85,17 @@ float* lightZ(int index)        { return &c->flight[index].z; }
 float* lightR(int index)        { return &c->flight[index].r; }
 float* lightG(int index)        { return &c->flight[index].g; }
 float* lightB(int index)        { return &c->flight[index].b; }
+
+bool*  billboardActive(int index)   { return &c->billboard[index].active; }
+float* billboardU1(int index)   { return &c->billboard[index].u1; }
+float* billboardU2(int index)   { return &c->billboard[index].u2; }
+float* billboardV1(int index)   { return &c->billboard[index].v1; }
+float* billboardV2(int index)   { return &c->billboard[index].v2; }
+float* billboardX(int index)   { return &c->billboard[index].x; }
+float* billboardY(int index)   { return &c->billboard[index].y; }
+float* billboardXS(int index)   { return &c->billboard[index].xs; }
+float* billboardYS(int index)   { return &c->billboard[index].ys; }
+float* billboardZ(int index)   { return &c->billboard[index].z; }
+float* billboardFudge(int index)   { return &c->billboard[index].fudge; }
+//vector_float3* billboardColor(int index)   { return &c->billboard[index].color; }
+

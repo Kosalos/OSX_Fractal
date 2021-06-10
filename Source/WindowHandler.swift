@@ -5,7 +5,9 @@ var winHandler:WindowHandler! = nil
 // 0 = widgets on Main window
 // 1 = widgets on Color window
 // 2 = widgets on Lights window
-// 3 = control window
+// 3 = widgets on Billboards window
+// 4 = control window
+// 5 = memory window
 
 class WindowHandler {
     var windows:[NSWindow] = []
@@ -26,22 +28,29 @@ class WindowHandler {
             windows.append(wc!.window!)
         }
         
-        windows.append(vc.view.window!) // 1 main window
-        addWindowToList("Color")   // 2
-        addWindowToList("Lights")  // 3
-        addWindowToList("Control") // 4 no widgets
-        addWindowToList("Memory")  // 5 no widgets
+        windows.append(vc.view.window!) // 0 main window
+        addWindowToList("Color")        // 1
+        addWindowToList("Lights")       // 2
+        addWindowToList("Billboards")   // 3
+        
+        //addWindowToList("Control")      // 4 no widgets
+        windows.append(winControl.window!)
+
+        addWindowToList("Memory")       // 5 no widgets
 
         // widget instances do not exist until their parent window is launched
-        let w1 = windows[0].contentViewController as! ViewController
+        let w0 = windows[0].contentViewController as! ViewController
+        widgets.append(w0.widget)
+
+        let w1 = windows[1].contentViewController as! WinColorViewController
         widgets.append(w1.widget)
 
-        let w2 = windows[1].contentViewController as! WinColorViewController
+        let w2 = windows[2].contentViewController as! WinLightViewController
         widgets.append(w2.widget)
 
-        let w3 = windows[2].contentViewController as! WinLightViewController
+        let w3 = windows[3].contentViewController as! WinBillboardViewController
         widgets.append(w3.widget)
-        
+
         func windowGainedFocus(notification: Notification) {
             // so only widget list on the active window has the red colored highlight
             for i in 0 ..< windows.count-2 {
@@ -65,18 +74,21 @@ class WindowHandler {
     func stringForRow(_ index:Int, _ row:Int) -> String { return widgets[index].data[row].displayString() }
 
     func refreshWidgetsAndImage() {
-        let w1 = windows[0].contentViewController as! ViewController
-        w1.flagViewToRecalcFractal()
+        let w0 = windows[0].contentViewController as! ViewController
+        w0.flagViewToRecalcFractal()
 
-        let w2 = windows[1].contentViewController as! WinColorViewController
+        let w1 = windows[1].contentViewController as! WinColorViewController
+        w1.displayWidgets()
+
+        let w2 = windows[2].contentViewController as! WinLightViewController
         w2.displayWidgets()
 
-        let w3 = windows[2].contentViewController as! WinLightViewController
+        let w3 = windows[3].contentViewController as! WinBillboardViewController
         w3.displayWidgets()
     }
     
     func updateWindowWidgetFocus() { // so only widget list on the active window has the red colored highlight
-        if focusIndex == windows.count-1 { return } // no widgets on memory window
+        if focusIndex > windows.count-2 { return } // no widgets on last 2 windows
         
         if focusIndex != NO_FOCUS && focusIndex < windows.count-2 {
             widgets[focusIndex].gainFocus()
@@ -100,13 +112,16 @@ class WindowHandler {
         windows[focusIndex].makeKeyAndOrderFront(nil)
         updateWindowWidgetFocus()
         
-        let w1 = windows[0].contentViewController as! ViewController
+        let w0 = windows[0].contentViewController as! ViewController
+        w0.displayWidgets()
+
+        let w1 = windows[1].contentViewController as! WinColorViewController
         w1.displayWidgets()
 
-        let w2 = windows[1].contentViewController as! WinColorViewController
+        let w2 = windows[2].contentViewController as! WinLightViewController
         w2.displayWidgets()
 
-        let w3 = windows[2].contentViewController as! WinLightViewController
+        let w3 = windows[3].contentViewController as! WinBillboardViewController
         w3.displayWidgets()
     }
 

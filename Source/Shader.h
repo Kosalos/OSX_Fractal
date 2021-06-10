@@ -16,9 +16,10 @@ enum {
     EQU_16_SPIRALBOX, EQU_17_SURFBOX, EQU_18_TWISTBOX, EQU_19_VERTEBRAE, EQU_20_DARKSURF,
     EQU_21_SPONGE, EQU_22_DONUTS, EQU_23_PDOF, EQU_24_MAGNETO, EQU_25_SPUDS2018,
     EQU_26_KALEIDO, EQU_27_MANDELNEST,EQU_28_KALI_RONTGEN,EQU_29_ENGINE,EQU_30_FRACTAL_CAGE,
-    EQU_31_GAZ_42,EQU_32_BONEYTUNNEL,EQU_33_GAZ_19,EQU_MAX };
+    EQU_31_GAZ_42,EQU_32_BONEYTUNNEL,EQU_33_GAZ_19,EQU_34_RADIOBASE,EQU_MAX };
 
 #define NUM_LIGHT   3
+#define NUM_BILLBOARD 10
 
 #define ESC_KEY      53
 #define HOME_KEY    115
@@ -39,6 +40,15 @@ typedef struct {
     vector_float3 nrmPos;       // normalized light position used by shader
     vector_float3 color;        // light color used by shader
 } FLightData;
+
+typedef struct {
+    bool  active;
+    float u1,v1,u2,v2;          // texture atlas region
+    float x,y;                  // position of UL corner as ratio
+    float xs,ys;                // size as ratio
+    float z;                    // distance from camera
+    float fudge,unused1,unused2;        // color when no texture
+} BillboardData;
 
 typedef struct {
     int version;
@@ -118,6 +128,9 @@ typedef struct {
 
     float blurFocalDistance,blurStrength,blurDim;
     float coloringM1,coloringM2,coloringM3;
+    
+    BillboardData billboard[NUM_BILLBOARD];
+
 } Control;
 
 // 3D window ---------------------------------
@@ -163,7 +176,8 @@ typedef struct {
 
 void setControlPointer(Control *ptr);
 void resetAllLights(void);
-void encodeWidgetDataForAllLights(void);
+void resetShaderArrayData(void);
+void encodeShaderArrayData(void);
 float* lightBright(int index);
 float* lightPower(int index);
 float* lightX(int index);
@@ -172,6 +186,21 @@ float* lightZ(int index);
 float* lightR(int index);
 float* lightG(int index);
 float* lightB(int index);
+
+//-----------------------
+
+bool*  billboardActive(int index);
+float* billboardU1(int index);
+float* billboardU2(int index);
+float* billboardV1(int index);
+float* billboardV2(int index);
+float* billboardX(int index);
+float* billboardY(int index);
+float* billboardXS(int index);
+float* billboardYS(int index);
+float* billboardZ(int index);
+float* billboardFudge(int index);
+//vector_float3* billboardColor(int index);
 
 #endif
 

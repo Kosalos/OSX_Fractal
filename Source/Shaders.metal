@@ -212,13 +212,13 @@ float boxFold(float v, float fold) { return abs(v + fold) - fabs(v- fold) - v; }
 float boxFold2(float v, float fold) { if(v < -fold) v = -2 * fold - v; return v; }
 
 float DE_MANDELBOX(float3 pos,device Control &control,thread float4 &orbitTrap) {
-#ifdef SINGLE_EQUATION
+#ifdef zzzSINGLE_EQUATION
     return 0;
 #else
     // For the Juliabox, c is a constant. For the Mandelbox, c is variable.
     float3 c = control.juliaboxMode ? control.julia : pos;
     float r2,dr = control.fx;
-    
+    float cx = control.cx;
     float fR2 = control.cz * control.cz;
     float mR2 = control.cw * control.cw;
     
@@ -228,15 +228,17 @@ float DE_MANDELBOX(float3 pos,device Control &control,thread float4 &orbitTrap) 
     
     for(int i = 0; i < control.isteps; ++i) {
         if(control.doInversion) {
-            pos.x = boxFold(pos.x,control.cx);
-            pos.y = boxFold(pos.y,control.cx);
-            pos.z = boxFold(pos.z,control.cx);
+            pos.x = boxFold(pos.x,cx);
+            pos.y = boxFold(pos.y,cx);
+            pos.z = boxFold(pos.z,cx);
         }
         else {
-            pos.x = boxFold2(pos.x,control.cx);
-            pos.y = boxFold2(pos.y,control.cx);
-            pos.z = boxFold2(pos.z,control.cx);
+            pos.x = boxFold2(pos.x,cx);
+            pos.y = boxFold2(pos.y,cx);
+            pos.z = boxFold2(pos.z,cx);
         }
+        
+        cx *= control.dx;
         
         r2 = pos.x*pos.x + pos.y*pos.y + pos.z*pos.z;
         
@@ -902,7 +904,7 @@ float DE_TWISTBOX(float3 pos,device Control &control,thread float4 &orbitTrap) {
 #define slopesinz  control.fw
 
 float DE_VERTEBRAE(float3 pos,device Control &control,thread float4 &orbitTrap) {
-#ifdef zzSINGLE_EQUATION
+#ifdef SINGLE_EQUATION
     return 0;
 #else
     float4 c = 0.5 * float4(control.cx, control.cy, control.cz, control.cw);
@@ -1235,46 +1237,95 @@ float DE_MANDELNEST(float3 pos,device Control &control,thread float4 &orbitTrap)
 #ifdef zzzSINGLE_EQUATION
     return 0;
 #else
-    float r,dr = 1;
+    float jk,r,dr = 1;
     float fx = control.fx;
     float shift = control.cx;
     float3 julia = control.julia;
-    float3 deltaJulia = float3(control.dx,control.dy,control.dz);
+//    float3 deltaJulia = float3(control.dx,control.dy,control.dz);
     
     for(int i=0; i < control.isteps; ++i) {
         r = length(pos);
         if(r > 3) break;
         
-        if(control.bcx && !(i & 2)) {
-            pos = sin(shift + fx * asin(pos/r));
-        } else {
-            pos = cos(shift + fx * acos(pos/r));
-        }
-        
-        pos *= pow(r,fx);
-        pos += control.juliaboxMode ? julia : pos;
+        if(r < abs(dr))
+                pos = sin(shift + fx * asin(pos/r));
+         else
+             pos = cos(shift + fx * acos(pos/r));
+
+//        if(control.bcx && !(i & 2)) {
+//            pos = sin(shift + fx * atan(pos/r));
+//        } else {
+//            pos = cos(shift + fx * atan(pos/r));
+//        }
         
         dr = pow(r, fx - 1.0) * fx * dr + 1.0;
+
+        jk = r * control.dy;
+        
+        pos *= pow(jk,fx);
+        pos += control.juliaboxMode ? julia : pos;
         
         shift += control.angle1;
         fx += control.angle2;
         
         if(control.juliaboxMode)
-            julia += deltaJulia;
+            julia = mix(julia,pos,control.dx); //deltaJulia;
 
         float4 hk = float4(pos,r);
         orbitTrap = min(orbitTrap, dot(hk,hk));
     }
     
-    return 0.25 * log(r) * r/dr;
+    return control.dz * log(r) * r/dr;
 #endif
 }
+
+/*
+ float DE_MANDELNEST(float3 pos,device Control &control,thread float4 &orbitTrap) {
+ #ifdef zzzSINGLE_EQUATION
+     return 0;
+ #else
+     float r,dr = 1;
+     float fx = control.fx;
+     float shift = control.cx;
+     float3 julia = control.julia;
+     float3 deltaJulia = float3(control.dx,control.dy,control.dz);
+     
+     for(int i=0; i < control.isteps; ++i) {
+         r = length(pos);
+         if(r > 3) break;
+         
+         if(control.bcx && !(i & 2)) {
+             pos = sin(shift + fx * asin(pos/r));
+         } else {
+             pos = cos(shift + fx * acos(pos/r));
+         }
+         
+         pos *= pow(r,fx);
+         pos += control.juliaboxMode ? julia : pos;
+         
+         dr = pow(r, fx - 1.0) * fx * dr + 1.0;
+         
+         shift += control.angle1;
+         fx += control.angle2;
+         
+         if(control.juliaboxMode)
+             julia += deltaJulia;
+
+         float4 hk = float4(pos,r);
+         orbitTrap = min(orbitTrap, dot(hk,hk));
+     }
+     
+     return 0.25 * log(r) * r/dr;
+ #endif
+ }
+
+ */
 
 //MARK: - 28 Kali Rontgen
 // https://www.shadertoy.com/view/XlXcRj
 
 float DE_KALI_RONTGEN(float3 pos,device Control &control,thread float4 &orbitTrap) {
-#ifdef zzzSINGLE_EQUATION
+#ifdef SINGLE_EQUATION
     return 0;
 #else
     float d = 10000.;
@@ -1306,7 +1357,7 @@ float DE_KALI_RONTGEN(float3 pos,device Control &control,thread float4 &orbitTra
 // https://www.shadertoy.com/view/ttSBRm
 
 float DE_ENGINE(float3 pos,device Control &control,thread float4 &orbitTrap) {
-#ifdef zzzSINGLE_EQUATION
+#ifdef SINGLE_EQUATION
     return 0;
 #else
 //    #define hash(n) fract(sin(n * 234.567+123.34))
@@ -1343,7 +1394,7 @@ float DE_ENGINE(float3 pos,device Control &control,thread float4 &orbitTrap) {
 #define R(p,a,r) mix(a*dot(p,a),p,cos(r))+sin(r)*cross(p,a)
 
 float DE_FRACTAL_CAGE(float3 p,device Control &control,thread float4 &orbitTrap) {
-#ifdef zzzSINGLE_EQUATION
+#ifdef SINGLE_EQUATION
     return 0;
 #else
     float lp,r2,s = 1;
@@ -1368,7 +1419,7 @@ float DE_FRACTAL_CAGE(float3 p,device Control &control,thread float4 &orbitTrap)
 // https://www.shadertoy.com/view/Nss3WB
 
 float DE_GAZ_42(float3 p,device Control &control,thread float4 &orbitTrap) {
-#ifdef zzzSINGLE_EQUATION
+#ifdef SINGLE_EQUATION
     return 0;
 #else
     float e,s = 1.5;
@@ -1390,7 +1441,7 @@ float DE_GAZ_42(float3 p,device Control &control,thread float4 &orbitTrap) {
 // boney tunnel  https://www.shadertoy.com/view/3sGXzD
 
 float DE_BONEYTUNNEL(float3 z,device Control &control,thread float4 &orbitTrap) {
-#ifdef zzzSINGLE_EQUATION
+#ifdef SINGLE_EQUATION
     return 0;
 #else
     vec3 offset = z;
@@ -1446,12 +1497,10 @@ float DE_BONEYTUNNEL(float3 z,device Control &control,thread float4 &orbitTrap) 
 
 //MARK: - 33 GAZ_19
 // https://www.shadertoy.com/view/WttfWM
-
-// 13
 //https://www.shadertoy.com/view/3ttBWn
 
 float DE_GAZ_19(float3 p,device Control &control,thread float4 &orbitTrap) {
-#ifdef zzzSINGLE_EQUATION
+#ifdef SINGLE_EQUATION
     return 0;
 #else
     float s=2.;
@@ -1474,6 +1523,197 @@ float DE_GAZ_19(float3 p,device Control &control,thread float4 &orbitTrap) {
 #endif
 }
 
+
+
+float planet_surface(vec3 p,float i,float size){
+    vec3 p1 = p/size;
+    p = (sin(sin(p1)+p1))*size;
+    return length(p) - size;
+}
+
+////MARK: - 34 Space Station
+//// https://www.shadertoy.com/view/tddfDr
+//
+//float DE_RADIOBASE(float3 p,device Control &control,thread float4 &orbitTrap) {
+//#ifdef zzzSINGLE_EQUATION
+//    return 0;
+//#else
+//    float p1,scale = control.cx;
+//    float result = 0.0;
+//    float i = 1.0;
+//
+//    for(int i1=0;i1 < control.isteps;++i1) {
+////        p1 = planet_surface(p*i,i,control.cy)/(i);
+//
+//        vec3 p2 = p * i / control.cy;
+//        vec3 p3 = i1 & 1 ? cos(sin(p2) + p2) : sin(cos(p2) + p2);
+//        p3 *= control.cz;
+//        p1 = (length(p3) - control.cw) / i;
+//
+//        p += rotatePosition(p,0,control.dy);
+//        p += rotatePosition(p,1,control.dz);
+//
+//
+//        result = max(result, -p1);
+//        i *= -5.0;
+//
+//        orbitTrap = min(orbitTrap, float4(abs(p), dot(p,p)));
+//    }
+//
+//    return result * scale/2.0;
+//#endif
+//}
+
+
+// //MARK: - 34 Space Station
+// // https://www.shadertoy.com/view/tddfDr
+//
+// float DE_RADIOBASE(float3 p,device Control &control,thread float4 &orbitTrap) {
+// #ifdef zzzSINGLE_EQUATION
+//     return 0;
+// #else
+//     float p1,scale = control.cx;
+//     float result = 0.0;
+//     float scale2 = 1.0;
+//
+//     for(int i1=0;i1 < control.isteps;++i1) {
+// //        p1 = planet_surface(p*i,i,control.cy)/(i);
+//
+//         vec3 p2 = p * scale / control.cy;
+//         vec3 p3 = sin(sin(p2) + p2) * control.cz;
+//         p1 = (length(p3) - control.cw) / scale;
+//
+//         result = max(result, -p1);
+//         scale *= scale2;
+//         scale2 *= control.dx;
+//
+// //        p += rotatePosition(p,0,control.dy);
+// //        p += rotatePosition(p,1,control.dz);
+//         p += control.julia;
+//
+//         orbitTrap = min(orbitTrap, float4(p3, dot(p2,p2)));
+//     }
+//
+//     return result * scale/2.0;
+// #endif
+// }
+
+/*
+ 
+ //MARK: - 34 Space Station
+ // https://www.shadertoy.com/view/tddfDr
+
+ float DE_RADIOBASE(float3 p,device Control &control,thread float4 &orbitTrap) {
+ #ifdef zzzSINGLE_EQUATION
+     return 0;
+ #else
+     float p1,scale = control.cx;
+     float result = 0.0;
+     float scale2 = 1.0;
+
+     for(int i1=0;i1 < control.isteps;++i1) {
+ //        p1 = planet_surface(p*i,i,control.cy)/(i);
+         
+         vec3 p2 = p * scale / control.cy;
+         vec3 p3 = sin(sin(p2) + p2) * control.cz;
+         p1 = (length(p3) - control.cw) / scale;
+
+         result = max(result, -p1);
+         scale *= scale2;
+         scale2 *= control.dx;
+         
+ //        p += rotatePosition(p,0,control.dy);
+ //        p += rotatePosition(p,1,control.dz);
+         p += control.julia;
+
+         orbitTrap = min(orbitTrap, float4(p3, dot(p2,p2)));
+     }
+
+     return result * scale/2.0;
+ #endif
+ }
+
+ */
+
+
+//MARK: - 34 Radio Base
+// https://www.shadertoy.com/view/WlcczS
+
+float DE_RADIOBASE(float3 pos,device Control &control,thread float4 &orbitTrap) {
+#ifdef zzzSINGLE_EQUATION
+    return 0;
+#else
+    float r,s = 1;
+    float3 p = pos;
+    float3 offset = p * control.cx;
+
+    for(int i=0;i < control.isteps;++i) {
+        p = control.cy - abs(sin(p - control.cz) - control.cw);
+
+        r = control.dx * clamp(control.dy * max(control.dz / dot(p,p),control.dw), -control.ex, control.ex);
+        s *= r;
+        p *= r;
+        p += offset;
+
+        orbitTrap = min(orbitTrap, float4(abs(p), dot(p,p)));
+    }
+
+    return length(cross(p,normalize(float3(control.ey,control.ez,control.ew))))/s - 0.006;
+#endif
+}
+
+// new
+//float DE_RADIOBASE(float3 pos,device Control &control,thread float4 &orbitTrap) {
+//#ifdef zzzSINGLE_EQUATION
+//    return 0;
+//#else
+//    float r,s = 1;
+//    float3 p = pos;
+//    float3 offset = p * control.cx;
+//
+//    for(int i=0;i < control.isteps;++i) {
+//        p = control.cy - abs(abs(p - control.cz) - control.cw);
+//
+//        r = control.dx * clamp(control.dy * max(control.dz / dot(p,p),control.dw), 0.0, control.ex);
+//        s *= r;
+//        p *= r;
+//        p += offset;
+//
+//        orbitTrap = min(orbitTrap, float4(abs(p), dot(p,p)));
+//    }
+//
+//    return length(cross(p,normalize(float3(control.ey,control.ez,control.ew))))/s - 0.006;
+//#endif
+//}
+
+/*  good
+ //MARK: - 34 Radio Base
+ // https://www.shadertoy.com/view/WlcczS
+
+ float DE_RADIOBASE(float3 pos,device Control &control,thread float4 &orbitTrap) {
+ #ifdef zzzSINGLE_EQUATION
+     return 0;
+ #else
+     float r,s = 4;
+     float3 p = pos; //abs(pos);
+     float3 offset = p * control.cx;
+
+     for(int i=0;i < control.isteps;++i) {
+         p = control.cy - abs(abs(p - control.cz) - control.cw);
+
+         r = control.dx * clamp(control.dy * max(control.dz / dot(p,p),control.dw), 0.0, control.ex);
+         s *= r;
+         p *= r;
+         p += offset;
+
+         orbitTrap = min(orbitTrap, float4(abs(p), dot(p,p)));
+     }
+
+     return length(cross(p,normalize(float3(1,3,3))))/s - 0.006;
+ #endif
+ }
+
+ */
 //MARK: - distance estimate
 // ===========================================
 
@@ -1512,6 +1752,7 @@ float DE_Inner(float3 pos,device Control &control,thread float4 &orbitTrap) {
         case EQU_31_GAZ_42      : return DE_GAZ_42(pos,control,orbitTrap);
         case EQU_32_BONEYTUNNEL : return DE_BONEYTUNNEL(pos,control,orbitTrap);
         case EQU_33_GAZ_19      : return DE_GAZ_19(pos,control,orbitTrap);
+        case EQU_34_RADIOBASE   : return DE_RADIOBASE(pos,control,orbitTrap);
     }
     
     return 0;
@@ -1576,13 +1817,19 @@ float3 calcNormal(float3 pos, device Control &control) {
 // boxplorer's method altered
 float3 getBlinnShading(float3 normal, float3 direction, float3 light,device Control &control) {
     float3 halfLV = normalize(light + direction);
-    float dif = dot(normal, light) * 0.5 + 0.75;
+    float dif = dot(normal, light) * 0.5;
     
-    dif += pow(dot(normal, halfLV), 3) * control.specular * 4;
-    dif = min(10.0,dif);
+    dif += pow(dot(normal, halfLV), control.fz) * control.specular;
+    dif = max(0.0,dif);
     
     return dif;
 }
+
+//float3 halfLV = normalize(light + direction);
+//float dif = dot(normal, light) * 0.5 + 0.75;
+//
+//dif += pow(dot(normal, halfLV), 3) * control.specular * 4;
+//dif = min(10.0,dif);
 
 float3 lerp(float3 a, float3 b, float w) { return a + w*(b-a); }
 
@@ -1836,27 +2083,149 @@ kernel void rayMarchShader
     
     float3 distAns = shortest_dist(camera,direction,c,orbitTrap);
     
-    if (distAns.x <= MAX_DIST) { // hit object
+    ////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////
+    // billboards
+
+    bool billboard = false;
+    
+    for(int i=0;i<NUM_BILLBOARD;++i) {
+        device BillboardData &bb = c.billboard[i];
+        if(!bb.active) continue;
+
+        if(distAns.x > bb.z) {
+            float pixelX = float(q.x) / float(c.xSize);
+            float pixelY = float(q.y) / float(c.ySize);
+            float x1 = max(0.0, bb.x);
+            float x2 = min(1.0, x1 + bb.xs);
+            float y1 = max(0.0, bb.y);
+            float y2 = min(1.0, y1 + bb.ys);
+            
+            if(c.isStereo) {
+                float distanceFactor = 1 / (1 + (bb.z - 0.5) * 0.667);
+                float offset = c.sideVector.x * c.parallax * distanceFactor * c.billboard[i].fudge;
+//junk                float distanceFactor = 2 - bb.z * 0.667;
+//                float offset = c.sideVector.x * pow(c.parallax,distanceFactor);
+
+                x1 *= 0.5;
+                x2 *= 0.5;
+                
+                if(q.x >= xsize) {   // right side of stereo pair
+                    pixelX -= 0.5;
+                    x1 -= offset;
+                    x2 -= offset;
+                }
+                else {
+                    x1 += offset;
+                    x2 += offset;
+                }
+            }
+            
+            if(pixelX >= x1 && pixelX < x2 && pixelY >= y1 && pixelY < y2) {
+                if(c.txtOnOff) {
+                    uint2 pt;
+                    float ratioU = (pixelX - x1) / (x2-x1);
+                    float ratioV = (pixelY - y1) / (y2-y1);
+                    float u = bb.u1 + ratioU * (bb.u2 - bb.u1);
+                    float v = bb.v1 + ratioV * (bb.v2 - bb.v1);
+
+                    pt.x = uint(c.txtSize.x * u);
+                    pt.y = uint(c.txtSize.y * v);
+                    
+                    float4 cc = coloringTexture.read(pt);
+                    if(cc.w > 0.1) {
+                        billboard = true;
+                        color = cc.xyz;
+                    }
+                }
+                else {
+                    billboard = true;
+                    color = vector_float3(1,1,1);
+                }
+            }
+        }
+    }
+    
+    
+//    bool billboard = false;
+//
+//    if(distAns.x > c.fw) {
+//        float rx = float(q.x) / float(c.xSize);
+//        float ry = float(q.y) / float(c.ySize);
+//        float x1 = 0.35;
+//        float x2 = 1;
+//        float y1 = 0.3;
+//        float y2 = 0.7;
+//
+//        if(c.isStereo) {
+//            float distanceFactor = 1 / (1 + c.fw * 0.667);
+//            float offset = (c.sideVector * c.parallax).x * distanceFactor;
+//
+//            x1 *= 0.5;
+//            x2 *= 0.5;
+//
+//            if(q.x >= xsize) {   // right side of stereo pair
+//                rx -= 0.5;
+//                x1 -= offset;
+//                x2 -= offset;
+//            }
+//            else {
+//                x1 += offset;
+//                x2 += offset;
+//            }
+//        }
+//
+//        if(rx >= x1 && rx < x2 && ry >= y1 && ry < y2) {
+//            billboard = true;
+//
+//            if(c.txtOnOff) {
+//                uint2 pt;
+//                float u,v;
+//                u = (rx - x1) / (x2-x1);
+//                v = (ry - y1) / (y2-y1);
+//
+//                pt.x = uint(c.txtSize.x * u);
+//                pt.y = uint(c.txtSize.y * v);
+//
+//                float4 cc = coloringTexture.read(pt);
+//                if(cc.w > 0.1)
+//                    color = cc.xyz;
+//                else
+//                    billboard = false;
+//            }
+//            else
+//                color = float3(255,0,255);
+//        }
+//    }
+
+    
+    ////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////
+
+    if (!billboard && distAns.x <= MAX_DIST) { // hit object
         float3 position = camera + distAns.x * direction;
         float3 normal = calcNormal(position,c);
         
-        // use texture
-        if(c.txtOnOff) {
-            float xscale = abs(c.tScale);
-            float yscale = c.tScale < 0 ? -xscale : xscale;
-            float len = length(position) / distAns.x;
-            float x = normal.x / len;
-            float y = normal.z / len;
-            float w = c.txtSize.x;
-            float h = c.txtSize.y;
-            float xx = w + (c.tCenterX * 4 + x * xscale) * (w + len);
-            float yy = h + (c.tCenterY * 4 + y * yscale) * (h + len);
-            
-            uint2 pt;
-            pt.x = uint(fmod(xx,w));
-            pt.y = uint(c.txtSize.y - fmod(yy,h)); // flip Y coord
-            color = coloringTexture.read(pt).xyz;
-        }
+//        // use texture
+//        if(c.txtOnOff) {
+//            float xscale = abs(c.tScale);
+//            float yscale = c.tScale < 0 ? -xscale : xscale;
+//            float len = length(position) / distAns.x;
+//            float x = normal.x / len;
+//            float y = normal.z / len;
+//            float w = c.txtSize.x;
+//            float h = c.txtSize.y;
+//            float xx = w + (c.tCenterX * 4 + x * xscale) * (w + len);
+//            float yy = h + (c.tCenterY * 4 + y * yscale) * (h + len);
+//
+//            uint2 pt;
+//            pt.x = uint(fmod(xx,w));
+//            pt.y = uint(c.txtSize.y - fmod(yy,h)); // flip Y coord
+//
+//            color = coloringTexture.read(pt).xyz;
+//        }
         
         color += applyColoring(position,direction,distAns,normal,c);
         
@@ -1878,7 +2247,7 @@ kernel void rayMarchShader
         // ======================================================
         if(c.specular > 0) {
             float3 light = getBlinnShading(normal, direction, c.nlight, c);
-            color = mix(light, color, 0.8);
+            color = mix(light, color, c.fy); // 0.8);
         }
         
         // ======================================================
@@ -1918,24 +2287,24 @@ kernel void rayMarchShader
             }
         }
     }
-    else { // missed object
-        
-        // background color from texture
-        if(c.txtOnOff) {
-            float scale = c.tScale;
-            float x = direction.x;
-            float y = direction.z;
-            float w = c.txtSize.x;
-            float h = c.txtSize.y;
-            float xx = w + (c.tCenterX * 4 + x * scale) * w;
-            float yy = h + (c.tCenterY * 4 + y * scale) * h;
-            
-            uint2 pt;
-            pt.x = uint(fmod(xx,w));
-            pt.y = uint(c.txtSize.y - fmod(yy,h)); // flip Y coord
-            color = coloringTexture.read(pt).xyz;
-        }
-    }
+//    else { // missed object
+//
+//        // background color from texture
+//        if(c.txtOnOff) {
+//            float scale = c.tScale;
+//            float x = direction.x;
+//            float y = direction.z;
+//            float w = c.txtSize.x;
+//            float h = c.txtSize.y;
+//            float xx = w + (c.tCenterX * 4 + x * scale) * w;
+//            float yy = h + (c.tCenterY * 4 + y * scale) * h;
+//
+//            uint2 pt;
+//            pt.x = uint(fmod(xx,w));
+//            pt.y = uint(c.txtSize.y - fmod(yy,h)); // flip Y coord
+//            color = coloringTexture.read(pt).xyz;
+//        }
+//    }
     
     float alpha = distAns.x;
     

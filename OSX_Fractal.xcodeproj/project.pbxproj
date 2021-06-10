@@ -18,6 +18,7 @@
 		1D4A5BBB257D9C3B00B63E39 /* ControlPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4A5BBA257D9C3B00B63E39 /* ControlPickerViewController.swift */; };
 		1D4A5BBD257FEA2100B63E39 /* help5.txt in Resources */ = {isa = PBXBuildFile; fileRef = 1D4A5BBC257FEA2100B63E39 /* help5.txt */; };
 		1D4D7A63262BBE3C0097B9CB /* MemoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4D7A60262BB52D0097B9CB /* MemoryViewController.swift */; };
+		1D4E2D672672835600378C1A /* WinBillboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4E2D6626727C7F00378C1A /* WinBillboardViewController.swift */; };
 		1D88BAB0233135D300362BA9 /* ColorMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D88BAAF233135D300362BA9 /* ColorMap.swift */; };
 		1D95FCFC2308613F00C99D8D /* InstructionsG.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D95FCFB2308613F00C99D8D /* InstructionsG.swift */; };
 		1DA43D4B259ED227004954F9 /* WinColorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DA43D4A259ED227004954F9 /* WinColorViewController.swift */; };
@@ -46,6 +47,7 @@
 		1D4A5BBA257D9C3B00B63E39 /* ControlPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControlPickerViewController.swift; sourceTree = "<group>"; };
 		1D4A5BBC257FEA2100B63E39 /* help5.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = help5.txt; sourceTree = "<group>"; };
 		1D4D7A60262BB52D0097B9CB /* MemoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryViewController.swift; sourceTree = "<group>"; };
+		1D4E2D6626727C7F00378C1A /* WinBillboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WinBillboardViewController.swift; sourceTree = "<group>"; };
 		1D88BAAF233135D300362BA9 /* ColorMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorMap.swift; sourceTree = "<group>"; };
 		1D95FCFB2308613F00C99D8D /* InstructionsG.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstructionsG.swift; sourceTree = "<group>"; };
 		1DA43D4A259ED227004954F9 /* WinColorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WinColorViewController.swift; sourceTree = "<group>"; };
@@ -115,6 +117,7 @@
 				1D4A5BB8257D8C8C00B63E39 /* ControlViewController.swift */,
 				1DFFB87B23E2A3900093C78C /* WinLightViewController.swift */,
 				1DA43D4A259ED227004954F9 /* WinColorViewController.swift */,
+				1D4E2D6626727C7F00378C1A /* WinBillboardViewController.swift */,
 				1D4A5BBA257D9C3B00B63E39 /* ControlPickerViewController.swift */,
 				1D4D7A60262BB52D0097B9CB /* MemoryViewController.swift */,
 				1D40CB4C21F1015F009C73A3 /* Widget.swift */,
@@ -213,6 +216,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1D4E2D672672835600378C1A /* WinBillboardViewController.swift in Sources */,
 				1D4D7A63262BBE3C0097B9CB /* MemoryViewController.swift in Sources */,
 				1D4A5BBB257D9C3B00B63E39 /* ControlPickerViewController.swift in Sources */,
 				1DA43D4D259EE55B004954F9 /* WindowHandler.swift in Sources */,

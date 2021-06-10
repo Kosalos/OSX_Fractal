@@ -66,7 +66,7 @@ class WinLightViewController: NSViewController, NSWindowDelegate, WidgetDelegate
         widget.addLegend(" ")
         widget.addFloat("X Position",lightX(i),-20,20,0.2)
         widget.addFloat("Y",lightY(i),-20,20,0.2)
-        widget.addFloat("Z",lightZ(i),-10,20,0.2)
+        widget.addFloat("Z",lightZ(i),-10,40,0.2)
         widget.addLegend(" ")
         widget.addFloat("R Color",lightR(i),0,1,0.1)
         widget.addFloat("G",lightG(i),0,1,0.1)

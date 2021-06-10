@@ -82,7 +82,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         reset()
         ensureWindowSizeIsNotTooSmall()
         
-        resetAllLights()
+        resetShaderArrayData()
         showControlWindow()
         
         winHandler = WindowHandler()
@@ -190,7 +190,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
           "Pupukuusikkos Spiralbox", "SurfBox","TwistBox","Vertebrae", "DarkBeam Surfbox",
           "Klienian Sponge","Donuts","PDOF","MagnetoBulb","Spuds2018",
           "KaleidoScope","Mandel Nest","Kali Rontgen","Fractal Engine","Fractal Cage",
-          "Gaz 42","Boney Tunnel","Gaz 19" ]
+          "Gaz 42","Boney Tunnel","Gaz 19","Radio Base" ]
     
     func updateWindowTitle() {
         let index = Int(control.equation)
@@ -1045,6 +1045,37 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
                 control.InvRadius = 3.280
                 control.InvAngle = 0.080
             }
+        case EQU_34_RADIOBASE :
+            control.camera = SIMD3<Float>(0.0032876949, 9.548094, 0.10990448)
+            updateShaderDirectionVector( SIMD3<Float>(0.001503774, -0.9986789, 0.0513625) )
+            control.isteps = 8
+            control.cx = 0.015
+            control.cy = 3.986
+            control.cz = 3.546
+            control.cw = 2.262
+            control.dx = 5.280
+            control.dy = 0.643
+            control.dz = -2.620
+            control.dw = -15.000
+            control.ex = -8.182
+             
+            if control.doInversion {
+                control.camera = SIMD3<Float>(-0.033686545, 0.8973492, 0.12424417)
+                updateShaderDirectionVector( SIMD3<Float>(0.001503774, -0.9986789, 0.0513625) )
+                control.cx = -0.255
+                control.cy = 3.920
+                control.cz = 4.456
+                control.cw = 2.302
+                control.dx = 4.503
+                control.dy = 0.628
+                control.dz = -1.000
+                control.dw = -5.980
+                control.ex = -2.792
+                control.InvCenter = simd_float3(0.236, 0.230, -0.126)
+                control.InvRadius = 0.420
+                control.InvAngle = -0.620
+            }
+
         default : break
         }
         
@@ -1064,7 +1095,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         // this appears to stop beachball delays if I cause key roll-over?
         Thread.sleep(forTimeInterval: timeInterval)
         
-        encodeWidgetDataForAllLights()
+        encodeShaderArrayData()
         var c = control
         
         func prepareJulia() { c.julia = simd_float3(control.juliaX,control.juliaY,control.juliaZ) }
@@ -1624,7 +1655,6 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addInt32("Iterations",&control.isteps,3,130,1)
             widget.addFloat("Power",&control.fx,0.5,12,0.02)
             
-            widget.addFloat("CX",&control.cx,-2,10,0.1)
             widget.addBoolean("Switch",&control.bcx)
             juliaGroup(8,0.01)
             
@@ -1652,6 +1682,8 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addFloat("Sphere 1",&control.cz, 0,4,0.02)
             widget.addFloat("Sphere 2",&control.cw, 0,4,0.02)
             juliaGroup(10,0.01)
+            widget.addFloat("Fold",&control.dx, -10,10,0.01)
+
         case EQU_05_QUATJULIA :
             widget.addInt32("Iterations",&control.isteps,3,10,1)
             widget.addFloat("X",&control.cx,-5,5,0.05)
@@ -1831,9 +1863,9 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addFloat("Angle1",&control.angle1,-4,4,0.005)
             widget.addFloat("Angle2",&control.angle2,-4,4,0.005)
         case EQU_27_MANDELNEST :
-            widget.addInt32("Iterations",&control.isteps,3,130,1)
-            widget.addFloat("Power",&control.fx,0.5,12,0.02)
-            widget.addFloat("CX",&control.cx,-2,10,0.1)
+            widget.addInt32("Iterations",&control.isteps,2,20,1)
+            widget.addFloat("Power",&control.fx,2,20,0.02)
+            widget.addFloat("CX",&control.cx,-10,10,0.1)
             widget.addBoolean("Switch",&control.bcx)
             juliaGroup(8,0.01)
             widget.addFloat("Angle1",&control.angle1,-4,4,0.05)
@@ -1898,6 +1930,23 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addFloat("ex",&control.ex, -20,20,0.01)
             widget.addFloat("ey",&control.ey, -20,20,0.01)
             widget.addFloat("ez",&control.ez, -20,20,0.01)
+        case EQU_34_RADIOBASE :
+            widget.addInt32("Iterations",&control.isteps,1,30,1)
+            widget.addFloat("cx",&control.cx, -20,20,0.01)
+            widget.addFloat("cy",&control.cy, -20,20,0.01)
+            widget.addFloat("cz",&control.cz, -20,20,0.1)
+            widget.addFloat("cw",&control.cw, -20,20,0.1)
+            widget.addFloat("dx",&control.dx, -20,20,0.01)
+            widget.addFloat("dy",&control.dy, -20,20,0.01)
+            widget.addFloat("dz",&control.dz, -20,20,0.1)
+            widget.addFloat("dw",&control.dw, -20,20,0.1)
+            widget.addFloat("ex",&control.ex, -20,20,0.01)
+            widget.addFloat("ey",&control.ey, -20,20,0.01)
+            widget.addFloat("ez",&control.ez, -20,20,0.01)
+            widget.addFloat("ew",&control.ew, -20,20,0.01)
+
+            juliaGroup(10,0.01)
+
         default : break
         }
         

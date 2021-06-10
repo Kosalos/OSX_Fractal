@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
         <capability name="System colors introduced in macOS 10.13" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -62,9 +62,9 @@
                         <outlet property="delegate" destination="Voe-Tx-rLC" id="PrD-fu-P6m"/>
                     </connections>
                 </application>
-                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="OSX_Fractal" customModuleProvider="target"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="OSX_Fractal" customModuleProvider="target"/>
             </objects>
             <point key="canvasLocation" x="-4075" y="-366"/>
         </scene>
@@ -87,7 +87,7 @@
                 </windowController>
                 <customObject id="Oky-zY-oP4" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-4074" y="-187"/>
+            <point key="canvasLocation" x="-4011" y="-188"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="hIz-AP-VOD">
@@ -115,7 +115,7 @@
                                 </textFieldCell>
                             </textField>
                             <customView autoresizesSubviews="NO" wantsLayer="YES" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yHc-Iz-xFz" customClass="InstructionsG" customModule="OSX_Fractal" customModuleProvider="target">
-                                <rect key="frame" x="19" y="20" width="46" height="108"/>
+                                <rect key="frame" x="18" y="20" width="46" height="108"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                             </customView>
                         </subviews>
@@ -128,7 +128,7 @@
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-4074" y="129"/>
+            <point key="canvasLocation" x="-4016" y="110"/>
         </scene>
         <!--SaveLoadVC-->
         <scene sceneID="D49-Yr-lnw">
@@ -459,7 +459,7 @@
                 </viewController>
                 <customObject id="Prn-23-sKX" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-4525" y="673"/>
+            <point key="canvasLocation" x="-4435" y="688"/>
         </scene>
         <!--VideoRecorder-->
         <scene sceneID="c9f-gS-onw">
@@ -755,7 +755,7 @@
                         <windowStyleMask key="styleMask" titled="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="425" y="461" width="200" height="68"/>
-                        <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
                         <connections>
                             <outlet property="delegate" destination="vso-m8-sBu" id="xLm-bf-48d"/>
                         </connections>
@@ -766,7 +766,7 @@
                 </windowController>
                 <customObject id="4dq-yV-GgL" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2855" y="-239"/>
+            <point key="canvasLocation" x="-2623" y="-239"/>
         </scene>
         <!--Light ViewController-->
         <scene sceneID="dma-jW-h1U">
@@ -832,7 +832,7 @@
                 </viewController>
                 <customObject id="Lt1-DR-bMr" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2855" y="193"/>
+            <point key="canvasLocation" x="-2623" y="193"/>
         </scene>
         <!--Color Window-->
         <scene sceneID="9zG-zK-brE">
@@ -853,7 +853,7 @@
                 </windowController>
                 <customObject id="bwj-FR-tvZ" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2629" y="-239"/>
+            <point key="canvasLocation" x="-2853" y="-239"/>
         </scene>
         <!--Color ViewController-->
         <scene sceneID="XLS-c6-YmB">
@@ -905,7 +905,7 @@
                             <constraint firstItem="rm3-4k-N2w" firstAttribute="leading" secondItem="Lfe-t3-Nrb" secondAttribute="leading" constant="13" id="EUC-eR-v7X"/>
                             <constraint firstAttribute="bottom" secondItem="rm3-4k-N2w" secondAttribute="bottom" constant="20" id="HQA-lI-pgZ"/>
                             <constraint firstAttribute="trailing" secondItem="QG2-uV-bIS" secondAttribute="trailing" constant="20" id="bh3-kK-zle"/>
-                            <constraint firstItem="QG2-uV-bIS" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="rm3-4k-N2w" secondAttribute="trailing" symbolic="YES" id="mAy-gg-uXk"/>
+                            <constraint firstItem="QG2-uV-bIS" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="rm3-4k-N2w" secondAttribute="trailing" constant="12" symbolic="YES" id="mAy-gg-uXk"/>
                             <constraint firstItem="rm3-4k-N2w" firstAttribute="top" secondItem="QG2-uV-bIS" secondAttribute="top" id="nbk-Pl-mrf"/>
                         </constraints>
                     </view>
@@ -916,13 +916,13 @@
                 </viewController>
                 <customObject id="KiU-Wl-8HF" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2630.5" y="271.5"/>
+            <point key="canvasLocation" x="-2853" y="272"/>
         </scene>
         <!--Control Window-->
         <scene sceneID="XRf-ca-244">
             <objects>
                 <windowController storyboardIdentifier="Control" id="dcM-WL-aPd" userLabel="Control Window" sceneMemberID="viewController">
-                    <window key="window" title="4  Control" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="cwq-RG-SIg">
+                    <window key="window" title="5  Control" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="cwq-RG-SIg" userLabel="5  Control">
                         <windowStyleMask key="styleMask" titled="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="425" y="461" width="186" height="71"/>
@@ -937,7 +937,7 @@
                 </windowController>
                 <customObject id="Hgh-JK-dn0" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2161" y="-241"/>
+            <point key="canvasLocation" x="-2169" y="-238"/>
         </scene>
         <!--Control ViewController-->
         <scene sceneID="fj6-qP-EC7">
@@ -1316,7 +1316,7 @@
         <scene sceneID="fRZ-3P-06h">
             <objects>
                 <windowController storyboardIdentifier="Memory" id="1R5-s5-tni" userLabel="Memory Window" sceneMemberID="viewController">
-                    <window key="window" title="5 Memory" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="9aN-F9-2yO" userLabel="5 Memory">
+                    <window key="window" title="Memory" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="9aN-F9-2yO" userLabel="5 Memory">
                         <windowStyleMask key="styleMask" titled="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="425" y="461" width="200" height="68"/>
@@ -1332,7 +1332,7 @@
                 </windowController>
                 <customObject id="5Pz-JA-qsM" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1510" y="-273"/>
+            <point key="canvasLocation" x="-1503" y="-232"/>
         </scene>
         <!--Memory ViewController-->
         <scene sceneID="3pk-47-ypn">
@@ -1345,7 +1345,82 @@
                 </viewController>
                 <customObject id="W3P-6f-CaJ" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1293.5" y="118"/>
+            <point key="canvasLocation" x="-1325" y="157"/>
+        </scene>
+        <!--Billboard ViewController-->
+        <scene sceneID="0YC-FC-wk7">
+            <objects>
+                <viewController title="Billboard ViewController" id="zQM-gN-o7b" userLabel="Billboard ViewController" customClass="WinBillboardViewController" customModule="OSX_Fractal" customModuleProvider="target" sceneMemberID="viewController">
+                    <customView key="view" id="KZy-a0-znG" customClass="BaseNSView2" customModule="OSX_Fractal" customModuleProvider="target">
+                        <rect key="frame" x="0.0" y="0.0" width="200" height="274"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <subviews>
+                            <customView autoresizesSubviews="NO" wantsLayer="YES" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LX0-bU-Pol" customClass="InstructionsG" customModule="OSX_Fractal" customModuleProvider="target">
+                                <rect key="frame" x="13" y="132" width="46" height="139"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                            </customView>
+                            <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="W7R-Yn-icR">
+                                <rect key="frame" x="157" y="5" width="25" height="25"/>
+                                <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="aCA-P8-BnP">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="helpPressed:" target="zQM-gN-o7b" id="Acx-ER-AVJ"/>
+                                </connections>
+                            </button>
+                            <textField autoresizesSubviews="NO" wantsLayer="YES" verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="knF-lH-q2N">
+                                <rect key="frame" x="65" y="156" width="121" height="88"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <shadow key="shadow" blurRadius="1">
+                                    <size key="offset" width="2" height="2"/>
+                                    <color key="color" name="windowFrameTextColor" catalog="System" colorSpace="catalog"/>
+                                </shadow>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" refusesFirstResponder="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="left" id="19b-gE-w2g">
+                                    <font key="font" metaFont="system" size="14"/>
+                                    <color key="textColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="findHighlightColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="W7R-Yn-icR" secondAttribute="trailing" constant="20" symbolic="YES" id="Kdf-B1-Uxd"/>
+                            <constraint firstAttribute="bottom" secondItem="W7R-Yn-icR" secondAttribute="bottom" constant="9" id="etQ-Ne-JEm"/>
+                        </constraints>
+                    </customView>
+                    <connections>
+                        <outlet property="instructions" destination="knF-lH-q2N" id="0VO-vp-0eq"/>
+                        <outlet property="instructionsG" destination="LX0-bU-Pol" id="rzv-Gp-sVB"/>
+                    </connections>
+                </viewController>
+                <customObject id="e9A-1y-s1z" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-2402" y="16"/>
+        </scene>
+        <!--Billboard Window-->
+        <scene sceneID="YLg-F3-vFb">
+            <objects>
+                <windowController storyboardIdentifier="Billboards" id="VpE-6N-ryN" userLabel="Billboard Window" sceneMemberID="viewController">
+                    <window key="window" title="4  Billboards" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="R84-Xr-cuQ" userLabel="4  Billboards">
+                        <windowStyleMask key="styleMask" titled="YES"/>
+                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+                        <rect key="contentRect" x="425" y="461" width="200" height="68"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
+                        <view key="contentView" id="X9V-UK-Usz">
+                            <rect key="frame" x="0.0" y="0.0" width="200" height="68"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </view>
+                        <connections>
+                            <outlet property="delegate" destination="VpE-6N-ryN" id="CES-yB-JY4"/>
+                        </connections>
+                    </window>
+                    <connections>
+                        <segue destination="zQM-gN-o7b" kind="relationship" relationship="window.shadowedContentViewController" id="vpC-QT-kX0"/>
+                    </connections>
+                </windowController>
+                <customObject id="nbX-JW-Mel" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-2395" y="-239"/>
         </scene>
     </scenes>
 </document>
