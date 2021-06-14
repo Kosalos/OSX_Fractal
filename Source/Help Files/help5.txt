@@ -1,7 +1,7 @@
-Control Window
+5 Control Window
 
 Alternate way to control widgets.
-Four independent panel are provided.
+Four independent panels are provided.
 
 Click the 'X' and 'Y' buttons to assign a widget to the respective axis.
 

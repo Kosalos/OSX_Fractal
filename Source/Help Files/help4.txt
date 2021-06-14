@@ -1,27 +1,20 @@
-Lights Window
+4 Billboards
 
-Three light sources are provided.
+Press 'P' to launch the bitmap selection dialog,
+then use billbords to specify where portions of the bitmap are displayed within
+the fractal image
 
-Set <Bright> to zero (full left on widget) to skip a light source.
+10 billboards are available
 
-<Spread> controls the "spot light" vs. "diffuse" characteristic.
+X,Y : set the position of the upper left corner of the billboard
+Z   : set the dustance from the camera
 
-OrbitTrapping
-All of these algorithms are 'escape-time Fractals',
-and by tracking certain variables as the escape is determined
-we learn information that can be used to enhance the fractal coloring.
+XS,YS : set the size of the billboard
 
-Cycles:     how many times the trap controls are repeated
-Strength:   relative brightness of trap coloring, from 0% to 100%
-x Color:    assign Color to channel 'x' (252 colors)
-x Weight:   specify how much channel 'x' adds to color, from -3 to +3
+All the billboards get their image data from the single bitmap loaded earlier
 
-... the same 2 widgets for channels 'y' - 'r'
+U1,V1 : specify the relative position of the upper left coordinate
+        of the billboard as 0 ... 1
+U2,V2 : the same for the lower right coordinate
 
-Fixed Trap has three values:
-0: Orbit Trap calculated from ray point position
-1: Orbit Trap calculated using distance of point from fixed point
-2: fixed point is a relative distance from first ray point position
-
-Press <L> to cycle keyboard focus between the windows.
-
+Fud:  experimental attempt to correctly position the billboard depth within the fractal image

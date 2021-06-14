@@ -14,7 +14,7 @@ class HelpViewController: NSViewController {
         let textView = scrollView.documentView as? NSTextView
         
         do {
-            textView!.string = try String(contentsOfFile: Bundle.main.path(forResource: helpFilename[helpIndex], ofType: "")!)
+            textView!.string = try String(contentsOfFile: Bundle.main.path(forResource: helpFilename[helpIndex-1], ofType: "")!)
             isHelpVisible = true
         } catch {
             fatalError("\n\nload help text failed\n\n")

@@ -19,12 +19,7 @@ class WinLightViewController: NSViewController, NSWindowDelegate, WidgetDelegate
         vc.flagViewToRecalcFractal()
     }
     
-    @IBAction func helpPressed(_ sender: NSButton) {
-        if !isHelpVisible {
-            helpIndex = 3
-            presentPopover("HelpVC")
-        }
-    }
+    @IBAction func helpPressed(_ sender: NSButton) { vc.showHelpPage(self.view,3) }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,8 +37,8 @@ class WinLightViewController: NSViewController, NSWindowDelegate, WidgetDelegate
     //MARK: -
     
     func updateLayoutOfChildViews() {
-        let widgetPanelHeight:Int = 700
-        instructionsG.frame = CGRect(x:5, y:5, width:75, height:widgetPanelHeight)
+        let widgetPanelHeight:Int = 565
+        instructionsG.frame = CGRect(x:5, y:5, width:44, height:widgetPanelHeight)
         instructionsG.bringToFront()
         instructionsG.refresh()
         
@@ -114,12 +109,6 @@ class WinLightViewController: NSViewController, NSWindowDelegate, WidgetDelegate
     }
 
     //MARK: -
-    
-    func presentPopover(_ name:String) {
-        let mvc = NSStoryboard(name: NSStoryboard.Name("Main"), bundle: nil)
-        let vc = mvc.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(name)) as! NSViewController
-        self.present(vc, asPopoverRelativeTo: view.bounds, of: view, preferredEdge: .minX, behavior: .transient)
-    }
     
     override func keyDown(with event: NSEvent) {
         if widget.keyPress(event,true) {

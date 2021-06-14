@@ -19,6 +19,7 @@
 		1D4A5BBD257FEA2100B63E39 /* help5.txt in Resources */ = {isa = PBXBuildFile; fileRef = 1D4A5BBC257FEA2100B63E39 /* help5.txt */; };
 		1D4D7A63262BBE3C0097B9CB /* MemoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4D7A60262BB52D0097B9CB /* MemoryViewController.swift */; };
 		1D4E2D672672835600378C1A /* WinBillboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4E2D6626727C7F00378C1A /* WinBillboardViewController.swift */; };
+		1D878EF526743DB7008538FA /* help2.txt in Resources */ = {isa = PBXBuildFile; fileRef = 1D878EF426743DB7008538FA /* help2.txt */; };
 		1D88BAB0233135D300362BA9 /* ColorMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D88BAAF233135D300362BA9 /* ColorMap.swift */; };
 		1D95FCFC2308613F00C99D8D /* InstructionsG.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D95FCFB2308613F00C99D8D /* InstructionsG.swift */; };
 		1DA43D4B259ED227004954F9 /* WinColorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DA43D4A259ED227004954F9 /* WinColorViewController.swift */; };
@@ -48,6 +49,7 @@
 		1D4A5BBC257FEA2100B63E39 /* help5.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = help5.txt; sourceTree = "<group>"; };
 		1D4D7A60262BB52D0097B9CB /* MemoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryViewController.swift; sourceTree = "<group>"; };
 		1D4E2D6626727C7F00378C1A /* WinBillboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WinBillboardViewController.swift; sourceTree = "<group>"; };
+		1D878EF426743DB7008538FA /* help2.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = help2.txt; sourceTree = "<group>"; };
 		1D88BAAF233135D300362BA9 /* ColorMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorMap.swift; sourceTree = "<group>"; };
 		1D95FCFB2308613F00C99D8D /* InstructionsG.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstructionsG.swift; sourceTree = "<group>"; };
 		1DA43D4A259ED227004954F9 /* WinColorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WinColorViewController.swift; sourceTree = "<group>"; };
@@ -84,6 +86,7 @@
 			children = (
 				1D4650092221B0BB00D14A94 /* HelpViewController.swift */,
 				1D46500B2221B0C400D14A94 /* help.txt */,
+				1D878EF426743DB7008538FA /* help2.txt */,
 				1D3FB4732256C7890027DFDF /* help3.txt */,
 				1DFFB87F23E501DC0093C78C /* help4.txt */,
 				1D4A5BBC257FEA2100B63E39 /* help5.txt */,
@@ -201,6 +204,7 @@
 			files = (
 				CFEA3DEF211463D900C7DBD3 /* Assets.xcassets in Resources */,
 				1D46500C2221B0C400D14A94 /* help.txt in Resources */,
+				1D878EF526743DB7008538FA /* help2.txt in Resources */,
 				CFEA3DF2211463D900C7DBD3 /* Main.storyboard in Resources */,
 				1DFFB88023E501DC0093C78C /* help4.txt in Resources */,
 				1D4A5BBD257FEA2100B63E39 /* help5.txt in Resources */,

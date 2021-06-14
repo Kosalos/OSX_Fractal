@@ -86,16 +86,7 @@ class VideoRecorderViewController: NSViewController, NSTableViewDataSource, NSTa
         easeInOutFlag = sender.state == .on
     }
     
-    func presentPopover(_ name:String) {
-        let mvc = NSStoryboard(name: NSStoryboard.Name("Main"), bundle: nil)
-        let vc = mvc.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(name)) as! NSViewController
-        self.present(vc, asPopoverRelativeTo: view.bounds, of: view, preferredEdge: .minX, behavior: .transient)
-    }
-    
-    @IBAction func helpPressed(_ sender: NSButton) {
-        helpIndex = 2
-        presentPopover("HelpVC")
-    }
+    @IBAction func helpPressed(_ sender: NSButton) { vc.showHelpPage(self.view,6) }
     
     @IBAction func resetPressed(_ sender: NSButton) { reset() }
     

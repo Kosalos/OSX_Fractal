@@ -28,6 +28,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     @IBOutlet var instructions: NSTextField!
     @IBOutlet var instructionsG: InstructionsG!
     @IBOutlet var metalView: MetalView!
+    @IBOutlet var mainHelpButton: NSButton!
     
     let PIPELINE_FRACTAL = 0
     let PIPELINE_NORMAL  = 1
@@ -90,9 +91,6 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         
         Timer.scheduledTimer(withTimeInterval:0.033, repeats:true) { timer in self.timerHandler() }
         
-        helpIndex = 0
-        // presentPopover("HelpVC")
-        
         winHandler.cycleWindowFocus() // sets focus to main window
     }
     
@@ -104,6 +102,8 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         
         winControl.showWindow(self)
     }
+    
+    @IBAction func mainHelpButtonPressed(_ sender: NSButton) { showHelpPage(self.view,1) }
     
     //MARK: -
     
@@ -1288,10 +1288,17 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     
     //MARK: -
     
-    func presentPopover(_ name:String) {
+    func presentPopover(_ parentView:NSView, _ name:String) {
         let mvc = NSStoryboard(name: NSStoryboard.Name("Main"), bundle: nil)
         let vc = mvc.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(name)) as! NSViewController
-        self.present(vc, asPopoverRelativeTo: view.bounds, of: view, preferredEdge: .minX, behavior: .semitransient) 
+        self.present(vc, asPopoverRelativeTo: parentView.bounds, of: parentView, preferredEdge: .minX, behavior: .semitransient)
+    }
+    
+    func showHelpPage(_ parentView:NSView, _ index:Int) {
+        if !isHelpVisible {
+            helpIndex = index
+            presentPopover(parentView,"HelpVC")
+        }
     }
     
     var ctrlKeyDown:Bool = false
@@ -1334,13 +1341,10 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         
         switch Int32(event.keyCode) {
         case HOME_KEY :
-            presentPopover("SaveLoadVC")
+            presentPopover(self.view,"SaveLoadVC")
             return
         case PAGE_UP :
-            if !isHelpVisible {
-                helpIndex = 0
-                presentPopover("HelpVC")
-            }
+            showHelpPage(self.view,1)
             return
         case END_KEY :
             let s = SaveLoadViewController()
@@ -1364,7 +1368,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         
         switch event.charactersIgnoringModifiers!.uppercased() {
         case "O" :
-            presentPopover("EquationPickerVC")
+            presentPopover(self.view,"EquationPickerVC")
             return
             
         case "0" :
@@ -1403,7 +1407,8 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             
         case " " :
             instructions.isHidden = !instructions.isHidden
-            instructionsG.isHidden = !instructionsG.isHidden
+            instructionsG.isHidden = instructions.isHidden
+            mainHelpButton.isHidden = instructions.isHidden
         case "H" :
             repeatCount = 20
             repeatStyle = 2
@@ -2099,7 +2104,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         texture = device.makeTexture(descriptor: textureDescriptor)!
         //-------------------------------
         
-        let widgetPanelHeight:Int = 1200
+        let widgetPanelHeight:Int = Int(view.frame.height - 35)
         instructionsG.frame = CGRect(x:5, y:5, width:75, height:widgetPanelHeight)
         instructionsG.bringToFront()
         instructionsG.refresh()

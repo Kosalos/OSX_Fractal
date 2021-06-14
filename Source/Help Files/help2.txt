@@ -1,0 +1,39 @@
+2 Color Window
+
+Bright  : overall brightness of image
+Enhance : biased brightness effect
+Contrast: enhance color differences from neutral gray tones
+
+Specular : add spotlight lighting effect
+  Light Position: move the spotlght
+  SPower : set spotlight power
+  SMix : set relative lighting, spotlight vs. coloring effects
+  
+Style : Select coloring style 0 ... 7
+
+Second Surface -------------------------------
+
+When value is zero (set to lowest value), the image renders as normal.
+When active (non-zero, specifying distance to move along ray),
+the Distance Estimation equation does not return the first fractal
+surface encountered, but instead continues to move along the ray
+to search for the second surface.
+Allows you to see 'inside' many fractal shapes.
+
+Reflect1 and Reflect2 control the second surface depth and strength
+
+Mix X,Y,Z : swap the RGB color values
+
+C Normal : specify distance from parent position when selecting the
+   positions of neighboring points when calculating the Normal vector.
+   
+Blur :
+  Specify the Strength of the blurring effect,
+  the distance from the camera where the blurring effect is centered,
+  and how much the blurred pointd are darkened
+
+Radial Symmetry :
+
+When value is zero (set to lowest value), the image renders as normal.
+When active (non-zero, specifying pie wedge size in radians),
+a pie slice shapged region of the image is repeated to form a mandala.

@@ -1,26 +1,24 @@
-Bare Bones Raymarching
-
-Press 'page up' to display this dialog.
-
-Press 'O' to launch Equation Picker dialog
-
-Note for arrow keys and jog keys :
-Hold 'Shift' key for slow changes
-Hold 'Option' key for fast changes
-Hold both 'Shift' and 'Option' for very fast changes
+1 Main Window
 
 Lt/Rt Arrows : Alter value of focused widget
 Up/Dn Arrows : Move widget focus
 Spacebar     : Toggle instructions Display
 
-Note:  mouse click on widget to move focus directly
+Note for arrow keys and jog keys :
+  Hold 'Shift' key for slow changes
+  Hold 'Option' key for fast changes
+  Hold both 'Shift' and 'Option' for very fast changes
+
+Note: Mouse click on widget barchart to move focus directly
 
 Keyboard commands ----------------------------
 
 1,2 : Change Equation (previous, next)
 3   : Toggle Cross-Eyed Stereo
+      When stereo viewing is enabled the widget 'Parallax'
+      is offered at the top of the widget list.
+      Adjust this parameter for best stereo effect.
 
-===============================================
 Jogging the camera, and Rotating the view direction
 
 Use 4,5 for X
@@ -33,9 +31,9 @@ Add <shift + option> for very fast jog
 Add <control> to rotate the view direction rather than jog
 (shift & option can be added during rotation to control speed)
 
-Note: Press key 'C' to cycle through 4 palettes of colors for trap effect
-===============================================
+<Cmd>1 ... <Cmd>5  Move window focus to respective Window
 
+===============================================
 0   : Toggle Full Screen
 
 <,> : Adjust window size smaller/larger
@@ -46,6 +44,9 @@ G   : Cycle through the coloring schemes
       note: certain color schemes have a widget entry called 'Color Boost'
       you'll need to fiddle with this parameter as well as
       Brightness for best results.
+
+O   : Launch Equation Picker dialog
+
 P   : Load Picture for texturing
       launches picture selection dialog.
       When active additional widgets alter which
@@ -54,7 +55,8 @@ P   : Load Picture for texturing
 
 home      : Launch Save/Load dialog.
 end       : Load next saved image.
-            Once you have multiple images saved: this cycles them.
+            Once you have multiple images saved, this cycles them.
+            
 page up   : Show this dialog
 
 Video Recording ------------------------------
@@ -62,27 +64,7 @@ Video Recording ------------------------------
 Press '[' to launch video recorder window.
 Press ']' to hit <Add Keyframe to end> button on recorder window.
 
-Second Surface -------------------------------
-
-When value is zero (set to lowest value), the image renders as normal.
-When active (non-zero, specifying distance to move along ray),
-the Distance Estimation equation does not return the first fractal
-surface encountered, but instead continues to move along the ray
-to search for the second surface.
-Allows you to see 'inside' many fractal shapes.
-
-Radial Symmetry ------------------------------
-
-When value is zero (set to lowest value), the image renders as normal.
-When active (non-zero, specifying pie wedge size in radians),
-a pie slice shapged region of the image is repeated to form a mandala.
-
-Coloring Effect ------------------------------
-
-Press 'M' to toggle coloring Effect
-When active, the 'Scale' widget manages its' effect
-
-----------------------------------------------
+-----------------------------
 Developers :
   Read about the 'V', and 'H' key commands
   described at the top of Shaders.metal.

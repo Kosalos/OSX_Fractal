@@ -21,7 +21,7 @@ class ControlViewController: NSViewController {
     func launchPopOver(_ pIndex:Int, _ sIndex:Int) {
         panelIndex = pIndex
         selectIndex = sIndex
-        presentPopover("ControlPickerVC")
+        vc.presentPopover(self.view,"ControlPickerVC")
     }
     
     @IBAction func x1(_ sender: NSButton) { launchPopOver(0,0) }
@@ -33,12 +33,7 @@ class ControlViewController: NSViewController {
     @IBAction func x4(_ sender: NSButton) { launchPopOver(3,0) }
     @IBAction func y4(_ sender: NSButton) { launchPopOver(3,1) }
     
-    @IBAction func helpPressed(_ sender: NSButton) {
-        if !isHelpVisible {
-            helpIndex = 4
-            presentPopover("HelpVC")
-        }
-    }
+    @IBAction func helpPressed(_ sender: NSButton) { vc.showHelpPage(self.view,5) }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -84,12 +79,6 @@ class ControlViewController: NSViewController {
     }
     
     //MARK: -
-    
-    func presentPopover(_ name:String) {
-        let mvc = NSStoryboard(name: NSStoryboard.Name("Main"), bundle: nil)
-        let vc = mvc.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(name)) as! NSViewController
-        self.present(vc, asPopoverRelativeTo: view.bounds, of: view, preferredEdge: .minX, behavior: .semitransient)
-    }
     
     func widgetSelectionMade() {
         setPanelWidgetIndex(panelIndex,selectIndex,controlPickerSelection)
