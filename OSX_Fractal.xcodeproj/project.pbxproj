@@ -8,12 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		1D09268C223C1248005BC5FC /* EquationPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D09268B223C1248005BC5FC /* EquationPickerViewController.swift */; };
+		1D37762B2680E0DD004A79C4 /* help7.txt in Resources */ = {isa = PBXBuildFile; fileRef = 1D37762A2680E0DD004A79C4 /* help7.txt */; };
 		1D3FB471225519240027DFDF /* VideoRecorderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3FB46F225519240027DFDF /* VideoRecorderViewController.swift */; };
 		1D3FB4742256C78A0027DFDF /* help3.txt in Resources */ = {isa = PBXBuildFile; fileRef = 1D3FB4732256C7890027DFDF /* help3.txt */; };
 		1D40CB4D21F1015F009C73A3 /* Widget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D40CB4C21F1015F009C73A3 /* Widget.swift */; };
 		1D465008221E88DA00D14A94 /* SaveLoadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D465007221E88DA00D14A94 /* SaveLoadViewController.swift */; };
 		1D46500A2221B0BB00D14A94 /* HelpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4650092221B0BB00D14A94 /* HelpViewController.swift */; };
-		1D46500C2221B0C400D14A94 /* help.txt in Resources */ = {isa = PBXBuildFile; fileRef = 1D46500B2221B0C400D14A94 /* help.txt */; };
+		1D46500C2221B0C400D14A94 /* help1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 1D46500B2221B0C400D14A94 /* help1.txt */; };
 		1D4A5BB9257D8C8C00B63E39 /* ControlViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4A5BB8257D8C8C00B63E39 /* ControlViewController.swift */; };
 		1D4A5BBB257D9C3B00B63E39 /* ControlPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4A5BBA257D9C3B00B63E39 /* ControlPickerViewController.swift */; };
 		1D4A5BBD257FEA2100B63E39 /* help5.txt in Resources */ = {isa = PBXBuildFile; fileRef = 1D4A5BBC257FEA2100B63E39 /* help5.txt */; };
@@ -38,12 +39,13 @@
 
 /* Begin PBXFileReference section */
 		1D09268B223C1248005BC5FC /* EquationPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EquationPickerViewController.swift; sourceTree = "<group>"; };
+		1D37762A2680E0DD004A79C4 /* help7.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = help7.txt; sourceTree = "<group>"; };
 		1D3FB46F225519240027DFDF /* VideoRecorderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoRecorderViewController.swift; sourceTree = "<group>"; };
 		1D3FB4732256C7890027DFDF /* help3.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = help3.txt; sourceTree = "<group>"; };
 		1D40CB4C21F1015F009C73A3 /* Widget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widget.swift; sourceTree = "<group>"; };
 		1D465007221E88DA00D14A94 /* SaveLoadViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SaveLoadViewController.swift; sourceTree = "<group>"; };
 		1D4650092221B0BB00D14A94 /* HelpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelpViewController.swift; sourceTree = "<group>"; };
-		1D46500B2221B0C400D14A94 /* help.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = help.txt; sourceTree = "<group>"; };
+		1D46500B2221B0C400D14A94 /* help1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = help1.txt; sourceTree = "<group>"; };
 		1D4A5BB8257D8C8C00B63E39 /* ControlViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControlViewController.swift; sourceTree = "<group>"; };
 		1D4A5BBA257D9C3B00B63E39 /* ControlPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControlPickerViewController.swift; sourceTree = "<group>"; };
 		1D4A5BBC257FEA2100B63E39 /* help5.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = help5.txt; sourceTree = "<group>"; };
@@ -85,12 +87,13 @@
 			isa = PBXGroup;
 			children = (
 				1D4650092221B0BB00D14A94 /* HelpViewController.swift */,
-				1D46500B2221B0C400D14A94 /* help.txt */,
+				1D46500B2221B0C400D14A94 /* help1.txt */,
 				1D878EF426743DB7008538FA /* help2.txt */,
 				1D3FB4732256C7890027DFDF /* help3.txt */,
 				1DFFB87F23E501DC0093C78C /* help4.txt */,
 				1D4A5BBC257FEA2100B63E39 /* help5.txt */,
 				1DA43D4E25A103F2004954F9 /* help6.txt */,
+				1D37762A2680E0DD004A79C4 /* help7.txt */,
 			);
 			path = "Help Files";
 			sourceTree = "<group>";
@@ -203,7 +206,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				CFEA3DEF211463D900C7DBD3 /* Assets.xcassets in Resources */,
-				1D46500C2221B0C400D14A94 /* help.txt in Resources */,
+				1D37762B2680E0DD004A79C4 /* help7.txt in Resources */,
+				1D46500C2221B0C400D14A94 /* help1.txt in Resources */,
 				1D878EF526743DB7008538FA /* help2.txt in Resources */,
 				CFEA3DF2211463D900C7DBD3 /* Main.storyboard in Resources */,
 				1DFFB88023E501DC0093C78C /* help4.txt in Resources */,

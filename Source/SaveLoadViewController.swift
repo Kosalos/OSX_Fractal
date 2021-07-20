@@ -88,7 +88,7 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     @IBOutlet var DateRadio: NSButton!
     @IBOutlet var KindRadio: NSButton!
     @IBOutlet var saveNewButton: NSButton!
-    @IBOutlet var loadNewestButton: NSButton!
+    @IBOutlet var helpButton: NSButton!
     var tv:NSTableView! = nil
     var dateString:String = ""
     var fileURL:URL! = nil
@@ -99,12 +99,7 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
         overwriteAndDismissDialog(index)
     }
     
-    @IBAction func loadNewestPressed(_ sender: NSButton) {
-        dateSort = true
-        dateAscending = false
-        sortSLEntries()
-        loadAndDismissDialog(0)        
-    }
+    @IBAction func helpPressed(_ sender: NSButton) { showHelpPage(view,.SaveLoad) }
     
     func numberOfSections(in tableView: NSTableView) -> Int { return 1 }
     func numberOfRows(in tableView: NSTableView) -> Int { return slEntry.count }
@@ -218,7 +213,6 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
         case  1 : saveNewPressed(DateRadio)         // S
         case  2 : radioPressed(DateRadio)           // D
         case 36 : loadAndDismissDialog(focus)       // <return>
-        case 37 : loadNewestPressed(loadNewestButton) // L
         case 40 : radioPressed(KindRadio)           // K
         case 53 : dismiss(self)  // Esc
         default : break
@@ -229,7 +223,7 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
         DateRadio.set(textColor: dateSort ? .red : .white)
         KindRadio.set(textColor: !dateSort ? .red : .white)
         saveNewButton.set(textColor: .white)
-        loadNewestButton.set(textColor: .white)
+        helpButton.set(textColor: .white)
     }
     
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
@@ -245,6 +239,29 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
     }
     
     func tableViewSelectionDidChange(_ notification: Notification) {
+        if tv.numberOfSelectedRows > 1 {
+            let selectedEntries = tv.selectedRowIndexes
+
+            let alert = NSAlert()
+            alert.messageText = "Confirm Deletion of Selected Entries"
+            alert.informativeText = "Are you sure?"
+            alert.addButton(withTitle: "NO")
+            alert.addButton(withTitle: "YES")
+            alert.beginSheetModal(for: self.view.window!) {( returnCode: NSApplication.ModalResponse) -> Void in
+                if returnCode.rawValue == 1001 {
+                    do {
+                        for index in selectedEntries  {
+                            self.deleteEntry(index)
+                        }
+
+                        self.dismiss(self)
+                    }
+                }
+            }
+            
+            return
+        }
+        
         loadAndDismissDialog(tv.selectedRow)
     }
     

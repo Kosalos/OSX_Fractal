@@ -19,7 +19,7 @@ class WinLightViewController: NSViewController, NSWindowDelegate, WidgetDelegate
         vc.flagViewToRecalcFractal()
     }
     
-    @IBAction func helpPressed(_ sender: NSButton) { vc.showHelpPage(self.view,3) }
+    @IBAction func helpPressed(_ sender: NSButton) { showHelpPage(view,.Light) }
     
     override func viewDidLoad() {
         super.viewDidLoad()

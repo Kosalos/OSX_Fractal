@@ -125,9 +125,11 @@ class WindowHandler {
         w3.displayWidgets()
     }
 
-    func setWindowFocus(_ index:Int) {
-        focusIndex = index-1
-        cycleWindowFocus()
+    func setWindowFocus(_ baseZeroIndex:Int) {
+        if baseZeroIndex >= 0 && baseZeroIndex < windows.count {
+            focusIndex = baseZeroIndex - 1 // prepare for cycleWindowFocus call
+            cycleWindowFocus()
+        }
     }
         
     func closeAllWindows() {

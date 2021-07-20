@@ -30,7 +30,7 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
         defineWidgets()
     }
     
-    @IBAction func helpPressed(_ sender: NSButton) { vc.showHelpPage(self.view,2) }
+    @IBAction func helpPressed(_ sender: NSButton) { showHelpPage(view,.Color) }
  
     override func viewDidLoad() {
         super.viewDidLoad()

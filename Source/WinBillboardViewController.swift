@@ -19,7 +19,7 @@ class WinBillboardViewController: NSViewController, NSWindowDelegate, WidgetDele
         vc.flagViewToRecalcFractal()
     }
     
-    @IBAction func helpPressed(_ sender: NSButton) { vc.showHelpPage(self.view,4) }
+    @IBAction func helpPressed(_ sender: NSButton) { showHelpPage(view,.Billboard) }
     
     override func viewDidLoad() {
         super.viewDidLoad()

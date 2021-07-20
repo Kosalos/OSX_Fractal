@@ -103,7 +103,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         winControl.showWindow(self)
     }
     
-    @IBAction func mainHelpButtonPressed(_ sender: NSButton) { showHelpPage(self.view,1) }
+    @IBAction func mainHelpButtonPressed(_ sender: NSButton) { showHelpPage(view,.Main) }
     
     //MARK: -
     
@@ -524,38 +524,27 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
                 control.InvAngle =  0.1
             }
         case EQU_14_SPUDS :
-            control.camera = SIMD3<Float>(-0.017165225, -11.63782, -12.160562)
-            updateShaderDirectionVector( SIMD3<Float>(0.0, 0.09950372, 0.9950372) )
-            control.cx = 0.01
-            control.cy = 2.9100008
-            control.cz = 2.0900004
-            control.cw = 2.1300004
-            control.dx = 2.2099998
-            control.dy = 0.61
-            control.dz = 4.049999
-            control.fx = 1.2000002
-            control.isteps = 9
-            control.bright = 2.3600001
-            control.contrast = 0.16
+            control.camera = simd_float3(0.98336715, -1.2565054, -3.960955)
+            control.cx = 3.7524672
+            control.cy = 1.0099992
+            control.cz = -1.0059854
+            control.cw = -1.0534152
+            control.dx = 1.1883448
+            control.dz = -4.100001
+            control.dw = -3.2119942
+            control.ex = 3.2999988
+            control.isteps = 8
+            control.bright = 0.92
             
             if control.doInversion {
-                control.camera = SIMD3<Float>(0.44283432, -0.5461547, -1.4410573)
-                updateShaderDirectionVector( SIMD3<Float>(0.0, 0.09950371, 0.99503714) )
-                control.cx = 0.31
-                control.cy = 1.9300008
-                control.cz = 1.2500002
-                control.cw = 2.1300004
-                control.dx = 2.51
-                control.dy = 0.61
-                control.dz = 4.049999
-                control.fx = 1.2000002
-                control.InvCx =  0.40399995
-                control.InvCy =  -0.398
-                control.InvCz =  0.24200001
-                control.InvRadius =  1.7400002
-                control.InvAngle =  -4.48
+                control.camera = simd_float3( 0.18336754 , -0.29131955 , -4.057477 )
+                updateShaderDirectionVector(simd_float3( 0.0 , 0.09950372 , 0.9950372 ))
+                control.InvCx =  -0.544
+                control.InvCy =  -0.18200001
+                control.InvCz =  -0.44799998
+                control.InvRadius =  1.3700002
+                control.InvAngle =  0.1
             }
-            
         case EQU_15_FLOWER :
             control.camera = simd_float3(-0.16991696, -2.5964863, -12.54011)
             control.cx = 1.6740334
@@ -1294,13 +1283,6 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         self.present(vc, asPopoverRelativeTo: parentView.bounds, of: parentView, preferredEdge: .minX, behavior: .semitransient)
     }
     
-    func showHelpPage(_ parentView:NSView, _ index:Int) {
-        if !isHelpVisible {
-            helpIndex = index
-            presentPopover(parentView,"HelpVC")
-        }
-    }
-    
     var ctrlKeyDown:Bool = false
     var optionKeyDown:Bool = false
     var cmdKeyDown:Bool = false
@@ -1344,7 +1326,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             presentPopover(self.view,"SaveLoadVC")
             return
         case PAGE_UP :
-            showHelpPage(self.view,1)
+            showHelpPage(view,.Main)
             return
         case END_KEY :
             let s = SaveLoadViewController()
@@ -1355,14 +1337,8 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         }
         
         if cmdKeyDown {
-            switch event.charactersIgnoringModifiers!.uppercased() {
-            case "1" : winHandler.setWindowFocus(0)
-            case "2" : winHandler.setWindowFocus(1)
-            case "3" : winHandler.setWindowFocus(2)
-            case "4" : winHandler.setWindowFocus(3)
-            case "5" : winHandler.setWindowFocus(4)
-            default : break
-            }
+            let str = event.charactersIgnoringModifiers!.uppercased()
+            winHandler.setWindowFocus(Int(str)! - 1)
             return
         }
         
@@ -1654,15 +1630,20 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         widget.reset()
         
         if control.isStereo { widget.addFloat("Parallax",&control.parallax,0.0001,1,0.001) }
-        
+
         switch Int(control.equation) {
         case EQU_01_MANDELBULB :
-            widget.addInt32("Iterations",&control.isteps,3,130,1)
+//            widget.addInt32("Iterations",&control.isteps,3,130,1)
+//            widget.addFloat("Power",&control.fx,0.5,12,0.02)
+        
+            // zorro
             widget.addFloat("Power",&control.fx,0.5,12,0.02)
-            
-            widget.addBoolean("Switch",&control.bcx)
-            juliaGroup(8,0.01)
-            
+            widget.addFloat("X",&control.cx,-2,2,0.001)
+            widget.addFloat("Y",&control.cy,-2,2,0.001)
+            widget.addFloat("Z",&control.cz,0.000001, 10,0.01)
+            widget.addFloat("C",&control.cw,0.0001,10,0.01)
+            widget.addFloat("P",&control.dx,1,100,1)
+
         case EQU_02_APOLLONIAN2 :
             widget.addInt32("Iterations",&control.isteps,2,40,1)
             widget.addFloat("Multiplier",&control.cx,10,300,0.2)
@@ -1753,16 +1734,15 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addFloat("Offset Y",&control.juliaY,-15,15,0.1)
             widget.addFloat("Offset Z",&control.juliaZ,-15,15,0.1)
         case EQU_14_SPUDS :
-            widget.addInt32("Iterations",&control.isteps,2,20,1)
-            widget.addFloat("Q1",&control.cx,-6,6,0.02)
-            widget.addFloat("Q2",&control.cy,0.01,16,0.02)
-            widget.addFloat("Q3",&control.cz,-6,6,0.02)
-            widget.addFloat("Q4",&control.cw,-6,6,0.02)
-            widget.addFloat("Q5",&control.fx,-6,6,0.02)
-            widget.addFloat("Q6",&control.dx,0.01,16,0.02)
-            widget.addFloat("Q7",&control.dy,-6,6,0.02)
-            widget.addFloat("Q8",&control.dz,-6,6,0.02)
-            widget.addFloat("Q9",&control.dw,-6,6,0.02)
+            widget.addInt32("Iterations",&control.isteps,3,30,1)
+            widget.addFloat("Power",&control.ex,1.5,12,0.1)
+            widget.addFloat("MinRad",&control.cx,-5,5,0.1)
+            widget.addFloat("FixedRad",&control.cy,-5,5,0.02)
+            widget.addFloat("Fold Limit",&control.cz,-5,5,0.02)
+            widget.addFloat("Fold Limit2",&control.cw,-5,5,0.02)
+            widget.addFloat("ZMUL",&control.dx,-5,5,0.1)
+            widget.addFloat("Scale",&control.dz,-5,5,0.1)
+            widget.addFloat("Scale2",&control.dw,-5,5,0.1)
         case EQU_15_FLOWER :
             widget.addInt32("Iterations",&control.isteps,2,30,1)
             widget.addFloat("Scale",&control.cx,0.5,3,0.01)
@@ -1788,22 +1768,24 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             juliaGroup(10,0.01)
         case EQU_19_VERTEBRAE :
             widget.addInt32("Iterations",&control.isteps,1,10,1)
-            widget.addFloat("X",&control.cx,       -10,10,0.1)
-            widget.addFloat("Y",&control.cy,       -10,10,0.1)
-            widget.addFloat("Z",&control.cz,       -10,10,0.1)
-            widget.addFloat("W",&control.cw,       -10,10,0.1)
-            widget.addFloat("ScaleX",&control.dx,  -10,10,0.05)
-            widget.addFloat("Sine X",&control.dw,  -10,10,0.05)
-            widget.addFloat("Offset X",&control.ez,-10,10,0.05)
-            widget.addFloat("Slope X",&control.fy, -10,10,0.05)
-            widget.addFloat("ScaleY",&control.dy,  -10,10,0.05)
-            widget.addFloat("Sine Y",&control.ex,  -10,10,0.05)
-            widget.addFloat("Offset Y",&control.ew,-10,10,0.05)
-            widget.addFloat("Slope Y",&control.fz, -10,10,0.05)
-            widget.addFloat("ScaleZ",&control.dz,  -10,10,0.05)
-            widget.addFloat("Sine Z",&control.ey,  -10,10,0.05)
-            widget.addFloat("Offset Z",&control.fx,-10,10,0.05)
-            widget.addFloat("Slope Z",&control.fw, -10,10,0.05)
+            widget.addFloat("X",&control.cx,       -20,20,0.1)
+            widget.addFloat("Y",&control.cy,       -20,20,0.1)
+            widget.addFloat("Z",&control.cz,       -20,20,0.1)
+            widget.addFloat("W",&control.cw,       -20,20,0.1)
+            widget.addFloat("ScaleX",&control.dx,  -20,20,0.05)
+            widget.addFloat("Sine X",&control.dw,  -20,20,0.05)
+            widget.addFloat("Offset X",&control.ez,-20,20,0.05)
+            widget.addFloat("Slope X",&control.fy, -20,20,0.05)
+            widget.addFloat("ScaleY",&control.dy,  -20,20,0.05)
+            widget.addFloat("Sine Y",&control.ex,  -20,20,0.05)
+            widget.addFloat("Offset Y",&control.ew,-20,20,0.05)
+            widget.addFloat("Slope Y",&control.fz, -20,20,0.05)
+            widget.addFloat("ScaleZ",&control.dz,  -20,20,0.05)
+            widget.addFloat("Sine Z",&control.ey,  -20,20,0.05)
+            widget.addFloat("Offset Z",&control.fx,-20,20,0.05)
+            widget.addFloat("Slope Z",&control.fw, -20,20,0.05)
+            widget.addFloat("Fold 1",&control.angle1,0.01,10,0.1)
+            widget.addFloat("Fold 2",&control.angle2,0.01,10,0.1)
         case EQU_20_DARKSURF :
             widget.addInt32("Iterations",&control.isteps,2,30,1)
             widget.addFloat("scale",&control.cx,    -10,10,0.05)
@@ -1936,7 +1918,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addFloat("ey",&control.ey, -20,20,0.01)
             widget.addFloat("ez",&control.ez, -20,20,0.01)
         case EQU_34_RADIOBASE :
-            widget.addInt32("Iterations",&control.isteps,1,30,1)
+            widget.addInt32("Iterations",&control.isteps,1,80,1)
             widget.addFloat("cx",&control.cx, -20,20,0.01)
             widget.addFloat("cy",&control.cy, -20,20,0.01)
             widget.addFloat("cz",&control.cz, -20,20,0.1)
@@ -1948,9 +1930,13 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addFloat("ex",&control.ex, -20,20,0.01)
             widget.addFloat("ey",&control.ey, -20,20,0.01)
             widget.addFloat("ez",&control.ez, -20,20,0.01)
-            widget.addFloat("ew",&control.ew, -20,20,0.01)
-
-            juliaGroup(10,0.01)
+ 
+            widget.addInt32("istart",&control.icx, 1,69,1)
+            widget.addInt32("istop",&control.icy, 1,69,1)
+ 
+//            widget.addFloat("ew",&control.ew, -20,20,0.01)
+//
+//            juliaGroup(10,0.01)
 
         default : break
         }

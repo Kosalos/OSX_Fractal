@@ -27,11 +27,12 @@ Use 4,5 for X
 Add <shift> for slow jog
 Add <option> for fast jog
 Add <shift + option> for very fast jog
+Add <Q> for 1/1000 speed
 
 Add <control> to rotate the view direction rather than jog
 (shift & option can be added during rotation to control speed)
 
-<Cmd>1 ... <Cmd>5  Move window focus to respective Window
+Press <Cmd>1 ... <Cmd>6 to Move focus to respective Window
 
 ===============================================
 0   : Toggle Full Screen
@@ -40,10 +41,8 @@ Add <control> to rotate the view direction rather than jog
 
 ?,/ : Toggle Fast Rendering
       (rendering is fast/blurry while keys are held down)
+
 G   : Cycle through the coloring schemes
-      note: certain color schemes have a widget entry called 'Color Boost'
-      you'll need to fiddle with this parameter as well as
-      Brightness for best results.
 
 O   : Launch Equation Picker dialog
 

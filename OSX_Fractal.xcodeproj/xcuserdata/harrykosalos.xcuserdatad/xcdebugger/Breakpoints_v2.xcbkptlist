@@ -14,8 +14,8 @@
             filePath = "Source/Shaders.metal"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1971"
-            endingLineNumber = "1971"
+            startingLineNumber = "2178"
+            endingLineNumber = "2178"
             landmarkName = "applyColoring ( float3 position, float3 direction, float3 distAns, float3 normal, device Control &amp;control)"
             landmarkType = "9">
          </BreakpointContent>
@@ -30,8 +30,8 @@
             filePath = "Source/Shaders.metal"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1757"
-            endingLineNumber = "1757"
+            startingLineNumber = "1953"
+            endingLineNumber = "1953"
             landmarkName = "DE_Inner(float3 pos,device Control &amp;control,thread float4 &amp;orbitTrap)"
             landmarkType = "9">
          </BreakpointContent>
@@ -46,8 +46,8 @@
             filePath = "Source/Shaders.metal"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1738"
-            endingLineNumber = "1738"
+            startingLineNumber = "1934"
+            endingLineNumber = "1934"
             landmarkName = "DE_Inner(float3 pos,device Control &amp;control,thread float4 &amp;orbitTrap)"
             landmarkType = "9">
          </BreakpointContent>
@@ -62,10 +62,42 @@
             filePath = "Source/Shaders.metal"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1625"
-            endingLineNumber = "1625"
+            startingLineNumber = "1714"
+            endingLineNumber = "1714"
             landmarkName = "unknown"
             landmarkType = "0">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "BADF0C06-E7D3-4F02-8B89-CF47AFD13D1C"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Source/ViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1923"
+            endingLineNumber = "1923"
+            landmarkName = "defineWidgetsForCurrentEquation()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "DD6F358F-0CA7-489B-B2C4-FCF68EF3AACD"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Source/ViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1736"
+            endingLineNumber = "1736"
+            landmarkName = "defineWidgetsForCurrentEquation()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

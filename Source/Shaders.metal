@@ -49,10 +49,10 @@ float2 rotatePosition2(float2 pos, float angle) {
     float ss = sin(angle);
     float cc = cos(angle);
     float qt = pos.x;
-
+    
     pos.x = pos.x * cc - pos.y * ss;
     pos.y =    qt * ss + pos.y * cc;
-
+    
     return pos;
 }
 
@@ -60,7 +60,7 @@ float2 rotatePosition2(float2 pos, float angle) {
 // mandelbulb: https://github.com/jtauber/mandelbulb/blob/master/mandel8.py
 
 float DE_MANDELBULB(float3 pos,device Control &control,thread float4 &orbitTrap) {
-#ifdef SINGLE_EQUATION
+#ifdef zzzSINGLE_EQUATION
     return 0;
 #else
     float dr = 1;
@@ -98,7 +98,7 @@ float DE_MANDELBULB(float3 pos,device Control &control,thread float4 &orbitTrap)
 // apollonian2: https://www.shadertoy.com/view/llKXzh
 
 float DE_APOLLONIAN2(float3 pos,device Control &control,thread float4 &orbitTrap) {
-#ifdef zzzSINGLE_EQUATION
+#ifdef  zzzSINGLE_EQUATION
     return 0;
 #else
     float t = control.cz + 0.25 * cos(control.cw * PI * control.cx * (pos.z - pos.x));
@@ -212,7 +212,7 @@ float boxFold(float v, float fold) { return abs(v + fold) - fabs(v- fold) - v; }
 float boxFold2(float v, float fold) { if(v < -fold) v = -2 * fold - v; return v; }
 
 float DE_MANDELBOX(float3 pos,device Control &control,thread float4 &orbitTrap) {
-#ifdef zzzSINGLE_EQUATION
+#ifdef    SINGLE_EQUATION
     return 0;
 #else
     // For the Juliabox, c is a constant. For the Mandelbox, c is variable.
@@ -238,9 +238,7 @@ float DE_MANDELBOX(float3 pos,device Control &control,thread float4 &orbitTrap) 
             pos.z = boxFold2(pos.z,cx);
         }
         
-        cx *= control.dx;
-        
-        r2 = pos.x*pos.x + pos.y*pos.y + pos.z*pos.z;
+        r2 = dot(pos,pos); // pos.x*pos.x + pos.y*pos.y + pos.z*pos.z;
         
         if(r2 < mR2) {
             float temp = fR2 / mR2;
@@ -674,6 +672,91 @@ float DE_QUATJULIA2(float3 pos,device Control &control,thread float4 &orbitTrap)
 #define Q8 control.dz
 #define Q9 control.dw
 
+//widget.addEntry("Power",&control.power,1.5,12,0.1)
+//widget.addEntry("MinRad",&control.cx,-5,5,0.1)
+//widget.addEntry("FixedRad",&control.cy,-5,5,0.02)
+//widget.addEntry("Fold Limit",&control.cz,-5,5,0.02)
+//widget.addEntry("Fold Limit2",&control.cw,-5,5,0.02)
+//widget.addEntry("ZMUL",&control.dx,-5,5,0.1)
+//widget.addEntry("Scale",&control.dz,-5,5,0.1)
+//widget.addEntry("Scale2",&control.dw,-5,5,0.1)
+
+
+void spudsSphereFold(thread float3 &z, thread float &dz,device Control &control) {
+    float r2 = dot(z,z);
+    if (r2< control.cx) {
+        float temp = (control.cy / control.cx);
+        z *= temp;
+        dz *= temp;
+    } else if (r2 < control.cy) {
+        float temp = control.cy /r2;
+        z *= temp;
+        dz *= temp;
+    }
+}
+
+float3 spudsBoxFold(float3 z, float dz) { return clamp(z, -dz, dz) * 2.0 - z; }
+
+void spudsPowN2(thread float3 &z, float zr0, thread float &dr,device Control &control) {
+    float zo0 = asin( z.z/zr0 );
+    float zi0 = atan2( z.y,z.x );
+    float zr = pow( zr0, control.ex-1.0 );
+    float zo = zo0 * control.ex;
+    float zi = zi0 * control.ex;
+    dr = zr*dr * control.ex * abs(length(float3(1.0,1.0,control.dx)/sqrt(3.0))) + 1.0;
+    zr *= zr0;
+    z = zr*float3( cos(zo)*cos(zi), cos(zo)*sin(zi), control.dx * sin(zo) );
+}
+
+float DE_SPUDS(float3 pos,device Control &control,thread float4 &orbitTrap) {
+    #ifdef SINGLE_EQUATION
+        return 0;
+    #else
+    int n = 0;
+    float dz = 1.0;
+    float r = length(pos);
+    
+    float3 ot,trap = control.otFixed;
+    if(int(control.orbitStyle + 0.5) == 2) trap -= pos;
+    
+    while(r < 5 && n < control.isteps) {
+        if (n < control.isteps/2) {
+            pos = spudsBoxFold(pos,dz);
+            spudsSphereFold(pos,dz,control);
+            pos = control.dz * pos;
+            dz *= abs(control.dz);
+            r = length(pos);
+        } else {
+            pos = spudsBoxFold(pos,dz);
+            r = length(pos);
+            spudsPowN2(pos,r,dz,control);
+            pos = control.dw * pos;
+            dz *= abs(control.dw);
+        }
+        
+        ot = pos;
+        if(control.orbitStyle > 0) ot -= trap;
+        orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
+        
+        n++;
+    }
+    
+    return r * log(r) / dz;
+    #endif
+}
+
+/*
+
+#define Q1 control.cx
+#define Q2 control.cy
+#define Q3 control.cz
+#define Q4 control.cw
+#define Q5 control.fx
+#define Q6 control.dx
+#define Q7 control.dy
+#define Q8 control.dz
+#define Q9 control.dw
+
 float3 spudsBoxFold(float3 pos, float fold, float mult) {
     return clamp(pos, -fold, fold) * mult - pos;
 }
@@ -703,7 +786,7 @@ float DE_SPUDS(float3 pos,device Control &control,thread float4 &orbitTrap) {
                 pos *= temp;
                 dz *= temp;
             }
-
+            
             pos *= Q7;
             dz *= abs(Q7);
         } else {
@@ -718,13 +801,13 @@ float DE_SPUDS(float3 pos,device Control &control,thread float4 &orbitTrap) {
             dz = zr * dz * Q5 * abs(length(float3(1.0,1.0,Q6)/sqrt(3.0))) + 1.0;
             zr *= r;
             pos = zr * float3(cos(zo)*cos(zi), cos(zo)*sin(zi), Q6 * sin(zo));
-
+            
             pos = Q8 * pos;
             dz *= abs(Q8);
         }
         
         r = length(pos);
-
+        
         ot = pos;
         if(control.orbitStyle > 0) ot -= trap;
         orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
@@ -735,6 +818,7 @@ float DE_SPUDS(float3 pos,device Control &control,thread float4 &orbitTrap) {
     return r * log(r) / dz;
 #endif
 }
+*/
 
 //MARK: - 15 Flower Hive
 // FlowerHive: https://www.shadertoy.com/view/lt3Gz8
@@ -904,7 +988,7 @@ float DE_TWISTBOX(float3 pos,device Control &control,thread float4 &orbitTrap) {
 #define slopesinz  control.fw
 
 float DE_VERTEBRAE(float3 pos,device Control &control,thread float4 &orbitTrap) {
-#ifdef SINGLE_EQUATION
+#ifdef    SINGLE_EQUATION
     return 0;
 #else
     float4 c = 0.5 * float4(control.cx, control.cy, control.cz, control.cw);
@@ -922,12 +1006,17 @@ float DE_VERTEBRAE(float3 pos,device Control &control,thread float4 &orbitTrap) 
         nz.yzw = 2.0 * z.x * z.yzw;
         z = nz+c;
         
-        z.x = scalelogx*log(z.x + sqrt(z.x*z.x + 1.));
-        z.y = scalelogy*log(z.y + sqrt(z.y*z.y + 1.));
-        z.z = scalelogz*log(z.z + sqrt(z.z*z.z + 1.));
+        const float hk = 0.6;
+        z.x = scalelogx*log(z.x + sqrt(z.x*z.x + hk));
+        z.y = scalelogy*log(z.y + sqrt(z.y*z.y + hk));
+        z.z = scalelogz*log(z.z + sqrt(z.z*z.z + hk));
+        
         z.x = scalesinx*sin(z.x + offsetsinx)+(z.x*slopesinx);
         z.y = scalesiny*sin(z.y + offsetsiny)+(z.y*slopesiny);
         z.z = scalesinz*sin(z.z + offsetsinz)+(z.z*slopesinz);
+        
+        z.xyz = spudsBoxFold(z.xyz,control.angle1);
+        z.xyz = rotatePosition(z.xyz,1,control.angle2);
         
         mz2 = dot(z,z);
         if(mz2 > 12.0) break;
@@ -937,7 +1026,7 @@ float DE_VERTEBRAE(float3 pos,device Control &control,thread float4 &orbitTrap) 
         orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
     }
     
-    return 0.3 * sqrt(mz2/md2) * log(mz2);
+    return sqrt(mz2/md2) * log(mz2);
 #endif
 }
 
@@ -1111,10 +1200,10 @@ float DE_PDOF(float3 pos,device Control &control,thread float4 &orbitTrap) {
 #else
     float DEfactor = 1;
     float3 ap;
-
+    
     float3 ot,trap = control.otFixed;
     if(control.orbitStyle == 2) trap -= pos;
-
+    
     for(int i=0; i < control.isteps; ++i) {
         ap = pos;
         pos = control.dx * clamp(pos, -control.cx, control.cx) - pos;
@@ -1234,32 +1323,32 @@ float DE_KALEIDO(float3 pos,device Control &control,thread float4 &orbitTrap) {
 //MARK: - 27 MandelNest
 
 float DE_MANDELNEST(float3 pos,device Control &control,thread float4 &orbitTrap) {
-#ifdef zzzSINGLE_EQUATION
+#ifdef    SINGLE_EQUATION
     return 0;
 #else
     float jk,r,dr = 1;
     float fx = control.fx;
     float shift = control.cx;
     float3 julia = control.julia;
-//    float3 deltaJulia = float3(control.dx,control.dy,control.dz);
+    //    float3 deltaJulia = float3(control.dx,control.dy,control.dz);
     
     for(int i=0; i < control.isteps; ++i) {
         r = length(pos);
         if(r > 3) break;
         
         if(r < abs(dr))
-                pos = sin(shift + fx * asin(pos/r));
-         else
-             pos = cos(shift + fx * acos(pos/r));
-
-//        if(control.bcx && !(i & 2)) {
-//            pos = sin(shift + fx * atan(pos/r));
-//        } else {
-//            pos = cos(shift + fx * atan(pos/r));
-//        }
+            pos = sin(shift + fx * asin(pos/r));
+        else
+            pos = cos(shift + fx * acos(pos/r));
+        
+        //        if(control.bcx && !(i & 2)) {
+        //            pos = sin(shift + fx * atan(pos/r));
+        //        } else {
+        //            pos = cos(shift + fx * atan(pos/r));
+        //        }
         
         dr = pow(r, fx - 1.0) * fx * dr + 1.0;
-
+        
         jk = r * control.dy;
         
         pos *= pow(jk,fx);
@@ -1270,7 +1359,7 @@ float DE_MANDELNEST(float3 pos,device Control &control,thread float4 &orbitTrap)
         
         if(control.juliaboxMode)
             julia = mix(julia,pos,control.dx); //deltaJulia;
-
+        
         float4 hk = float4(pos,r);
         orbitTrap = min(orbitTrap, dot(hk,hk));
     }
@@ -1281,44 +1370,44 @@ float DE_MANDELNEST(float3 pos,device Control &control,thread float4 &orbitTrap)
 
 /*
  float DE_MANDELNEST(float3 pos,device Control &control,thread float4 &orbitTrap) {
- #ifdef zzzSINGLE_EQUATION
-     return 0;
+ #ifdef    SINGLE_EQUATION
+ return 0;
  #else
-     float r,dr = 1;
-     float fx = control.fx;
-     float shift = control.cx;
-     float3 julia = control.julia;
-     float3 deltaJulia = float3(control.dx,control.dy,control.dz);
-     
-     for(int i=0; i < control.isteps; ++i) {
-         r = length(pos);
-         if(r > 3) break;
-         
-         if(control.bcx && !(i & 2)) {
-             pos = sin(shift + fx * asin(pos/r));
-         } else {
-             pos = cos(shift + fx * acos(pos/r));
-         }
-         
-         pos *= pow(r,fx);
-         pos += control.juliaboxMode ? julia : pos;
-         
-         dr = pow(r, fx - 1.0) * fx * dr + 1.0;
-         
-         shift += control.angle1;
-         fx += control.angle2;
-         
-         if(control.juliaboxMode)
-             julia += deltaJulia;
-
-         float4 hk = float4(pos,r);
-         orbitTrap = min(orbitTrap, dot(hk,hk));
-     }
-     
-     return 0.25 * log(r) * r/dr;
+ float r,dr = 1;
+ float fx = control.fx;
+ float shift = control.cx;
+ float3 julia = control.julia;
+ float3 deltaJulia = float3(control.dx,control.dy,control.dz);
+ 
+ for(int i=0; i < control.isteps; ++i) {
+ r = length(pos);
+ if(r > 3) break;
+ 
+ if(control.bcx && !(i & 2)) {
+ pos = sin(shift + fx * asin(pos/r));
+ } else {
+ pos = cos(shift + fx * acos(pos/r));
+ }
+ 
+ pos *= pow(r,fx);
+ pos += control.juliaboxMode ? julia : pos;
+ 
+ dr = pow(r, fx - 1.0) * fx * dr + 1.0;
+ 
+ shift += control.angle1;
+ fx += control.angle2;
+ 
+ if(control.juliaboxMode)
+ julia += deltaJulia;
+ 
+ float4 hk = float4(pos,r);
+ orbitTrap = min(orbitTrap, dot(hk,hk));
+ }
+ 
+ return 0.25 * log(r) * r/dr;
  #endif
  }
-
+ 
  */
 
 //MARK: - 28 Kali Rontgen
@@ -1360,12 +1449,12 @@ float DE_ENGINE(float3 pos,device Control &control,thread float4 &orbitTrap) {
 #ifdef SINGLE_EQUATION
     return 0;
 #else
-//    #define hash(n) fract(sin(n * 234.567+123.34))
+    //    #define hash(n) fract(sin(n * 234.567+123.34))
 #define hash(n) fract(sin(n * control.cx + control.cy))
     float scale = control.dy;
     float mr2 =  control.dz;
     float s=3.;
-
+    
     pos -= clamp(pos,-control.cz,control.cz) * 2;
     pos.xy *= rotatePosition2(pos.xy,control.angle1);
     pos.yz *= rotatePosition2(pos.yz,control.angle2);
@@ -1383,7 +1472,7 @@ float DE_ENGINE(float3 pos,device Control &control,thread float4 &orbitTrap) {
         pos = pos * scale * g + p0 * control.dx;
         s = s * abs(scale) * g + control.dx;
     }
-
+    
     return length(cross(pos,normalize(float3(1))))/s-.005;
 #endif
 }
@@ -1400,13 +1489,13 @@ float DE_FRACTAL_CAGE(float3 p,device Control &control,thread float4 &orbitTrap)
     float lp,r2,s = 1;
     float icy = 1.0 / control.cy;
     float3 p2,cy3 = float3(control.cy);
-
+    
     for (int i=0; i<control.isteps; i++) {
         p -= control.cx * round(p / control.cx);
-
+        
         p2 = pow(abs(p),cy3);
         lp = pow(p2.x + p2.y + p2.z, icy);
-
+        
         r2 = control.dx / max( pow(lp,control.cz), control.cw);
         p *= r2;
         s *= r2;
@@ -1450,17 +1539,17 @@ float DE_BONEYTUNNEL(float3 z,device Control &control,thread float4 &orbitTrap) 
     float fl = control.cx;
     float fr = control.cy;
     float r,r2,scale = control.cw;
-
+    
     float3 ot,trap = control.otFixed;
     if(int(control.orbitStyle + 0.5) == 2) trap -= z;
-
+    
     for (int i=0; i<control.isteps; i++) {
         // box_fold
         z = clamp(z, -fl, fl) * 2.0 - z;
-
+        
         // sphere_fold
         r2 = dot(z,z);
-
+        
         if(r2 < control.cz) {
             float temp = (fr / control.cz);
             z *= temp;
@@ -1471,10 +1560,10 @@ float DE_BONEYTUNNEL(float3 z,device Control &control,thread float4 &orbitTrap) 
                 z *= temp;
                 dr *= temp;
             }
-
+        
         z = scale * z + offset;
         dr = dr * abs(scale) + 1.0;
-
+        
         if(i < control.icx) { // torus
             vec2 q = vec2(length(z.xz) - control.dy ,z.y);
             r = length(q) - control.dz;
@@ -1482,7 +1571,7 @@ float DE_BONEYTUNNEL(float3 z,device Control &control,thread float4 &orbitTrap) 
         else { // sphere
             r = length(z) - control.dx;
         }
-
+        
         float dd = r / abs(dr);
         if (i < 3 || dd < fd) fd = dd;
         
@@ -1490,7 +1579,7 @@ float DE_BONEYTUNNEL(float3 z,device Control &control,thread float4 &orbitTrap) 
         if(control.orbitStyle > 0) ot -= trap;
         orbitTrap = min(orbitTrap, float4(abs(ot), dot(ot,ot)));
     }
-
+    
     return fd;
 #endif
 }
@@ -1512,13 +1601,13 @@ float DE_GAZ_19(float3 p,device Control &control,thread float4 &orbitTrap) {
         p.y += control.cw * sin(p.y) / s;
         p.x -= p.y * control.dx * sin(p.x) / s;
         
-//        p = 3 * p - vec3(9,2,3);
+        //        p = 3 * p - vec3(9,2,3);
         p = control.dy * p - vec3(control.ex,control.ey,control.ez);
         s *= 3; // control.dz;
-
+        
         orbitTrap = min(orbitTrap, float4(abs(p), dot(p,p)));
     }
-
+    
     return length(p)/ s - 0.001;
 #endif
 }
@@ -1535,7 +1624,7 @@ float planet_surface(vec3 p,float i,float size){
 //// https://www.shadertoy.com/view/tddfDr
 //
 //float DE_RADIOBASE(float3 p,device Control &control,thread float4 &orbitTrap) {
-//#ifdef zzzSINGLE_EQUATION
+//#ifdef    SINGLE_EQUATION
 //    return 0;
 //#else
 //    float p1,scale = control.cx;
@@ -1569,7 +1658,7 @@ float planet_surface(vec3 p,float i,float size){
 // // https://www.shadertoy.com/view/tddfDr
 //
 // float DE_RADIOBASE(float3 p,device Control &control,thread float4 &orbitTrap) {
-// #ifdef zzzSINGLE_EQUATION
+// #ifdef    SINGLE_EQUATION
 //     return 0;
 // #else
 //     float p1,scale = control.cx;
@@ -1602,69 +1691,176 @@ float planet_surface(vec3 p,float i,float size){
  
  //MARK: - 34 Space Station
  // https://www.shadertoy.com/view/tddfDr
-
+ 
  float DE_RADIOBASE(float3 p,device Control &control,thread float4 &orbitTrap) {
- #ifdef zzzSINGLE_EQUATION
-     return 0;
+ #ifdef    SINGLE_EQUATION
+ return 0;
  #else
-     float p1,scale = control.cx;
-     float result = 0.0;
-     float scale2 = 1.0;
-
-     for(int i1=0;i1 < control.isteps;++i1) {
+ float p1,scale = control.cx;
+ float result = 0.0;
+ float scale2 = 1.0;
+ 
+ for(int i1=0;i1 < control.isteps;++i1) {
  //        p1 = planet_surface(p*i,i,control.cy)/(i);
-         
-         vec3 p2 = p * scale / control.cy;
-         vec3 p3 = sin(sin(p2) + p2) * control.cz;
-         p1 = (length(p3) - control.cw) / scale;
-
-         result = max(result, -p1);
-         scale *= scale2;
-         scale2 *= control.dx;
-         
+ 
+ vec3 p2 = p * scale / control.cy;
+ vec3 p3 = sin(sin(p2) + p2) * control.cz;
+ p1 = (length(p3) - control.cw) / scale;
+ 
+ result = max(result, -p1);
+ scale *= scale2;
+ scale2 *= control.dx;
+ 
  //        p += rotatePosition(p,0,control.dy);
  //        p += rotatePosition(p,1,control.dz);
-         p += control.julia;
-
-         orbitTrap = min(orbitTrap, float4(p3, dot(p2,p2)));
-     }
-
-     return result * scale/2.0;
+ p += control.julia;
+ 
+ orbitTrap = min(orbitTrap, float4(p3, dot(p2,p2)));
+ }
+ 
+ return result * scale/2.0;
  #endif
  }
-
+ 
  */
 
 
 //MARK: - 34 Radio Base
 // https://www.shadertoy.com/view/WlcczS
 
+
+vec4 Rotate34(vec4 z,device Control &control)
+{
+    vec4 tp;
+    if (control.dx != 0.)
+    {
+        tp = z;
+        z.x = tp.x * cos(control.dx) + tp.y * sin(control.dx);
+        z.y = tp.x * -sin(control.dx) + tp.y * cos(control.dx);
+    }
+    if (control.dy != 0.)
+    {
+        tp = z;
+        z.y = tp.y * cos(control.dy) + tp.z * sin(control.dy);
+        z.z = tp.y * -sin(control.dy) + tp.z * cos(control.dy);
+    }
+    //    if (control.dz != 0.)
+    //    {
+    //        tp = z;
+    //        z.x = tp.x * cos(control.dz) + tp.z * sin(control.dz);
+    //        z.z = tp.x * -sin(control.dz) + tp.z * cos(control.dz);
+    //    }
+    //    if (control.dw != 0.)
+    //    {
+    //        tp = z;
+    //        z.x = tp.x * cos(control.dw) + tp.w * sin(control.dw);
+    //        z.w = tp.x * -sin(control.dw) + tp.w * cos(control.dw);
+    //    }
+    //    if (control.ex != 0.)
+    //    {
+    //        tp = z;
+    //        z.y = tp.y * cos(control.ex) + tp.w * sin(control.ex);
+    //        z.w = tp.y * -sin(control.ex) + tp.w * cos(control.ex);
+    //    }
+    //    if (control.ey != 0.)
+    //    {
+    //        tp = z;
+    //        z.z = tp.z * cos(control.ey) + tp.w * sin(control.ey);
+    //        z.w = tp.z * -sin(control.ey) + tp.w * cos(control.ey);
+    //    }
+    return z;
+}
+
+
 float DE_RADIOBASE(float3 pos,device Control &control,thread float4 &orbitTrap) {
 #ifdef zzzSINGLE_EQUATION
     return 0;
 #else
-    float r,s = 1;
-    float3 p = pos;
-    float3 offset = p * control.cx;
-
+    vec4 z = vec4(pos,control.ez);
+    float r2= 0.0;
+    float Dd = 1.0;
+    //float opt2 = 0.5 * control.cw  / control.cy;
+    
     for(int i=0;i < control.isteps;++i) {
-        p = control.cy - abs(sin(p - control.cz) - control.cw);
-
-        r = control.dx * clamp(control.dy * max(control.dz / dot(p,p),control.dw), -control.ex, control.ex);
-        s *= r;
-        p *= r;
-        p += offset;
-
-        orbitTrap = min(orbitTrap, float4(abs(p), dot(p,p)));
+        if (i >= control.icx && i < control.icy)
+        {
+            z += control.cx; // PreAddM; // offset
+        }
+        
+        z = abs(z); // abs()
+        vec4 temp4;
+        
+        //Conditional swizzle
+        if ( z.y > z.x ) { temp4.x = z.y; z.y = z.x; z.x = temp4.x;}
+        if ( z.z > z.x ) { temp4.x = z.z; z.z = z.x; z.x = temp4.x;}
+        if ( z.z > z.y ) { temp4.y = z.z; z.z = z.y; z.y = temp4.y;}
+        //        if ( z.w > z.x ) { temp4.x = z.w; z.w = z.x; z.x = temp4.x;}
+        //        if ( z.w > z.y ) { temp4.x = z.w; z.w = z.y; z.y = temp4.x;}
+        //        if ( z.w > z.z ) { temp4.y = z.w; z.w = z.z; z.z = temp4.y;}
+        
+        // temp 4D rotation
+        z = Rotate34(z,control);
+        
+        // scale  and offset
+        z.x = control.cy * z.x - control.cz;
+        z.y = control.cy * z.y - control.cw;
+        z.w = control.cy * z.w - control.cw;
+        //        z.z -= opt2;
+        //        z.z = -abs(-z.z);
+        //        z.z += opt2;
+        z.z *= control.cy;
+        Dd *= control.cy;
+        
+        r2 = dot(z.xyz,z.xyz);// or //float r2=(z.x*z.x+z.y*z.y+z.z*z.z);
+        //float r2=z.x*z.x+z.y*z.y+z.z*z.z+z.w*z.w;
+        //r2 = length(z.xyz);
+        
+        //if (i<ColorIterations) orbitTrap = min(orbitTrap, abs(vec4(z.xyz,r2)));
+        //        if (i<ColorIterations)
+        //        {
+        //            vec4 p = abs(z);
+        //            orbitTrap.x = min(orbitTrap.x, abs(p.x-p.y-p.z+p.w));
+        //            orbitTrap.y = min(orbitTrap.y, abs(p.x-p.y+p.z-p.w));
+        //            orbitTrap.z = min(orbitTrap.z, abs(p.x+p.y-p.z+p.w));
+        //            orbitTrap.w = min(orbitTrap.w, abs(p.x+p.y+p.z-p.w));
+        //        }
+        if ( r2 > 6) // bailout)
+        {
+            r2 = sqrt(r2);
+            return r2 / Dd;
+        }
     }
-
-    return length(cross(p,normalize(float3(control.ey,control.ez,control.ew))))/s - 0.006;
+    
+    return 0;
 #endif
 }
 
+//float DE_RADIOBASE(float3 pos,device Control &control,thread float4 &orbitTrap) {
+//#ifdef    SINGLE_EQUATION
+//    return 0;
+//#else
+//    float r,s = 1;
+//    float3 p = pos;
+//    float3 offset = p * control.cx;
+//
+//    for(int i=0;i < control.isteps;++i) {
+//        p = control.cy - abs(sin(p - control.cz) - control.cw);
+//
+//        r = control.dx * clamp(control.dy * max(control.dz / dot(p,p),control.dw), -control.ex, control.ex);
+//        s *= r;
+//        p *= r;
+//        p += offset;
+//
+//        orbitTrap = min(orbitTrap, float4(abs(p), dot(p,p)));
+//    }
+//
+//    return length(cross(p,normalize(float3(control.ey,control.ez,control.ew))))/s - 0.006;
+//#endif
+//}
+
 // new
 //float DE_RADIOBASE(float3 pos,device Control &control,thread float4 &orbitTrap) {
-//#ifdef zzzSINGLE_EQUATION
+//#ifdef    SINGLE_EQUATION
 //    return 0;
 //#else
 //    float r,s = 1;
@@ -1689,30 +1885,30 @@ float DE_RADIOBASE(float3 pos,device Control &control,thread float4 &orbitTrap) 
 /*  good
  //MARK: - 34 Radio Base
  // https://www.shadertoy.com/view/WlcczS
-
+ 
  float DE_RADIOBASE(float3 pos,device Control &control,thread float4 &orbitTrap) {
- #ifdef zzzSINGLE_EQUATION
-     return 0;
+ #ifdef    SINGLE_EQUATION
+ return 0;
  #else
-     float r,s = 4;
-     float3 p = pos; //abs(pos);
-     float3 offset = p * control.cx;
-
-     for(int i=0;i < control.isteps;++i) {
-         p = control.cy - abs(abs(p - control.cz) - control.cw);
-
-         r = control.dx * clamp(control.dy * max(control.dz / dot(p,p),control.dw), 0.0, control.ex);
-         s *= r;
-         p *= r;
-         p += offset;
-
-         orbitTrap = min(orbitTrap, float4(abs(p), dot(p,p)));
-     }
-
-     return length(cross(p,normalize(float3(1,3,3))))/s - 0.006;
+ float r,s = 4;
+ float3 p = pos; //abs(pos);
+ float3 offset = p * control.cx;
+ 
+ for(int i=0;i < control.isteps;++i) {
+ p = control.cy - abs(abs(p - control.cz) - control.cw);
+ 
+ r = control.dx * clamp(control.dy * max(control.dz / dot(p,p),control.dw), 0.0, control.ex);
+ s *= r;
+ p *= r;
+ p += offset;
+ 
+ orbitTrap = min(orbitTrap, float4(abs(p), dot(p,p)));
+ }
+ 
+ return length(cross(p,normalize(float3(1,3,3))))/s - 0.006;
  #endif
  }
-
+ 
  */
 //MARK: - distance estimate
 // ===========================================
@@ -1780,9 +1976,20 @@ float DE(float3 pos,device Control &control,thread float4 &orbitTrap) {
 //MARK: -
 // x = distance, y = iteration count, z = average distance hop
 
+float2 complexPower(float2 value, float power) {
+    float rr = value.x * value.x + value.y * value.y; // radius squared
+    if(rr == 0) return 0.0001;
+    
+    float p1 = pow(rr, power / 2);
+    float arg = atan2(value.y, value.x);
+    float2 p2 = float2( cos(power * arg), sin(power * arg));
+    return p1 * p2;
+}
+
 float3 shortest_dist(float3 eye, float3 marchingDirection,device Control &control,thread float4 &orbitTrap) {
-    float dist,hop = 0;
     float3 ans = float3(MIN_DIST,0,0);
+    
+    float dist,hop = 0;
     //    float secondSurface = control.secondSurface;
     int i = 0;
     
@@ -1985,12 +2192,12 @@ float3 applyColoring
             ans = applyColoring7(position,direction,distAns,normal,control);
             break;
     }
-
+    
     a2 = ans;
     ans.x = mix(a2.x,a2.y,control.coloringM1);
     ans.y = mix(a2.y,a2.z,control.coloringM2);
     ans.z = mix(a2.z,a2.x,control.coloringM3);
-
+    
     return ans;
 }
 
@@ -2003,7 +2210,7 @@ float3 cycle(float3 c, float s, device Control &control) {
 
 float3 getOrbitColor(device Control &control,float4 orbitTrap) {
     float3 orbitColor;
-
+    
     orbitTrap.w = sqrt(orbitTrap.w);
     
     if (control.Cycles > 0.0) {
@@ -2087,13 +2294,13 @@ kernel void rayMarchShader
     ////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////
     // billboards
-
+    
     bool billboard = false;
     
     for(int i=0;i<NUM_BILLBOARD;++i) {
         device BillboardData &bb = c.billboard[i];
         if(!bb.active) continue;
-
+        
         if(distAns.x > bb.z) {
             float pixelX = float(q.x) / float(c.xSize);
             float pixelY = float(q.y) / float(c.ySize);
@@ -2105,9 +2312,9 @@ kernel void rayMarchShader
             if(c.isStereo) {
                 float distanceFactor = 1 / (1 + (bb.z - 0.5) * 0.667);
                 float offset = c.sideVector.x * c.parallax * distanceFactor * c.billboard[i].fudge;
-//junk                float distanceFactor = 2 - bb.z * 0.667;
-//                float offset = c.sideVector.x * pow(c.parallax,distanceFactor);
-
+                //junk                float distanceFactor = 2 - bb.z * 0.667;
+                //                float offset = c.sideVector.x * pow(c.parallax,distanceFactor);
+                
                 x1 *= 0.5;
                 x2 *= 0.5;
                 
@@ -2129,7 +2336,7 @@ kernel void rayMarchShader
                     float ratioV = (pixelY - y1) / (y2-y1);
                     float u = bb.u1 + ratioU * (bb.u2 - bb.u1);
                     float v = bb.v1 + ratioV * (bb.v2 - bb.v1);
-
+                    
                     pt.x = uint(c.txtSize.x * u);
                     pt.y = uint(c.txtSize.y * v);
                     
@@ -2148,84 +2355,84 @@ kernel void rayMarchShader
     }
     
     
-//    bool billboard = false;
-//
-//    if(distAns.x > c.fw) {
-//        float rx = float(q.x) / float(c.xSize);
-//        float ry = float(q.y) / float(c.ySize);
-//        float x1 = 0.35;
-//        float x2 = 1;
-//        float y1 = 0.3;
-//        float y2 = 0.7;
-//
-//        if(c.isStereo) {
-//            float distanceFactor = 1 / (1 + c.fw * 0.667);
-//            float offset = (c.sideVector * c.parallax).x * distanceFactor;
-//
-//            x1 *= 0.5;
-//            x2 *= 0.5;
-//
-//            if(q.x >= xsize) {   // right side of stereo pair
-//                rx -= 0.5;
-//                x1 -= offset;
-//                x2 -= offset;
-//            }
-//            else {
-//                x1 += offset;
-//                x2 += offset;
-//            }
-//        }
-//
-//        if(rx >= x1 && rx < x2 && ry >= y1 && ry < y2) {
-//            billboard = true;
-//
-//            if(c.txtOnOff) {
-//                uint2 pt;
-//                float u,v;
-//                u = (rx - x1) / (x2-x1);
-//                v = (ry - y1) / (y2-y1);
-//
-//                pt.x = uint(c.txtSize.x * u);
-//                pt.y = uint(c.txtSize.y * v);
-//
-//                float4 cc = coloringTexture.read(pt);
-//                if(cc.w > 0.1)
-//                    color = cc.xyz;
-//                else
-//                    billboard = false;
-//            }
-//            else
-//                color = float3(255,0,255);
-//        }
-//    }
-
+    //    bool billboard = false;
+    //
+    //    if(distAns.x > c.fw) {
+    //        float rx = float(q.x) / float(c.xSize);
+    //        float ry = float(q.y) / float(c.ySize);
+    //        float x1 = 0.35;
+    //        float x2 = 1;
+    //        float y1 = 0.3;
+    //        float y2 = 0.7;
+    //
+    //        if(c.isStereo) {
+    //            float distanceFactor = 1 / (1 + c.fw * 0.667);
+    //            float offset = (c.sideVector * c.parallax).x * distanceFactor;
+    //
+    //            x1 *= 0.5;
+    //            x2 *= 0.5;
+    //
+    //            if(q.x >= xsize) {   // right side of stereo pair
+    //                rx -= 0.5;
+    //                x1 -= offset;
+    //                x2 -= offset;
+    //            }
+    //            else {
+    //                x1 += offset;
+    //                x2 += offset;
+    //            }
+    //        }
+    //
+    //        if(rx >= x1 && rx < x2 && ry >= y1 && ry < y2) {
+    //            billboard = true;
+    //
+    //            if(c.txtOnOff) {
+    //                uint2 pt;
+    //                float u,v;
+    //                u = (rx - x1) / (x2-x1);
+    //                v = (ry - y1) / (y2-y1);
+    //
+    //                pt.x = uint(c.txtSize.x * u);
+    //                pt.y = uint(c.txtSize.y * v);
+    //
+    //                float4 cc = coloringTexture.read(pt);
+    //                if(cc.w > 0.1)
+    //                    color = cc.xyz;
+    //                else
+    //                    billboard = false;
+    //            }
+    //            else
+    //                color = float3(255,0,255);
+    //        }
+    //    }
+    
     
     ////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////
-
+    
     if (!billboard && distAns.x <= MAX_DIST) { // hit object
         float3 position = camera + distAns.x * direction;
         float3 normal = calcNormal(position,c);
         
-//        // use texture
-//        if(c.txtOnOff) {
-//            float xscale = abs(c.tScale);
-//            float yscale = c.tScale < 0 ? -xscale : xscale;
-//            float len = length(position) / distAns.x;
-//            float x = normal.x / len;
-//            float y = normal.z / len;
-//            float w = c.txtSize.x;
-//            float h = c.txtSize.y;
-//            float xx = w + (c.tCenterX * 4 + x * xscale) * (w + len);
-//            float yy = h + (c.tCenterY * 4 + y * yscale) * (h + len);
-//
-//            uint2 pt;
-//            pt.x = uint(fmod(xx,w));
-//            pt.y = uint(c.txtSize.y - fmod(yy,h)); // flip Y coord
-//
-//            color = coloringTexture.read(pt).xyz;
-//        }
+        //        // use texture
+        //        if(c.txtOnOff) {
+        //            float xscale = abs(c.tScale);
+        //            float yscale = c.tScale < 0 ? -xscale : xscale;
+        //            float len = length(position) / distAns.x;
+        //            float x = normal.x / len;
+        //            float y = normal.z / len;
+        //            float w = c.txtSize.x;
+        //            float h = c.txtSize.y;
+        //            float xx = w + (c.tCenterX * 4 + x * xscale) * (w + len);
+        //            float yy = h + (c.tCenterY * 4 + y * yscale) * (h + len);
+        //
+        //            uint2 pt;
+        //            pt.x = uint(fmod(xx,w));
+        //            pt.y = uint(c.txtSize.y - fmod(yy,h)); // flip Y coord
+        //
+        //            color = coloringTexture.read(pt).xyz;
+        //        }
         
         color += applyColoring(position,direction,distAns,normal,c);
         
@@ -2267,7 +2474,7 @@ kernel void rayMarchShader
         // ======================================================
         if(c.OrbitStrength > 0) {
             float3 oColor = getOrbitColor(c,orbitTrap);
-//            color = mix(color, 3.0 * oColor, c.OrbitStrength);
+            //            color = mix(color, 3.0 * oColor, c.OrbitStrength);
             color = mix(color, oColor, c.OrbitStrength);
         }
         
@@ -2287,24 +2494,24 @@ kernel void rayMarchShader
             }
         }
     }
-//    else { // missed object
-//
-//        // background color from texture
-//        if(c.txtOnOff) {
-//            float scale = c.tScale;
-//            float x = direction.x;
-//            float y = direction.z;
-//            float w = c.txtSize.x;
-//            float h = c.txtSize.y;
-//            float xx = w + (c.tCenterX * 4 + x * scale) * w;
-//            float yy = h + (c.tCenterY * 4 + y * scale) * h;
-//
-//            uint2 pt;
-//            pt.x = uint(fmod(xx,w));
-//            pt.y = uint(c.txtSize.y - fmod(yy,h)); // flip Y coord
-//            color = coloringTexture.read(pt).xyz;
-//        }
-//    }
+    //    else { // missed object
+    //
+    //        // background color from texture
+    //        if(c.txtOnOff) {
+    //            float scale = c.tScale;
+    //            float x = direction.x;
+    //            float y = direction.z;
+    //            float w = c.txtSize.x;
+    //            float h = c.txtSize.y;
+    //            float xx = w + (c.tCenterX * 4 + x * scale) * w;
+    //            float yy = h + (c.tCenterY * 4 + y * scale) * h;
+    //
+    //            uint2 pt;
+    //            pt.x = uint(fmod(xx,w));
+    //            pt.y = uint(c.txtSize.y - fmod(yy,h)); // flip Y coord
+    //            color = coloringTexture.read(pt).xyz;
+    //        }
+    //    }
     
     float alpha = distAns.x;
     
@@ -2366,7 +2573,7 @@ kernel void effectsShader
     
     total /= float(bCount);
     
-    if(control.blurDim > 0) 
+    if(control.blurDim > 0)
         total *= (1.0 - control.blurDim/10);
     
     outTexture.write(total,p);

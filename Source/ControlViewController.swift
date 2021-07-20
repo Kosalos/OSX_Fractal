@@ -33,7 +33,7 @@ class ControlViewController: NSViewController {
     @IBAction func x4(_ sender: NSButton) { launchPopOver(3,0) }
     @IBAction func y4(_ sender: NSButton) { launchPopOver(3,1) }
     
-    @IBAction func helpPressed(_ sender: NSButton) { vc.showHelpPage(self.view,5) }
+    @IBAction func helpPressed(_ sender: NSButton) { showHelpPage(view,.Control) }
     
     override func viewDidLoad() {
         super.viewDidLoad()

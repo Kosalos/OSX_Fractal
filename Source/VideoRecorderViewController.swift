@@ -86,7 +86,7 @@ class VideoRecorderViewController: NSViewController, NSTableViewDataSource, NSTa
         easeInOutFlag = sender.state == .on
     }
     
-    @IBAction func helpPressed(_ sender: NSButton) { vc.showHelpPage(self.view,6) }
+    @IBAction func helpPressed(_ sender: NSButton) { showHelpPage(view,.Video) }
     
     @IBAction func resetPressed(_ sender: NSButton) { reset() }
     

@@ -18,6 +18,7 @@ var vcMemory:MemoryViewController! = nil
 
 class MemoryViewController: NSViewController, NSWindowDelegate {
     var index = Int()
+    var focusIndex = Int()
     var data:[MemoryData] = []
     
     override func viewDidLoad() {
@@ -45,6 +46,13 @@ class MemoryViewController: NSViewController, NSWindowDelegate {
     
     override func viewDidAppear() {
         view.window?.delegate = self
+    }    
+    
+    @IBAction func helpPressed(_ sender: NSButton) {
+        let alert = NSAlert()
+        alert.messageText = "Select Image to Return To"
+        alert.informativeText = "Mouse click/drag to select which settings to retrieve."
+        alert.beginSheetModal(for: view.window!) { ( returnCode: NSApplication.ModalResponse) -> Void in () }
     }
     
     func addImage(_ t:MTLTexture) {
@@ -59,14 +67,27 @@ class MemoryViewController: NSViewController, NSWindowDelegate {
         let pt = event.locationInWindow
         let x = Int((pt.x - MXB) / (MMARGIN + MSZ))
         let y = MYS - 1 - Int((pt.y - MYB) / (MMARGIN + MSZ))
-        let index = x + y * MXS
-        //print(x," ",y,"  ",index)
+        let temp = x + y * MXS
         
-        if(index >= 0 && index < MTOTAL) {
-            vc.control = data[index].control
+        if temp >= 0 && temp < MTOTAL {
+            focusIndex = temp
+            view.setNeedsDisplay(view.bounds)
+        }
+    }
+    
+    override func mouseDragged(with event: NSEvent) {
+        mouseDown(with: event)
+    }
+    
+    override func mouseUp(with event: NSEvent) {
+        if data[focusIndex].control.cx != 0 {
+            vc.control = data[focusIndex].control
             vc.control.skip = 1
             vc.controlJustLoaded()
         }
+        
+        focusIndex = -1
+        view.setNeedsDisplay(view.bounds)
     }
     
     override func keyDown(with event: NSEvent) {
@@ -75,10 +96,10 @@ class MemoryViewController: NSViewController, NSWindowDelegate {
             vc.repeatCount = 0
         default : break
         }
-
+        
         vc.keyDown(with:event)
     }
-
+    
     override func keyUp(with event: NSEvent) { vc.keyUp(with:event) }
 }
 
@@ -92,10 +113,17 @@ class BaseNSViewMemory: NSView {
         NSBezierPath(rect:bounds).fill()
         
         var index = vcMemory.index-1; if index < 0 { index = MTOTAL-1 }
-        let r = vcMemory.data[index].image.frame.insetBy(dx: -2, dy: -2)
+        var r = vcMemory.data[index].image.frame.insetBy(dx: -2, dy: -2)
         let context = NSGraphicsContext.current?.cgContext
-        context?.setLineWidth(2.0)
+        context?.setLineWidth(4.0)
         NSColor.red.set()
         NSBezierPath(rect:r).stroke()
+        
+        if vcMemory.focusIndex >= 0 {
+            index = vcMemory.focusIndex
+            r = vcMemory.data[index].image.frame.insetBy(dx: -2, dy: -2)
+            NSColor.yellow.set()
+            NSBezierPath(rect:r).stroke()
+        }
     }
 }

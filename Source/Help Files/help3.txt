@@ -1,32 +1,18 @@
-Video recorder Window
+3 Lights
 
-You define a video recording by saving a list of keyframes.
-Each keyframe captures all your widget settings,
-except brightness, contrast, specular and color scheme.
+Light#:  select which light to alter (three are available)
 
-Note: the <Add Keyframe to end> button can be pressed as ']'
-on the Main window.
+Bright: set light brightness
+Spread: set how spread out the light effect is
+X,Y,Z: set position of light
+R,G,B: set light color
 
-Press '[' to move keyboard focus back to Main window
+Fog Amount: set stength of Fog effect
+R,G,B: set fog color
 
-Video frames per keyframe:
-Affects the duration and smoothness of the video.
-
-Smoothing Factor:
-Sets the stength of the rolling average algorithm that smoothes
-the effect of parameter changes between keyframes.
-Set to '0' to skip this effect.
-
-Ease In/Out:
-Is the interpolation algorithm plain linear, or does it slowdown or
-speed up at the ends of each keyframe region.
-
-The videos are .m4v files.
-Do a Finder search to them in the documents folder of this app.
-
-Note:
-While a video is being created you can press <Space> to stop immediately.
-
-Don't change the equation # during a recording.
-Don't change the window size during a recording.
-
+O Strength: set strength of Orbit trap effect
+Cycles: set #cycles of the obit trap algorithm
+X,Y,Z,R Weight: set strength of the 4 orbit trap parameters
+X,Y,Z,R Color: select palette color for respctive orbit paramter
+Fixed Trap (0,1,2):  set style of orbit trap seed point (0 = legacy style)
+X,Y,Z: set position of orbit trap for styles 1 and 2
