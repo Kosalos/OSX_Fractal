@@ -2133,6 +2133,91 @@ float3 applyColoring7
 }
 
 //MARK: -
+//MARK: -
+//MARK: -
+
+float3 phong_contrib
+(
+ float3 k_d,
+ float3 k_s,
+ float  alpha,
+ float3 p,
+ float3 eye,
+ float3 lightPos,
+ float3 lightIntensity,
+ device Control &control
+ ) {
+    float3 N = calcNormal(p,control);
+    float3 L = normalize(lightPos - p);
+    float dotLN = dot(L, N);
+    if (dotLN < 0.0) return float3();
+    
+    float3 V = normalize(eye - p);
+    float3 R = normalize(reflect(-L, N));
+    float dotRV = dot(R, V);
+    if (dotRV < 0.0) return lightIntensity * (k_d * dotLN);
+    
+    return lightIntensity * (k_d * dotLN + k_s * pow(dotRV, alpha));
+}
+
+//float soft_shadow(float3 ro, float3 rd, float mint, float maxt, float k, float3 position, Control control) {
+//    float res = 1.0;
+//    for(float t=mint; t < maxt;) {
+//        float h = scene(ro + rd*t,control);
+//        if( h<0.001 )
+//            return 0.0;
+//        res = min( res, k*h/t );
+//        t += h;
+//    }
+//    return res;
+//}
+
+//float calc_AO(float3 pos, float3 nor, Control control) {
+//    float occ = 0.0;
+//    float sca = 1.0;
+//    for(int i=0; i<5; i++) {
+//        float hr = 0.01 + 0.12*float(i)/4.0;
+//        float3 aopos =  nor * hr + pos;
+//        float dd = scene(aopos,control);
+//        occ += -(dd-hr)*sca;
+//        sca *= 0.95;
+//    }
+//    return clamp( 1.0 - 3.0*occ, 0.0, 1.0 );
+//}
+
+//float3 lighting(float3 k_a, float3 k_d, float3 k_s, float alpha, float3 p, float3 eye, device Control &control) {
+
+float3 lighting(float3 position, device Control &control) {
+    
+#define k_a control.coloring1
+#define k_d control.coloring2
+#define k_s control.coloring3
+#define k_alpha control.coloring4
+
+    float3 color = k_a / 2;
+    float3 normal = calcNormal(position,control);
+    
+    color = mix(color, normal, control.coloring5);
+    color = mix(color, float3(1.0 - smoothstep(0.0, 0.6, distance(float2(0.0), position.xy))), control.coloring6);
+    color = color * float3(1.0, 0.5, control.coloring7);
+    
+//     float occ = calc_AO(p, normal,control);
+    
+    float3 light1Pos = float3(4.0 * sin(control.coloring8),
+                              5.0,
+                              4.0 * cos(control.coloring9));
+    float3 light1Intensity = float3(0.4);
+
+    color += phong_contrib(k_d, k_s, k_alpha, position, control.camera, light1Pos, light1Intensity, control);
+    
+//    color = mix(color, color * occ * soft_shadow(p, normalize(light1Pos), control.p8, control.p9 * 10, control.pA * 30,control), control.pB);
+
+    return color;
+}
+
+//MARK: -
+//MARK: -
+//MARK: -
 
 float3 applyColoring
 (
@@ -2152,10 +2237,13 @@ float3 applyColoring
             ans = float3(1 - (normal / f2 + sqrt(distAns.y / f1)));
             break;
         case 1 :
-            f1 = 5 + control.coloring1 * 10;
-            f2 = 5 + control.coloring2 * 20;
-            f3 = 0.01 + control.coloring3 * 5;
-            ans = float3(abs(1 - (normal * f3 + sqrt(distAns.y / f1)))) / f2;
+//            f1 = 5 + control.coloring1 * 10;
+//            f2 = 5 + control.coloring2 * 20;
+//            f3 = 0.01 + control.coloring3 * 5;
+//            ans = float3(abs(1 - (normal * f3 + sqrt(distAns.y / f1)))) / f2;
+            
+            ans = lighting(position,control);
+            
             break;
         case 2 :
             f1 = 5 + control.coloring1 * 10;
@@ -2230,6 +2318,8 @@ float3 getOrbitColor(device Control &control,float4 orbitTrap) {
     return orbitColor;
 }
 
+//MARK: -
+//MARK: -
 //MARK: -
 
 kernel void rayMarchShader

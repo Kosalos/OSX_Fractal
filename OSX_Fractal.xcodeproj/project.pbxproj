@@ -18,6 +18,7 @@
 		1D4A5BB9257D8C8C00B63E39 /* ControlViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4A5BB8257D8C8C00B63E39 /* ControlViewController.swift */; };
 		1D4A5BBB257D9C3B00B63E39 /* ControlPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4A5BBA257D9C3B00B63E39 /* ControlPickerViewController.swift */; };
 		1D4A5BBD257FEA2100B63E39 /* help5.txt in Resources */ = {isa = PBXBuildFile; fileRef = 1D4A5BBC257FEA2100B63E39 /* help5.txt */; };
+		1D4D365A26CC5FC900E4B6AB /* grid.png in Resources */ = {isa = PBXBuildFile; fileRef = 1D4D365926CC5F9B00E4B6AB /* grid.png */; };
 		1D4D7A63262BBE3C0097B9CB /* MemoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4D7A60262BB52D0097B9CB /* MemoryViewController.swift */; };
 		1D4E2D672672835600378C1A /* WinBillboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4E2D6626727C7F00378C1A /* WinBillboardViewController.swift */; };
 		1D878EF526743DB7008538FA /* help2.txt in Resources */ = {isa = PBXBuildFile; fileRef = 1D878EF426743DB7008538FA /* help2.txt */; };
@@ -49,6 +50,7 @@
 		1D4A5BB8257D8C8C00B63E39 /* ControlViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControlViewController.swift; sourceTree = "<group>"; };
 		1D4A5BBA257D9C3B00B63E39 /* ControlPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControlPickerViewController.swift; sourceTree = "<group>"; };
 		1D4A5BBC257FEA2100B63E39 /* help5.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = help5.txt; sourceTree = "<group>"; };
+		1D4D365926CC5F9B00E4B6AB /* grid.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = grid.png; sourceTree = "<group>"; };
 		1D4D7A60262BB52D0097B9CB /* MemoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryViewController.swift; sourceTree = "<group>"; };
 		1D4E2D6626727C7F00378C1A /* WinBillboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WinBillboardViewController.swift; sourceTree = "<group>"; };
 		1D878EF426743DB7008538FA /* help2.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = help2.txt; sourceTree = "<group>"; };
@@ -135,6 +137,7 @@
 				1D09268B223C1248005BC5FC /* EquationPickerViewController.swift */,
 				CFD49CC52115B92300B4C5EB /* MetalView.swift */,
 				CFEA3DEA211463D800C7DBD3 /* AppDelegate.swift */,
+				1D4D365926CC5F9B00E4B6AB /* grid.png */,
 				CFEA3DEE211463D900C7DBD3 /* Assets.xcassets */,
 				1D52F119263711400093B328 /* Help Files */,
 				CFEA3DE8211463D800C7DBD3 /* Products */,
@@ -205,6 +208,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1D4D365A26CC5FC900E4B6AB /* grid.png in Resources */,
 				CFEA3DEF211463D900C7DBD3 /* Assets.xcassets in Resources */,
 				1D37762B2680E0DD004A79C4 /* help7.txt in Resources */,
 				1D46500C2221B0C400D14A94 /* help1.txt in Resources */,

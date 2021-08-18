@@ -29,7 +29,8 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     @IBOutlet var instructionsG: InstructionsG!
     @IBOutlet var metalView: MetalView!
     @IBOutlet var mainHelpButton: NSButton!
-    
+    @IBOutlet var metalView2: MetalView!
+
     let PIPELINE_FRACTAL = 0
     let PIPELINE_NORMAL  = 1
     let PIPELINE_EFFECTS = 2
@@ -1205,7 +1206,13 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             }
         }
         
-        if let v = vcMemory { v.addImage(metalView.currentDrawable!.texture) }
+//zorro        if let v = vcMemory { v.addImage(metalView.currentDrawable!.texture) }
+
+        
+        if let v = vcMemory {
+            v.addImage(metalView.currentDrawable!.texture)
+        }
+
         
         if control.skip > 1 {   // 'fast' renders will have ~50% utilization
             timeInterval = NSDate().timeIntervalSince(start as Date)
@@ -1650,6 +1657,17 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             widget.addFloat("Foam",&control.cy,0.1,3,0.02)
             widget.addFloat("Foam2",&control.cz,0.1,3,0.02)
             widget.addFloat("Bend",&control.cw,0.01,0.03,0.0001)
+            
+            
+            widget.addFloat("ex",&control.ex,-10,10,0.05)
+            widget.addFloat("ey",&control.ey,-10,10,0.05)
+            widget.addFloat("ez",&control.ez,-10,10,0.05)
+            widget.addFloat("ew",&control.ew,-10,10,0.05)
+            widget.addFloat("fx",&control.fx,-10,10,0.05)
+            widget.addFloat("fy",&control.fy,-10,10,0.05)
+            widget.addFloat("fz",&control.fz,-10,10,0.05)
+            widget.addFloat("fw",&control.fw,-10,10,0.05)
+
         case EQU_03_KLEINIAN :
             widget.addInt32("Final Iterations",&control.icx, 1,69,1)
             widget.addInt32("Box Iterations",&control.icy,1,40,1)
@@ -2221,48 +2239,5 @@ extension NSMutableAttributedString {
         let normal = NSAttributedString(string: text + "\n")
         append(normal)
         return self
-    }
-}
-
-// https://stackoverflow.com/questions/33844130/take-a-snapshot-of-current-screen-with-metal-in-swift
-extension MTLTexture {
-    func bytes() -> UnsafeMutableRawPointer {
-        let width = self.width
-        let height   = self.height
-        let rowBytes = self.width * 4
-        let p = malloc(width * height * 4)
-        
-        self.getBytes(p!, bytesPerRow: rowBytes, from: MTLRegionMake2D(0, 0, width, height), mipmapLevel: 0)
-        
-        return p!
-    }
-    
-    func toImage() -> CGImage? {
-        let p = bytes()
-        
-        let pColorSpace = CGColorSpaceCreateDeviceRGB()
-        
-        let rawBitmapInfo = CGImageAlphaInfo.noneSkipFirst.rawValue | CGBitmapInfo.byteOrder32Little.rawValue
-        let bitmapInfo:CGBitmapInfo = CGBitmapInfo(rawValue: rawBitmapInfo)
-        
-        let selftureSize = self.width * self.height * 4
-        let rowBytes = self.width * 4
-        let releaseMaskImagePixelData: CGDataProviderReleaseDataCallback = { (info: UnsafeMutableRawPointer?, data: UnsafeRawPointer, size: Int) -> () in
-            return
-        }
-        let provider = CGDataProvider(dataInfo: nil, data: p, size: selftureSize, releaseData: releaseMaskImagePixelData)
-        let cgImageRef = CGImage(width: self.width, height: self.height, bitsPerComponent: 8, bitsPerPixel: 32, bytesPerRow: rowBytes, space: pColorSpace, bitmapInfo: bitmapInfo, provider: provider!, decode: nil, shouldInterpolate: true, intent: CGColorRenderingIntent.defaultIntent)!
-        
-        return cgImageRef
-    }
-    
-    func toNSImage(_ sz:NSSize) -> NSImage? {
-        return NSImage(cgImage:toImage()!, size:sz)
-    }
-}
-
-extension NSImageView {
-    func imageFromTexture(_ tt:MTLTexture) {
-        image = tt.toNSImage(frame.size)!
     }
 }
