@@ -1,0 +1,17 @@
+7 Save/Load Dialog
+
+Press 'D' to select sorting entries by Date
+Press 'D' again to toggle between Ascending and Descending dates
+
+Press 'K' to sort entries by fractal kind
+
+Press 'S' to add the current fractal settings to the list
+
+Click on entry for immediate Load
+
+Click on entry 'Overwrite' button to replace that dataset
+      with the current fractal data
+
+Click on entry 'Delete' button to remove it from the list
+
+Click/Drag mouse over list to multi-select entries for deletion

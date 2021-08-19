@@ -12,6 +12,7 @@ let MTOTAL = MXS * MYS
 struct MemoryData {
     var image = NSImageView()
     var control = Control()
+    var pixelsPtr:UnsafeMutableRawPointer! = nil
 }
 
 var vcMemory:MemoryViewController! = nil
@@ -35,6 +36,7 @@ class MemoryViewController: NSViewController, NSWindowDelegate {
                 var d = MemoryData()
                 d.image = NSImageView.init(frame:CGRect(x:xp, y:yp, width:MSZ, height:MSZ))
                 d.control = vc.control
+                d.pixelsPtr = nil
                 
                 data.append(d)
                 self.view.addSubview(data[i].image)
@@ -57,7 +59,13 @@ class MemoryViewController: NSViewController, NSWindowDelegate {
     
     func addImage(_ t:MTLTexture) {
         data[index].control = vc.control
+
+        // free malloced memory for image we are about to overwrite
+        if data[index].pixelsPtr != nil { free(data[index].pixelsPtr) }
+
         data[index].image.imageFromTexture(t)
+        data[index].pixelsPtr = destPixelsPtr
+
         index += 1
         if index >= MTOTAL { index = 0 }
         view.setNeedsDisplay(view.bounds)
@@ -136,6 +144,8 @@ extension NSImageView {
 
 // https://stackoverflow.com/questions/33844130/take-a-snapshot-of-current-screen-with-metal-in-swift
 
+var destPixelsPtr:UnsafeMutableRawPointer! = nil
+
 extension MTLTexture {
     func imageBytes(_ width:Int, _ height:Int) -> UnsafeMutableRawPointer {
         let rowBytes = width * 4
@@ -144,12 +154,15 @@ extension MTLTexture {
         return p!
     }
     
+    // Note: assumes destination size is smaller than image size
     func toImage(_ desiredSize:NSSize) -> CGImage? {
         // scale src pixels to dst pixel size
         let xs = Int(desiredSize.width)
         let ys = Int(desiredSize.height)
-        let srcPixels = imageBytes(self.width,self.height).assumingMemoryBound(to: Float.self) // 4 bytes per pixel
-        let dstPixels = imageBytes(xs,ys).assumingMemoryBound(to: Float.self)
+        let srcPixels = imageBytes(self.width,self.height).assumingMemoryBound(to: Float.self) // 4 bytes per pixel RGBA
+
+        destPixelsPtr = imageBytes(xs,ys)
+        let dstPixels = destPixelsPtr.assumingMemoryBound(to: Float.self)
 
         let xHop = self.width / xs
         let yHop = self.height / ys

@@ -156,7 +156,12 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         if repeatCount > 0 && !metalView.viewIsDirty {
             repeatCount -= 1
             if repeatStyle == 1 { vcColor.randomizeColorSettings() }
-            if repeatStyle == 2 { setControlParametersToRandomValues() }
+            
+            if repeatStyle == 2 {
+                widget.randomValues(shiftKeyDown,optionKeyDown)
+                updateWindowTitle()
+            }
+            
             isDirty = true
         }
         
@@ -1290,6 +1295,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         self.present(vc, asPopoverRelativeTo: parentView.bounds, of: parentView, preferredEdge: .minX, behavior: .semitransient)
     }
     
+    var shiftKeyDown:Bool = false
     var ctrlKeyDown:Bool = false
     var optionKeyDown:Bool = false
     var cmdKeyDown:Bool = false
@@ -1298,6 +1304,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     
     func updateModifierKeyFlags(_ ev:NSEvent) {
         let rv = ev.modifierFlags.intersection(.deviceIndependentFlagsMask).rawValue
+        shiftKeyDown    = rv & (1 << 17) != 0
         ctrlKeyDown     = rv & (1 << 18) != 0
         optionKeyDown   = rv & (1 << 19) != 0
         cmdKeyDown      = rv & (1 << 20) != 0
@@ -1545,53 +1552,53 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         print("}")
     }
     
-    /// press 'H" to set control parameters to random values
-    func setControlParametersToRandomValues() {
-        func fRandom() -> Float { return Float.random(in: -1 ..< 0) }
-        func fRandom2() -> Float { return Float.random(in: 0 ..< 1) }
-        func fRandom3() -> Float { return Float.random(in: -5 ..< 5) }
-        func fRandom3Tweak() -> Float { return Float.random(in: 0.01 ... 0.01) }
-        
-        if optionKeyDown {
-            control.cx += fRandom3Tweak()
-            control.cy += fRandom3Tweak()
-            control.cz += fRandom3Tweak()
-            control.cw += fRandom3Tweak()
-            control.dx += fRandom3Tweak()
-            control.dy += fRandom3Tweak()
-            control.dz += fRandom3Tweak()
-            control.dw += fRandom3Tweak()
-            control.ex += fRandom3Tweak()
-            control.ey += fRandom3Tweak()
-            control.ez += fRandom3Tweak()
-            control.ew += fRandom3Tweak()
-            control.fx += fRandom3Tweak()
-            control.fy += fRandom3Tweak()
-            control.fz += fRandom3Tweak()
-            control.fw += fRandom3Tweak()
-        }
-        else {
-            control.cx = fRandom3()
-            control.cy = fRandom3()
-            control.cz = fRandom3()
-            control.cw = fRandom3()
-            control.dx = fRandom3()
-            control.dy = fRandom3()
-            control.dz = fRandom3()
-            control.dw = fRandom3()
-            control.ex = fRandom3()
-            control.ey = fRandom3()
-            control.ez = fRandom3()
-            control.ew = fRandom3()
-            control.fx = fRandom3()
-            control.fy = fRandom3()
-            control.fz = fRandom3()
-            control.fw = fRandom3()
-        }
-        
-        undoPush()
-        updateWindowTitle()
-    }
+//    /// press 'H" to set control parameters to random values
+//    func setControlParametersToRandomValues() {
+//        func fRandom() -> Float { return Float.random(in: -1 ..< 0) }
+//        func fRandom2() -> Float { return Float.random(in: 0 ..< 1) }
+//        func fRandom3() -> Float { return Float.random(in: -5 ..< 5) }
+//        func fRandom3Tweak() -> Float { return Float.random(in: 0.01 ... 0.01) }
+//
+//        if optionKeyDown {
+//            control.cx += fRandom3Tweak()
+//            control.cy += fRandom3Tweak()
+//            control.cz += fRandom3Tweak()
+//            control.cw += fRandom3Tweak()
+//            control.dx += fRandom3Tweak()
+//            control.dy += fRandom3Tweak()
+//            control.dz += fRandom3Tweak()
+//            control.dw += fRandom3Tweak()
+//            control.ex += fRandom3Tweak()
+//            control.ey += fRandom3Tweak()
+//            control.ez += fRandom3Tweak()
+//            control.ew += fRandom3Tweak()
+//            control.fx += fRandom3Tweak()
+//            control.fy += fRandom3Tweak()
+//            control.fz += fRandom3Tweak()
+//            control.fw += fRandom3Tweak()
+//        }
+//        else {
+//            control.cx = fRandom3()
+//            control.cy = fRandom3()
+//            control.cz = fRandom3()
+//            control.cw = fRandom3()
+//            control.dx = fRandom3()
+//            control.dy = fRandom3()
+//            control.dz = fRandom3()
+//            control.dw = fRandom3()
+//            control.ex = fRandom3()
+//            control.ey = fRandom3()
+//            control.ez = fRandom3()
+//            control.ew = fRandom3()
+//            control.fx = fRandom3()
+//            control.fy = fRandom3()
+//            control.fz = fRandom3()
+//            control.fw = fRandom3()
+//        }
+//
+//        undoPush()
+//        updateWindowTitle()
+//    }
     
     //MARK: -
     

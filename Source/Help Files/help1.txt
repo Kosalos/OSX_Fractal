@@ -44,6 +44,10 @@ Press <Cmd>1 ... <Cmd>6 to Move focus to respective Window
 
 G   : Cycle through the coloring schemes
 
+H   : Run 20 sessions, setting all float parameters to random values
+      add <Shift> key to randomize only the focused parameter
+      add <Option> key to 'tweak' the values instead
+      
 O   : Launch Equation Picker dialog
 
 P   : Load Picture for texturing

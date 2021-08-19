@@ -70,6 +70,21 @@ struct WidgetData {
         return false
     }
     
+    func randomFloatValue(_ optionKeyDown:Bool) {
+        if kind != .float { return }
+        
+        if optionKeyDown {
+            let r:Float = (range.y - range.x) / 30
+            var value:Float = valuePtr.load(as:Float.self) + Float.random(in: -r ... r)
+            value = max( min(value, range.y), range.x)
+            valuePtr.storeBytes(of:value, as:Float.self)
+        }
+        else {
+            let value:Float = Float.random(in: range.x ... range.y)
+            valuePtr.storeBytes(of:value, as:Float.self)
+        }
+    }
+    
     func setValue(_ v:Float) {
         if valuePtr != nil {
             valuePtr.storeBytes(of:v, as:Float.self)
@@ -143,8 +158,6 @@ class Widget {
     var data:[WidgetData] = []
     var focus:Int = NO_FOCUS
     var previousFocus:Int = NO_FOCUS
-    
-    
     var shiftKeyDown = Bool()
     var optionKeyDown = Bool()
     
@@ -328,5 +341,16 @@ class Widget {
         if data[index].kind == .float { return true }
         if data[index].kind == .integer32 { return true }
         return false
+    }
+    
+    func randomValues(_ shiftKeyDown:Bool, _ optionKeyDown:Bool) {
+        if shiftKeyDown && focus >= 0 {
+            data[focus].randomFloatValue(optionKeyDown)
+            return
+        }
+
+        for i in 0 ..< data.count {
+            data[i].randomFloatValue(optionKeyDown)
+        }
     }
 }
