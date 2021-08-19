@@ -12,8 +12,7 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
     
     @IBAction func resetButtonPressed(_ sender: NSButton) {
         randomizeColorSettings()
-        vc.repeatCount = 20
-        vc.repeatStyle = 1
+        vc.initRepeatation(.color)
     }
 
     func randomizeColorSettings() {

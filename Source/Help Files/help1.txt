@@ -47,6 +47,7 @@ G   : Cycle through the coloring schemes
 H   : Run 20 sessions, setting all float parameters to random values
       add <Shift> key to randomize only the focused parameter
       add <Option> key to 'tweak' the values instead
+      Press <Esc> to stop the repeatations
       
 O   : Launch Equation Picker dialog
 

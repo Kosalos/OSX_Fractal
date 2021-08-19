@@ -432,8 +432,6 @@ class SaveLoadViewController: NSViewController,NSTableViewDataSource, NSTableVie
             loadNextIndex += 1
             if loadNextIndex >= slEntry.count { loadNextIndex = 0 }
             
-            print(loadNextIndex)
-            
             determineURL(loadNextIndex, usefilenameNumber:true)
             let data = NSData(contentsOf: fileURL)
             

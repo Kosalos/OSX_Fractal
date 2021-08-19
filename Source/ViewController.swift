@@ -10,6 +10,8 @@ var coloringTexture:MTLTexture! = nil
 
 var device: MTLDevice! = nil
 
+enum RepeatStyle { case parameter,color }
+
 class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, WidgetDelegate {
     var control = Control()
     var widget:Widget! = nil
@@ -22,7 +24,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     var palletteIndex:Int = 0
     var texture:MTLTexture! = nil
     var repeatCount = Int()
-    var repeatStyle = Int()
+    var repeatStyle:RepeatStyle = .parameter
     var scrollWheelClickedCount = Int()
     
     @IBOutlet var instructions: NSTextField!
@@ -106,6 +108,11 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     
     @IBAction func mainHelpButtonPressed(_ sender: NSButton) { showHelpPage(view,.Main) }
     
+    func initRepeatation(_ style:RepeatStyle) {
+        repeatStyle = style
+        repeatCount = 20
+    }
+    
     //MARK: -
     
     var fastRenderEnabled:Bool = true
@@ -155,9 +162,11 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         
         if repeatCount > 0 && !metalView.viewIsDirty {
             repeatCount -= 1
-            if repeatStyle == 1 { vcColor.randomizeColorSettings() }
             
-            if repeatStyle == 2 {
+            switch repeatStyle {
+            case .color :
+                vcColor.randomizeColorSettings()
+              case .parameter :
                 widget.randomValues(shiftKeyDown,optionKeyDown)
                 updateWindowTitle()
             }
@@ -217,7 +226,6 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     
     /// reset widget focus index, update window title, recalc fractal.  Called after Load and LoadNext
     func controlJustLoaded() {
-        undoReset()
         defineWidgetsForCurrentEquation()
         widget.focus = 0
         updateWindowTitle()
@@ -1295,21 +1303,6 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         self.present(vc, asPopoverRelativeTo: parentView.bounds, of: parentView, preferredEdge: .minX, behavior: .semitransient)
     }
     
-    var shiftKeyDown:Bool = false
-    var ctrlKeyDown:Bool = false
-    var optionKeyDown:Bool = false
-    var cmdKeyDown:Bool = false
-    var speed1000:Bool = false
-    var performingUndo:Bool = false
-    
-    func updateModifierKeyFlags(_ ev:NSEvent) {
-        let rv = ev.modifierFlags.intersection(.deviceIndependentFlagsMask).rawValue
-        shiftKeyDown    = rv & (1 << 17) != 0
-        ctrlKeyDown     = rv & (1 << 18) != 0
-        optionKeyDown   = rv & (1 << 19) != 0
-        cmdKeyDown      = rv & (1 << 20) != 0
-    }
-    
     //MARK: -
     //MARK: -
     //MARK: -
@@ -1324,18 +1317,19 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             flagViewToRecalcFractal()
         }
         
-        performingUndo = false
         updateModifierKeyFlags(event)
         widget.updateAlterationSpeed(event)
         
         if widget.keyPress(event) {
-            undoPush()
             setShaderToFastRender()
             updateWindowTitle()
             return
         }
         
         switch Int32(event.keyCode) {
+        case ESC_KEY :
+            repeatCount = 0
+            return
         case HOME_KEY :
             presentPopover(self.view,"SaveLoadVC")
             return
@@ -1400,11 +1394,9 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             instructionsG.isHidden = instructions.isHidden
             mainHelpButton.isHidden = instructions.isHidden
         case "H" :
-            repeatCount = 20
-            repeatStyle = 2
+            initRepeatation(.parameter)
         case "V" : displayControlParametersInConsoleWindow()
         case "Q" : speed1000 = true
-        case "U" : performingUndo = true; undoPop()
         case "G" :
             control.colorScheme += 1
             if control.colorScheme > 7 { control.colorScheme = 0 }
@@ -1430,12 +1422,6 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     
     override func keyUp(with event: NSEvent) {
         super.keyUp(with: event)
-        
-        if performingUndo {
-            performingUndo = false
-            control.skip = 1
-            flagViewToRecalcFractal()
-        }
         
         switch event.charactersIgnoringModifiers!.uppercased() {
         case "4","$","5","%" : jogRelease(1,0,0)
@@ -2192,31 +2178,22 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             }
         }
     }
-    
-    
-    //MARK: -
-    //MARK: - Undo
-    
-    let MAXUNDO:Int = 500
-    
-    var undo:[Control] = []
-    
-    func undoReset() {
-        undo.removeAll()
-    }
-    
-    func undoPush() {
-        undo.append(control)
-        if undo.count == MAXUNDO { undo.removeFirst() }
-    }
-    
-    func undoPop() {
-        if undo.count > 0 {
-            control = undo.last!
-            undo.removeLast()
-            flagViewToRecalcFractal()
-        }
-    }
+}
+
+//MARK: -
+
+var shiftKeyDown:Bool = false
+var ctrlKeyDown:Bool = false
+var optionKeyDown:Bool = false
+var cmdKeyDown:Bool = false
+var speed1000:Bool = false
+
+func updateModifierKeyFlags(_ ev:NSEvent) {
+    let rv = ev.modifierFlags.intersection(.deviceIndependentFlagsMask).rawValue
+    shiftKeyDown    = rv & (1 << 17) != 0
+    ctrlKeyDown     = rv & (1 << 18) != 0
+    optionKeyDown   = rv & (1 << 19) != 0
+    cmdKeyDown      = rv & (1 << 20) != 0
 }
 
 //MARK: -

@@ -59,7 +59,7 @@ class ControlViewController: NSViewController {
             }
         }
         
-        vc.updateModifierKeyFlags(event)
+        updateModifierKeyFlags(event)
         vc.widget.updateAlterationSpeed(event)
         
         switch Int32(event.keyCode) {

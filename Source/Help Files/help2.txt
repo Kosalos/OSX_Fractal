@@ -11,6 +11,10 @@ Specular : add spotlight lighting effect
   
 Style : Select coloring style 0 ... 7
 
+Randomize Colors:
+    Run 20 sessions, setting all color parameters to random values
+    Press <Esc> to stop the repeatations
+
 Second Surface -------------------------------
 
 When value is zero (set to lowest value), the image renders as normal.

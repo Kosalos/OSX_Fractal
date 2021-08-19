@@ -158,8 +158,6 @@ class Widget {
     var data:[WidgetData] = []
     var focus:Int = NO_FOCUS
     var previousFocus:Int = NO_FOCUS
-    var shiftKeyDown = Bool()
-    var optionKeyDown = Bool()
     
     init(_ d:WidgetDelegate) {
         delegate = d
@@ -265,15 +263,13 @@ class Widget {
     }
     
     func updateAlterationSpeed(_ event:NSEvent) {
-        let rv = event.modifierFlags.intersection(.deviceIndependentFlagsMask).rawValue
-        shiftKeyDown  = rv & (1 << 17) != 0
-        optionKeyDown = rv & (1 << 19) != 0
+        updateModifierKeyFlags(event)
         
         alterationSpeed = 1
         if shiftKeyDown && optionKeyDown { alterationSpeed = 50 } else
             if shiftKeyDown { alterationSpeed = 0.1 } else if optionKeyDown { alterationSpeed = 10 }
         
-        if vc.speed1000 { alterationSpeed *= 0.01 }
+        if speed1000 { alterationSpeed *= 0.01 }
     }
     
     var lastKeypressWasArrowKey = false // if true then do not pass keypress onto main window
