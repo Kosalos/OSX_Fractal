@@ -1,9 +1,9 @@
 import Cocoa
 
-let X1:CGFloat = 1  // Auto box
-let X1S:CGFloat = 10
-let X2:CGFloat = X1 + X1S + 4 // value barchart
-let X2S:CGFloat = 40 - X2
+private let X1:CGFloat = 1  // Auto box
+private let X1S:CGFloat = 10
+private let X2:CGFloat = X1 + X1S + 4 // value barchart
+private let X2S:CGFloat = 40 - X2
 
 class InstructionsG: NSView {
     var parent:Widget! = nil

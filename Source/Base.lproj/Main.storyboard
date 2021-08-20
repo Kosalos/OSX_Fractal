@@ -355,21 +355,21 @@
             <objects>
                 <viewController storyboardIdentifier="HelpVC" id="sV0-5i-UiF" userLabel="HelpVC" customClass="HelpViewController" customModule="OSX_Fractal" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" appearanceType="aqua" id="17m-bx-P4L" customClass="BaseNSView2" customModule="OSX_Fractal" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="472" height="551"/>
+                        <rect key="frame" x="0.0" y="0.0" width="594" height="551"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Y0-tw-K88">
-                                <rect key="frame" x="8" y="28" width="444" height="511"/>
+                                <rect key="frame" x="8" y="28" width="566" height="511"/>
                                 <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="3Wn-US-Zn3">
-                                    <rect key="frame" x="0.0" y="0.0" width="429" height="511"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="551" height="511"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textView editable="NO" selectable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="bar" allowsCharacterPickerTouchBarItem="NO" textCompletion="NO" id="Lyj-kM-q1d">
-                                            <rect key="frame" x="0.0" y="0.0" width="429" height="511"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="551" height="511"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                            <size key="minSize" width="429" height="511"/>
-                                            <size key="maxSize" width="566" height="10000000"/>
+                                            <size key="minSize" width="551" height="511"/>
+                                            <size key="maxSize" width="600" height="10000000"/>
                                             <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                         </textView>
                                     </subviews>
@@ -379,7 +379,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" verticalHuggingPriority="750" horizontal="NO" id="cVa-8Y-UkL">
-                                    <rect key="frame" x="429" y="0.0" width="15" height="511"/>
+                                    <rect key="frame" x="551" y="0.0" width="15" height="511"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
@@ -397,7 +397,7 @@
                 </viewController>
                 <customObject id="sfn-lW-W4t" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-3481" y="626.5"/>
+            <point key="canvasLocation" x="-3327" y="880.5"/>
         </scene>
         <!--Equation Picker View Controller-->
         <scene sceneID="AyK-Hq-4i6">

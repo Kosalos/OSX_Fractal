@@ -7,10 +7,10 @@ var winControl:NSWindowController! = nil
 var videoRecorderWindow:NSWindowController! = nil
 var controlBuffer:MTLBuffer! = nil
 var coloringTexture:MTLTexture! = nil
-var enableAutoChange:Bool = false
-var autoChangeOptionKeyDown = false
-var autoChangeCtrlKeyDown = false
 var device: MTLDevice! = nil
+
+enum AutoChangeStatus: Int { case idle = 0,random,tweakFast,tweakSlow }
+var autoChangeStatus:AutoChangeStatus = .idle
 
 enum RepeatStyle { case parameter,color }
 
@@ -147,7 +147,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     @objc func timerHandler() {
         var isDirty:Bool = (vr != nil) && vr.isRecording
         
-        if enableAutoChange && winHandler.didAutoChange() { isDirty = true }
+        if autoChangeStatus != .idle && winHandler.didAutoChange() { isDirty = true }
         
         if performJog() { isDirty = true }
         
@@ -171,7 +171,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             case .color :
                 vcColor.randomizeColorSettings()
               case .parameter :
-                widget.randomValues(shiftKeyDown,optionKeyDown,cmdKeyDown)
+                widget.randomValues()
                 updateWindowTitle()
             }
             
@@ -215,7 +215,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         let index = Int(control.equation)
         var str = Int(index + 1).description + ": " + titleString[index] + " : " + widget.focusString()
         
-        // add float value annotation
+        // float value annotation -----------------------
         let i = widget.focus
         if i >= 0 && widget.data[i].kind == .float {
             let s = String(format: "  (%6.3f -[ %@ ]- %6.3f)",
@@ -224,6 +224,10 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
                            widget.data[i].range.max())
             str += s
         }
+        
+        // auto change status ---------------------------
+        let acLegend = [ "Idle","Random","Tweak Fast","Tweak Slow" ]
+        str += "     AutoChange:" + acLegend[autoChangeStatus.rawValue]
         
         view.window?.title = str
     }
@@ -237,7 +241,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         vcControl.refreshControlPanels()
         vcColor.defineWidgets()
         
-        winHandler.resetAutoChange()
+        winHandler.resetAllAutoChangeMarks()
         winHandler.refreshWidgetsAndImage()
     }
     
@@ -1349,10 +1353,21 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         default : break
         }
         
+        // window focus, auto change status --------------------------------
         if cmdKeyDown {
             let str = event.charactersIgnoringModifiers!.uppercased()
             switch str {
             case "1","2","3","4","5","6" : winHandler.setWindowFocus(Int(str)! - 1)
+                
+            case "A" :
+                autoChangeStatus = (autoChangeStatus == .idle) ? .random : .idle
+                updateWindowTitle()
+            case "S" :
+                autoChangeStatus = (autoChangeStatus == .idle) ? .tweakFast : .idle
+                updateWindowTitle()
+            case "D" :
+                autoChangeStatus = (autoChangeStatus == .idle) ? .tweakSlow : .idle
+                updateWindowTitle()
             default : break
             }
             return
@@ -1382,15 +1397,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         case "9","(" : jogCameraAndFocusPosition(0,0,+1)
         case "?","/" : fastRenderEnabled = !fastRenderEnabled
             
-        case "A" :
-            if shiftKeyDown {
-                enableAutoChange = !enableAutoChange
-                autoChangeOptionKeyDown = optionKeyDown
-                autoChangeCtrlKeyDown = ctrlKeyDown
-            }
-            else {
-                winHandler.toggleAutoChangeForWidget()
-            }
+        case "A" : winHandler.toggleAutoChangeOfFocusedParameterForWidget()
             
         case "C" :
             palletteIndex += 1

@@ -28,8 +28,8 @@ struct WidgetData {
             value = !value
             valuePtr.storeBytes(of:value, as:Bool.self)
             return true
-        case .float :
             
+        case .float :
             var value:Float = valuePtr.load(as:Float.self)
             let oldValue = value
             let amt:Float = delta * alterationSpeed
@@ -71,20 +71,30 @@ struct WidgetData {
         return false
     }
     
-    func randomFloatValue(_ optionKeyDown:Bool, _ ctrlKeyDown:Bool) {
+    func randomFloatValue(_ becauseOfAutoChange:Bool = true) {
         if kind != .float { return }
         
-        if optionKeyDown || ctrlKeyDown {
+        func randomize() {
+            let value:Float = Float.random(in: range.x ... range.y)
+            valuePtr.storeBytes(of:value, as:Float.self)
+        }
+        
+        if !becauseOfAutoChange {
+            randomize()
+            return
+        }
+        
+        switch autoChangeStatus {
+        case .tweakFast, .tweakSlow :
             var changeAmount:Float = (range.y - range.x) / 20
-            if ctrlKeyDown { changeAmount *= 0.1 }
+            if autoChangeStatus == .tweakSlow { changeAmount *= 0.1 }
             
             var value:Float = valuePtr.load(as:Float.self) + Float.random(in: -changeAmount ... changeAmount)
             value = max( min(value, range.y), range.x)
             valuePtr.storeBytes(of:value, as:Float.self)
-        }
-        else {
-            let value:Float = Float.random(in: range.x ... range.y)
-            valuePtr.storeBytes(of:value, as:Float.self)
+            
+        case .random : randomize()
+        case.idle    : break
         }
     }
     
@@ -284,31 +294,28 @@ class Widget {
 
         var changeMade:Bool = false
         
+        func ltRtArrow(_ direction:Int) {
+            if focus >= 0 {
+                lastKeypressWasArrowKey = true
+                if data[focus].alterValue(direction) {
+                    vc.flagViewToRecalcFractal()
+                    if data[focus].showValue { delegate?.displayWidgets() }
+                    if data[focus].callbackIndex >= 0 { delegate?.widgetCallback(data[focus].callbackIndex) }
+                    changeMade = true
+                }
+            }
+        }
+        
+        func upDnArrow(_ direction:Int) {
+            lastKeypressWasArrowKey = true
+            moveFocus(direction)
+        }
+
         switch Int32(event.keyCode) {
-        case LEFT_ARROW :
-            if focus < 0 { break }
-            lastKeypressWasArrowKey = true
-            if data[focus].alterValue(-1) {
-                vc.flagViewToRecalcFractal()
-                if data[focus].showValue { delegate?.displayWidgets() }
-                if data[focus].callbackIndex >= 0 { delegate?.widgetCallback(data[focus].callbackIndex) }
-                changeMade = true
-            }
-        case RIGHT_ARROW :
-            if focus < 0 { break }
-            lastKeypressWasArrowKey = true
-            if data[focus].alterValue(+1) {
-                vc.flagViewToRecalcFractal()
-                if data[focus].showValue { delegate?.displayWidgets() }
-                if data[focus].callbackIndex >= 0 { delegate?.widgetCallback(data[focus].callbackIndex) }
-                changeMade = true
-            }
-        case DOWN_ARROW :
-            lastKeypressWasArrowKey = true
-            moveFocus(+1)
-        case UP_ARROW :
-            lastKeypressWasArrowKey = true
-            moveFocus(-1)
+        case LEFT_ARROW  : ltRtArrow(-1)
+        case RIGHT_ARROW : ltRtArrow(+1)
+        case UP_ARROW    : upDnArrow(-1)
+        case DOWN_ARROW  : upDnArrow(+1)
         default : break
         }
         
@@ -343,26 +350,26 @@ class Widget {
         return false
     }
     
-    func randomValues(_ shiftKeyDown:Bool, _ optionKeyDown:Bool, _ cmdKeyDown:Bool) {
+    func randomValues() {
         if shiftKeyDown && focus >= 0 {
-            data[focus].randomFloatValue(optionKeyDown,cmdKeyDown)
+            data[focus].randomFloatValue(false)
             return
         }
 
         for i in 0 ..< data.count {
-            data[i].randomFloatValue(optionKeyDown,cmdKeyDown)
+            data[i].randomFloatValue(false)
         }
     }
     
     //MARK: -
 
-    func resetAutoChange() {
+    func resetAllAutoChangeMarks() {
         for i in 0 ..< data.count {
             data[i].autoChange = false
         }
     }
 
-    func toggleAutoChange() {
+    func toggleAutoChangeOfFocusedParameter() {
         if focus >= 0 && data[focus].kind == .float {
             data[focus].autoChange = !data[focus].autoChange
             instructionsG.refresh()
@@ -375,7 +382,7 @@ class Widget {
         for i in 0 ..< data.count {
             if data[i].autoChange {
                 ans = true
-                data[i].randomFloatValue(autoChangeOptionKeyDown,autoChangeCtrlKeyDown)
+                data[i].randomFloatValue()
             }
         }
 

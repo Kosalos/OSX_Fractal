@@ -1,13 +1,13 @@
 import Cocoa
 import MetalKit
 
-let MSZ = CGFloat(50)
-let MMARGIN = CGFloat(4)
-let MXB = CGFloat(10)
-let MYB = CGFloat(10)
-let MXS = Int(10)
-let MYS = Int(10)
-let MTOTAL = MXS * MYS
+private let MSZ = CGFloat(50)
+private let MMARGIN = CGFloat(4)
+private let MXB = CGFloat(10)
+private let MYB = CGFloat(10)
+private let MXS = Int(10)
+private let MYS = Int(10)
+private let MTOTAL = MXS * MYS
 
 struct MemoryData {
     var image = NSImageView()

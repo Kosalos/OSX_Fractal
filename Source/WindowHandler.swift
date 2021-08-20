@@ -91,33 +91,33 @@ class WindowHandler {
     
     //MARK: -
 
-    func resetAutoChange() {
+    func resetAllAutoChangeMarks() {
         let w0 = windows[0].contentViewController as! ViewController
-        w0.widget.resetAutoChange()
+        w0.widget.resetAllAutoChangeMarks()
         w0.displayWidgets()
         
         let w1 = windows[1].contentViewController as! WinColorViewController
-        w1.widget.resetAutoChange()
+        w1.widget.resetAllAutoChangeMarks()
         w1.displayWidgets()
 
         let w2 = windows[2].contentViewController as! WinLightViewController
-        w2.widget.resetAutoChange()
+        w2.widget.resetAllAutoChangeMarks()
         w2.displayWidgets()
     }
     
-    func toggleAutoChangeForWidget() {
+    func toggleAutoChangeOfFocusedParameterForWidget() {
         switch focusIndex {
         case 0 :
             let w0 = windows[0].contentViewController as! ViewController
-            w0.widget.toggleAutoChange()
+            w0.widget.toggleAutoChangeOfFocusedParameter()
             w0.displayWidgets()
         case 1 :
             let w1 = windows[1].contentViewController as! WinColorViewController
-            w1.widget.toggleAutoChange()
+            w1.widget.toggleAutoChangeOfFocusedParameter()
             w1.displayWidgets()
         case 2 :
             let w2 = windows[2].contentViewController as! WinLightViewController
-            w2.widget.toggleAutoChange()
+            w2.widget.toggleAutoChangeOfFocusedParameter()
             w2.displayWidgets()
         default : break
         }

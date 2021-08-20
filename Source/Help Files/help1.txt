@@ -45,18 +45,17 @@ Press <Cmd>1 ... <Cmd>6 to Move focus to respective Window
 A   : AutoChange
       All floating point parameter widgets have a circular button to the left of its barchart.
       Click on that button, or move the focus to that parameter and press 'A' to toggle its status.
-      Now press <Shift><A> to toggle "Enable AutoChange" on/off.
       All marked parameters will select random values every session, which launch continously.
-      
-      Press <Shift><Option><A> to enable the "Tweak current value" style of random changes.
-      Press <Shift><Ctrl><A> to enable the "Tweak current value just a little" style of random changes.
+
+      Press <Cmd><A> to toggle Random value changes.
+      Press <Cmd><S> to toggle Tweak Fast style of random changes.
+      Press <Cmd><D> to toggle Tweak Slow style of random changes.
       You can perform all the usual parameter changes while auto change is enabled.
 
 G   : Cycle through the coloring schemes
 
 H   : Run 20 sessions, setting all float parameters to random values
       add <Shift> key to randomize only the focused parameter
-      add <Option> key to 'tweak' the values instead
       Press <Esc> to stop the repeatations
       
 O   : Launch Equation Picker dialog
