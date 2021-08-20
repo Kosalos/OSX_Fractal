@@ -19,6 +19,7 @@ struct WidgetData {
     var showValue:Bool = false
     var wrap:Bool = false
     var callbackIndex:Int = 0
+    var autoChange:Bool = false
     
     func alterValue(_ direction:Int) -> Bool {
         switch kind {
@@ -70,12 +71,14 @@ struct WidgetData {
         return false
     }
     
-    func randomFloatValue(_ optionKeyDown:Bool) {
+    func randomFloatValue(_ optionKeyDown:Bool, _ ctrlKeyDown:Bool) {
         if kind != .float { return }
         
-        if optionKeyDown {
-            let r:Float = (range.y - range.x) / 30
-            var value:Float = valuePtr.load(as:Float.self) + Float.random(in: -r ... r)
+        if optionKeyDown || ctrlKeyDown {
+            var changeAmount:Float = (range.y - range.x) / 20
+            if ctrlKeyDown { changeAmount *= 0.1 }
+            
+            var value:Float = valuePtr.load(as:Float.self) + Float.random(in: -changeAmount ... changeAmount)
             value = max( min(value, range.y), range.x)
             valuePtr.storeBytes(of:value, as:Float.self)
         }
@@ -158,6 +161,7 @@ class Widget {
     var data:[WidgetData] = []
     var focus:Int = NO_FOCUS
     var previousFocus:Int = NO_FOCUS
+    var instructionsG:InstructionsG! = nil
     
     init(_ d:WidgetDelegate) {
         delegate = d
@@ -339,14 +343,43 @@ class Widget {
         return false
     }
     
-    func randomValues(_ shiftKeyDown:Bool, _ optionKeyDown:Bool) {
+    func randomValues(_ shiftKeyDown:Bool, _ optionKeyDown:Bool, _ cmdKeyDown:Bool) {
         if shiftKeyDown && focus >= 0 {
-            data[focus].randomFloatValue(optionKeyDown)
+            data[focus].randomFloatValue(optionKeyDown,cmdKeyDown)
             return
         }
 
         for i in 0 ..< data.count {
-            data[i].randomFloatValue(optionKeyDown)
+            data[i].randomFloatValue(optionKeyDown,cmdKeyDown)
         }
+    }
+    
+    //MARK: -
+
+    func resetAutoChange() {
+        for i in 0 ..< data.count {
+            data[i].autoChange = false
+        }
+    }
+
+    func toggleAutoChange() {
+        if focus >= 0 && data[focus].kind == .float {
+            data[focus].autoChange = !data[focus].autoChange
+            instructionsG.refresh()
+        }
+    }
+    
+    func didAutoChange() -> Bool {
+        var ans = false
+        
+        for i in 0 ..< data.count {
+            if data[i].autoChange {
+                ans = true
+                data[i].randomFloatValue(autoChangeOptionKeyDown,autoChangeCtrlKeyDown)
+            }
+        }
+
+        if ans { instructionsG.refresh() }
+        return ans
     }
 }

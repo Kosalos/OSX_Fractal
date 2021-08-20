@@ -7,7 +7,9 @@ var winControl:NSWindowController! = nil
 var videoRecorderWindow:NSWindowController! = nil
 var controlBuffer:MTLBuffer! = nil
 var coloringTexture:MTLTexture! = nil
-
+var enableAutoChange:Bool = false
+var autoChangeOptionKeyDown = false
+var autoChangeCtrlKeyDown = false
 var device: MTLDevice! = nil
 
 enum RepeatStyle { case parameter,color }
@@ -145,6 +147,8 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
     @objc func timerHandler() {
         var isDirty:Bool = (vr != nil) && vr.isRecording
         
+        if enableAutoChange && winHandler.didAutoChange() { isDirty = true }
+        
         if performJog() { isDirty = true }
         
         if control.skip > 1 && slowRenderCountDown > 0 {
@@ -167,7 +171,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
             case .color :
                 vcColor.randomizeColorSettings()
               case .parameter :
-                widget.randomValues(shiftKeyDown,optionKeyDown)
+                widget.randomValues(shiftKeyDown,optionKeyDown,cmdKeyDown)
                 updateWindowTitle()
             }
             
@@ -233,6 +237,7 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         vcControl.refreshControlPanels()
         vcColor.defineWidgets()
         
+        winHandler.resetAutoChange()
         winHandler.refreshWidgetsAndImage()
     }
     
@@ -1346,7 +1351,10 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         
         if cmdKeyDown {
             let str = event.charactersIgnoringModifiers!.uppercased()
-            winHandler.setWindowFocus(Int(str)! - 1)
+            switch str {
+            case "1","2","3","4","5","6" : winHandler.setWindowFocus(Int(str)! - 1)
+            default : break
+            }
             return
         }
         
@@ -1373,6 +1381,16 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         case "8","*" : jogCameraAndFocusPosition(0,0,-1)
         case "9","(" : jogCameraAndFocusPosition(0,0,+1)
         case "?","/" : fastRenderEnabled = !fastRenderEnabled
+            
+        case "A" :
+            if shiftKeyDown {
+                enableAutoChange = !enableAutoChange
+                autoChangeOptionKeyDown = optionKeyDown
+                autoChangeCtrlKeyDown = ctrlKeyDown
+            }
+            else {
+                winHandler.toggleAutoChangeForWidget()
+            }
             
         case "C" :
             palletteIndex += 1
@@ -1537,54 +1555,6 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         floatDisplay("InvAngle",control.InvAngle,indent)
         print("}")
     }
-    
-//    /// press 'H" to set control parameters to random values
-//    func setControlParametersToRandomValues() {
-//        func fRandom() -> Float { return Float.random(in: -1 ..< 0) }
-//        func fRandom2() -> Float { return Float.random(in: 0 ..< 1) }
-//        func fRandom3() -> Float { return Float.random(in: -5 ..< 5) }
-//        func fRandom3Tweak() -> Float { return Float.random(in: 0.01 ... 0.01) }
-//
-//        if optionKeyDown {
-//            control.cx += fRandom3Tweak()
-//            control.cy += fRandom3Tweak()
-//            control.cz += fRandom3Tweak()
-//            control.cw += fRandom3Tweak()
-//            control.dx += fRandom3Tweak()
-//            control.dy += fRandom3Tweak()
-//            control.dz += fRandom3Tweak()
-//            control.dw += fRandom3Tweak()
-//            control.ex += fRandom3Tweak()
-//            control.ey += fRandom3Tweak()
-//            control.ez += fRandom3Tweak()
-//            control.ew += fRandom3Tweak()
-//            control.fx += fRandom3Tweak()
-//            control.fy += fRandom3Tweak()
-//            control.fz += fRandom3Tweak()
-//            control.fw += fRandom3Tweak()
-//        }
-//        else {
-//            control.cx = fRandom3()
-//            control.cy = fRandom3()
-//            control.cz = fRandom3()
-//            control.cw = fRandom3()
-//            control.dx = fRandom3()
-//            control.dy = fRandom3()
-//            control.dz = fRandom3()
-//            control.dw = fRandom3()
-//            control.ex = fRandom3()
-//            control.ey = fRandom3()
-//            control.ez = fRandom3()
-//            control.ew = fRandom3()
-//            control.fx = fRandom3()
-//            control.fy = fRandom3()
-//            control.fz = fRandom3()
-//            control.fw = fRandom3()
-//        }
-//
-//        undoPush()
-//        updateWindowTitle()
-//    }
     
     //MARK: -
     
@@ -1999,9 +1969,9 @@ class ViewController: NSViewController, NSWindowDelegate, MetalViewDelegate, Wid
         default : break
         }
         
-        let index = widget.focus
-        defineWidgetsForCurrentEquation()
-        widget.focus = index
+//        let index = widget.focus
+//        defineWidgetsForCurrentEquation()
+//        widget.focus = index
         displayWidgets()
         flagViewToRecalcFractal()
     }

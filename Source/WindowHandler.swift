@@ -73,6 +73,8 @@ class WindowHandler {
     func widgetPointer(_ index:Int) -> Widget { return widgets[index] }
     func stringForRow(_ index:Int, _ row:Int) -> String { return widgets[index].data[row].displayString() }
 
+    //MARK: -
+
     func refreshWidgetsAndImage() {
         let w0 = windows[0].contentViewController as! ViewController
         w0.flagViewToRecalcFractal()
@@ -87,6 +89,57 @@ class WindowHandler {
         w3.displayWidgets()
     }
     
+    //MARK: -
+
+    func resetAutoChange() {
+        let w0 = windows[0].contentViewController as! ViewController
+        w0.widget.resetAutoChange()
+        w0.displayWidgets()
+        
+        let w1 = windows[1].contentViewController as! WinColorViewController
+        w1.widget.resetAutoChange()
+        w1.displayWidgets()
+
+        let w2 = windows[2].contentViewController as! WinLightViewController
+        w2.widget.resetAutoChange()
+        w2.displayWidgets()
+    }
+    
+    func toggleAutoChangeForWidget() {
+        switch focusIndex {
+        case 0 :
+            let w0 = windows[0].contentViewController as! ViewController
+            w0.widget.toggleAutoChange()
+            w0.displayWidgets()
+        case 1 :
+            let w1 = windows[1].contentViewController as! WinColorViewController
+            w1.widget.toggleAutoChange()
+            w1.displayWidgets()
+        case 2 :
+            let w2 = windows[2].contentViewController as! WinLightViewController
+            w2.widget.toggleAutoChange()
+            w2.displayWidgets()
+        default : break
+        }
+    }
+
+    func didAutoChange() -> Bool {
+        var ans = false
+ 
+        let w0 = windows[0].contentViewController as! ViewController
+        if w0.widget.didAutoChange() { ans = true }
+        
+        let w1 = windows[1].contentViewController as! WinColorViewController
+        if w1.widget.didAutoChange() { ans = true }
+
+        let w2 = windows[2].contentViewController as! WinLightViewController
+        if w2.widget.didAutoChange() { ans = true }
+        
+        return ans
+    }
+
+    //MARK: -
+
     func updateWindowWidgetFocus() { // so only widget list on the active window has the red colored highlight
         if focusIndex > windows.count-2 { return } // no widgets on last 2 windows
         
