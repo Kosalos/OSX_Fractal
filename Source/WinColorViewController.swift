@@ -160,7 +160,7 @@ class WinColorViewController: NSViewController, NSWindowDelegate, WidgetDelegate
     func widgetCallback(_ index:Int) {
         switch(index) {
         case 1 :
-            defineWidgets()
+            displayWidgets()
             vc.flagViewToRecalcFractal()
         case 98 :  // change color scheme
             vc.changeColorScheme()
